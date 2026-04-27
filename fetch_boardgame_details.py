@@ -50,7 +50,7 @@ def fetch_boardgame_details(boardgame_ids: list[str]) -> DataFrame:
             json_str = None
             while not json_str:
                 json_str = page.evaluate_js("() => JSON.stringify(window.GEEK?.geekitemPreload?.item ?? null)")
-                if not json_str:
+                if not json_str or json_str.lower() in ["null", "undefined", ""]:
                     if fail_count >= 5:
                         print(f"Failed to fetch details for boardgame ID {boardgame_id} after {fail_count} attempts, skipping...")
                         break
