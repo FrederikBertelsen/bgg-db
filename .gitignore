@@ -1,3 +1,15 @@
+/cookies/**
+/data/details/**
+/data/final/**
+/data/ranks/**
+/downloads/**
+
+!/cookies/.gitkeep
+!/data/details/.gitkeep
+!/data/final/.gitkeep
+!/data/ranks/.gitkeep
+!/downloads/.gitkeep
+
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,macos
 
