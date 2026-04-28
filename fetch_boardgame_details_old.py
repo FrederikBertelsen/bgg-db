@@ -13,7 +13,7 @@ from utils import get_today_date
 def fetch_boardgame_details(boardgame_ids: list[str]) -> DataFrame:
     bgg_username = os.getenv("BGG_USERNAME", None)
     bgg_password = os.getenv("BGG_PASSWORD", None)
-    wait_between_pages = int(os.getenv("WAIT_BETWEEN_PAGES", "1"))
+    wait_between_pages = int(os.getenv("WAIT_BETWEEN_PAGES", "2"))
 
     if not bgg_username or not bgg_password:
         print("BGG_USERNAME and BGG_PASSWORD must be set in the .env file")

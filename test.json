@@ -1,0 +1,598 @@
+[
+  {
+    "id": "342942",
+    "name": "Ark Nova",
+    "alternate_names": [
+      "Archa Nova",
+      "Arche Nova",
+      "Новий ковчег",
+      "นาวาสรรพสัตว์",
+      "アーク・ノヴァ 新たなる方舟",
+      "方舟动物园",
+      "方舟動物園",
+      "아크 노바"
+    ],
+    "year_published": "2021",
+    "short_description": "Plan and build a modern, scientifically managed zoo to support conservation projects.",
+    "description": "<p>In <em><strong>Ark Nova</strong></em>, you will plan and design a modern, scientifically managed zoo. With the ultimate goal of owning the most successful zoological establishment, you will build enclosures, accommodate animals, and support conservation projects all over the world. Specialists and unique buildings will help you in achieving this goal.</p>\\n\\n<p>Each player has a set of five action cards to manage their gameplay, and the power of an action is determined by the slot the card currently occupies. The cards in question are:</p>\\n\\n<ul>\\n <li>CARDS: Allows you to gain new zoo cards (animals, sponsors, and conservation project cards).</li>\\n <li>BUILD: Allows you to build standard or special enclosures, kiosks, and pavilions.</li>\\n <li>ANIMALS: Allows you to accommodate animals in your zoo.</li>\\n <li>ASSOCIATION: Allows your association workers to carry out different tasks.</li>\\n <li>SPONSORS: Allows you to play a sponsor card in your zoo or to raise money.</li>\\n</ul>\\n\\n<p>255 cards featuring animals, specialists, special enclosures, and conservation projects, each with a special ability, are at the heart of <em>Ark Nova</em>. Use them to increase the appeal and scientific reputation of your zoo and collect conservation points.</p>\\n\\n<p><em>&mdash;description from the publisher</em></p>\\n\\n",
+    "website_url": "https://www.feuerland-spiele.de/spiele/arche-nova/",
+    "thumbnail_url": "https://cf.geekdo-images.com/SoU8p28Sk1s8MSvoM4N8pQ__previewthumb/img/vJS50Sdz48YBUXhkMbOKvFCpyuE=/fit-in/300x320/filters:strip_icc()/pic6293412.jpg",
+    "image_url": "https://cf.geekdo-images.com/SoU8p28Sk1s8MSvoM4N8pQ__original/img/g4S18szTdrXCdIwVKzMKrZrYAcM=/0x0/filters:format(jpeg)/pic6293412.jpg",
+    "player_counts": {
+      "best": [
+        {
+          "min": 2,
+          "max": 2
+        }
+      ],
+      "recommended": [
+        {
+          "min": 1,
+          "max": 3
+        }
+      ],
+      "totalvotes": "2310"
+    },
+    "min_players": "1",
+    "max_players": "4",
+    "min_playtime": "90",
+    "max_playtime": "150",
+    "min_age": "14",
+    "weight": {
+      "averageweight": 3.797423510466989,
+      "votes": "3105"
+    },
+    "instructional_video_id": null,
+    "summary_video_id": "374481",
+    "playthrough_video_id": "426160",
+    "focus_video_id": null,
+    "howtoplay_video_id": null,
+    "has_danish_edition": false,
+    "categories": [
+      "Animals",
+      "Card Game",
+      "Environmental"
+    ],
+    "mechanics": [
+      "Contracts",
+      "End Game Bonuses",
+      "Events",
+      "Grid Coverage",
+      "Hand Management",
+      "Hexagon Grid"
+    ],
+    "honors": [
+      "2021 Golden Geek Best Solo Board Game Nominee",
+      "2021 Golden Geek Heavy Game of the Year Nominee",
+      "2021 Golden Geek Heavy Game of the Year Winner",
+      "2021 Meeples Choice Award Nominee",
+      "2021 Meeples Choice Award Winner",
+      "2022 Board Game Quest Awards Best Strategy/Euro Game Nominee"
+    ],
+    "credits": [
+      {
+        "role": "boardgame_designer",
+        "names": [
+          "Mathias Wigge"
+        ]
+      },
+      {
+        "role": "boardgame_artist",
+        "names": [
+          "Steffen Bieker",
+          "Loïc Billiau",
+          "Dennis Lohausen"
+        ]
+      },
+      {
+        "role": "boardgame_publisher",
+        "names": [
+          "Feuerland Spiele",
+          "Capstone Games",
+          "CMON Global Limited",
+          "Cranio Creations",
+          "Game Harbor",
+          "Gém Klub Kft."
+        ]
+      },
+      {
+        "role": "boardgame_graphic_designer",
+        "names": [
+          "Steffen Bieker",
+          "Christof Tisch"
+        ]
+      },
+      {
+        "role": "boardgame_editor",
+        "names": [
+          "Frank Heeren",
+          "Inga Keutmann",
+          "Nathan Morse",
+          "Bastian Winkelhaus"
+        ]
+      }
+    ],
+    "expansions": [
+      {
+        "id": "452698",
+        "name": "Ark Nova: 3D Colored Arcade Promo Building & Card",
+        "url": "https://boardgamegeek.com/boardgame/452698/ark-nova-3d-colored-arcade-promo-building-and-card"
+      },
+      {
+        "id": "450126",
+        "name": "Ark Nova: 3Dition",
+        "url": "https://boardgamegeek.com/boardgame/450126/ark-nova-3dition"
+      },
+      {
+        "id": "452699",
+        "name": "Ark Nova: Board Game Arena Maps",
+        "url": "https://boardgamegeek.com/boardgame/452699/ark-nova-board-game-arena-maps"
+      },
+      {
+        "id": "368966",
+        "name": "Ark Nova: Marine Worlds",
+        "url": "https://boardgamegeek.com/boardgame/368966/ark-nova-marine-worlds"
+      },
+      {
+        "id": "433207",
+        "name": "Ark Nova: Promotion Team & Capybara Promo Cards",
+        "url": "https://boardgamegeek.com/boardgame/433207/ark-nova-promotion-team-and-capybara-promo-cards"
+      },
+      {
+        "id": "368158",
+        "name": "Ark Nova: Zoo Map Pack 1",
+        "url": "https://boardgamegeek.com/boardgame/368158/ark-nova-zoo-map-pack-1"
+      }
+    ],
+    "reimplementation": [
+      {
+        "id": "441696",
+        "name": "Sanctuary",
+        "url": "https://boardgamegeek.com/boardgame/441696/sanctuary"
+      }
+    ],
+    "families": [
+      "Animals: Okapi",
+      "Components: Hexagonal Tiles",
+      "Continents: Africa",
+      "Continents: Asia",
+      "Continents: Europe",
+      "Continents: North America"
+    ],
+    "subdomains": [
+      "Strategy Games"
+    ],
+    "url": "https://boardgamegeek.com/boardgame/342942/ark-nova",
+    "ranks": [
+      {
+        "category": "Overall Rank",
+        "rank": "2",
+        "bayes_average_rank": "8.35494"
+      },
+      {
+        "category": "Strategy Rank",
+        "rank": "2",
+        "bayes_average_rank": "8.35488"
+      }
+    ],
+    "language_dependence": "Extensive use of text - massive conversion needed to be playable",
+    "rating_count": "60589",
+    "average_rating": "8.54086",
+    "bayes_average_rating": "8.35494",
+    "stddev_rating": "1.40388",
+    "average_weight": "3.7974",
+    "weighting_count": "3105",
+    "geeklist_count": "5278",
+    "trading_count": "449",
+    "wanting_count": "1065",
+    "wish_count": "17622",
+    "owned_count": "88258",
+    "prev_owned_count": "3960",
+    "comment_count": "8001",
+    "wishlist_comment_count": "1429",
+    "has_parts_count": "39",
+    "want_parts_count": "12",
+    "preorder_count": "340",
+    "want_to_play_count": "10935",
+    "want_to_buy_count": "5899",
+    "view_count": "6923453",
+    "play_count": "637774",
+    "play_count_last_month": "8561",
+    "fan_count": 8652,
+    "versions": [
+      {
+        "name": "English 2.1 edition",
+        "year_published": "2025",
+        "weight_kg": 0.0,
+        "width": 36.195,
+        "depth": 7.62,
+        "length": 29.845
+      },
+      {
+        "name": "English edition 2024",
+        "year_published": "2024",
+        "weight_kg": 0.0,
+        "width": 29.997400000000003,
+        "depth": 7.0104,
+        "length": 37.0078
+      },
+      {
+        "name": "German edition, eigth printing",
+        "year_published": "2024",
+        "weight_kg": 2.3999980529833,
+        "width": 29.99994,
+        "depth": 7.200011,
+        "length": 36.500054000000006
+      },
+      {
+        "name": "English edition 2023",
+        "year_published": "2023",
+        "weight_kg": 2.5000015627972,
+        "width": 29.99994,
+        "depth": 7.0000114,
+        "length": 36.999926
+      },
+      {
+        "name": "German edition, seventh printing",
+        "year_published": "2023",
+        "weight_kg": 0.0,
+        "width": 29.99994,
+        "depth": 7.0000114,
+        "length": 36.500054000000006
+      },
+      {
+        "name": "Hungarian second edition",
+        "year_published": "2023",
+        "weight_kg": 2.4400003640936,
+        "width": 29.99994,
+        "depth": 7.200011,
+        "length": 36.500054000000006
+      },
+      {
+        "name": "Portuguese edition",
+        "year_published": "2023",
+        "weight_kg": 0.0,
+        "width": 0.0,
+        "depth": 0.0,
+        "length": 0.0
+      },
+      {
+        "name": "Serbian edition",
+        "year_published": "2023",
+        "weight_kg": 0.0,
+        "width": 29.99994,
+        "depth": 7.0000114,
+        "length": 36.999926
+      },
+      {
+        "name": "Thai edition",
+        "year_published": "2023",
+        "weight_kg": 2.4500020758521,
+        "width": 36.500054000000006,
+        "depth": 7.3000108,
+        "length": 29.99994
+      },
+      {
+        "name": "Ukrainian edition",
+        "year_published": "2023",
+        "weight_kg": 0.0,
+        "width": 0.0,
+        "depth": 0.0,
+        "length": 0.0
+      },
+      {
+        "name": "Czech edition",
+        "year_published": "2022",
+        "weight_kg": 2.4879995086870004,
+        "width": 29.99994,
+        "depth": 7.3000108,
+        "length": 36.500054000000006
+      },
+      {
+        "name": "Dutch edition",
+        "year_published": "2022",
+        "weight_kg": 2.4400003640936,
+        "width": 29.99994,
+        "depth": 7.0000114,
+        "length": 36.999926
+      },
+      {
+        "name": "English edition, fifth printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 29.997400000000003,
+        "depth": 7.0104,
+        "length": 37.0078
+      },
+      {
+        "name": "English edition, first printing",
+        "year_published": "2022",
+        "weight_kg": 2.4947580350000003,
+        "width": 29.99994,
+        "depth": 7.0000114,
+        "length": 36.999926
+      },
+      {
+        "name": "English edition, fourth printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 29.997400000000003,
+        "depth": 7.0104,
+        "length": 37.0078
+      },
+      {
+        "name": "English edition, second printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 29.997400000000003,
+        "depth": 7.0104,
+        "length": 37.0078
+      },
+      {
+        "name": "English edition, seventh printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 29.997400000000003,
+        "depth": 7.0104,
+        "length": 37.0078
+      },
+      {
+        "name": "English edition, sixth printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 29.997400000000003,
+        "depth": 7.0104,
+        "length": 37.0078
+      },
+      {
+        "name": "English edition, third printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 0.0,
+        "depth": 0.0,
+        "length": 0.0
+      },
+      {
+        "name": "Finnish edition",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 0.0,
+        "depth": 0.0,
+        "length": 0.0
+      },
+      {
+        "name": "French edition",
+        "year_published": "2022",
+        "weight_kg": 2.2679618500000003,
+        "width": 29.99994,
+        "depth": 7.0000114,
+        "length": 36.999926
+      },
+      {
+        "name": "German edition, fifth printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 36.500054000000006,
+        "depth": 7.0000114,
+        "length": 29.99994
+      },
+      {
+        "name": "German edition, fourth printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 36.500054000000006,
+        "depth": 7.0000114,
+        "length": 29.99994
+      },
+      {
+        "name": "German edition, second printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 0.0,
+        "depth": 0.0,
+        "length": 0.0
+      },
+      {
+        "name": "German edition, sixth printing",
+        "year_published": "2022",
+        "weight_kg": 0.0,
+        "width": 36.500054000000006,
+        "depth": 7.0000114,
+        "length": 29.99994
+      }
+    ],
+    "shopping": [
+      {
+        "seller": "Meeples Corner",
+        "seller_country": "UK",
+        "currency": "GBP",
+        "price": "49.95",
+        "product_url": "https://meeplescorner.co.uk/products/ark-nova-game?ref=board_game_geek",
+        "image_url": "https://cf.geekdo-images.com/PwNia_mSfHm9IVupkfl7dg__affiliatelogo/img/g6qIm1YynHoD6jOIffUfTlfLebE=/fit-in/0x22/filters:strip_icc()/pic9109799.png"
+      },
+      {
+        "seller": "BoardGameBliss",
+        "seller_country": "CA",
+        "currency": "CAD",
+        "price": "71.95",
+        "product_url": "https://www.boardgamebliss.com/products/ark-nova?sca_ref=5341062.XFyYNsxlGR",
+        "image_url": "https://cf.geekdo-images.com/RJ-6Pg5P7_AffLXyI2iQEg__affiliatelogo/img/KamghUNQxuO7wCxrt2-CuOh7siE=/fit-in/0x22/filters:strip_icc()/pic7998396.png"
+      },
+      {
+        "seller": "K&B Hobbies and Games",
+        "seller_country": "CA",
+        "currency": "CAD",
+        "price": "84.99",
+        "product_url": "https://www.kbhobbies.com/product/ark-nova/53?category_id=T36KYI2GOGZARBK6I3II2R4V&cp=true&q=false&ref=BGG&sa=false&sbp=false",
+        "image_url": "https://cf.geekdo-images.com/T3HwQdX3hqF5vpYpblwkIA__affiliatelogo/img/PyIVm-mRkynAaw6RHIXEWeU8C9k=/fit-in/0x22/filters:strip_icc()/pic8635415.png"
+      },
+      {
+        "seller": "Usedgames.ca",
+        "seller_country": "CA",
+        "currency": "CAD",
+        "price": "179.95",
+        "product_url": "https://www.usedgames.ca/ark-nova-2021-bundle-base-game-marine-worlds-3x-pl.html?source=bgg",
+        "image_url": "https://cf.geekdo-images.com/EukfdFYyedVZHoTc5FXsOg__affiliatelogo/img/aSDu75qHcKgc1QYIv7c4mHbOUXM=/fit-in/0x22/filters:strip_icc()/pic9254294.png"
+      },
+      {
+        "seller": "Spiele-Offensive.de",
+        "seller_country": "DE",
+        "currency": "EUR",
+        "price": "49.99",
+        "product_url": "https://www.spiele-offensive.de/?cmd=artikel_anzeigen&aid=1027125&pid=4991&bid=1027125",
+        "image_url": "https://cf.geekdo-images.com/2NfBQ2H__eLkHLZIp4JryA__affiliatelogo/img/Z95S-ihiLprRFMfA4xwlDHeM2Yk=/fit-in/0x22/filters:strip_icc()/pic8521029.png"
+      },
+      {
+        "seller": "Dryad Games",
+        "seller_country": "US",
+        "currency": "USD",
+        "price": "59.47",
+        "product_url": "https://dryad-games.com/shop/ark-nova/aff/2/",
+        "image_url": "https://cf.geekdo-images.com/Kc6Ru44-wTMNCvjp5P0HJw__affiliatelogo/img/5O6SV_cemmthdd_BufQQyHQpraM=/fit-in/0x22/filters:strip_icc()/pic8575752.jpg"
+      },
+      {
+        "seller": "Game Summon",
+        "seller_country": "UK",
+        "currency": "GBP",
+        "price": "57.80",
+        "product_url": "https://gamesummon.co.uk/ark-nova/?utm_source=bgg",
+        "image_url": "https://cf.geekdo-images.com/X1jzTjIxPJjMak4OpcwzSA__affiliatelogo/img/mlG6RSJzTWOLMqQkSMfzrCLAHwU=/fit-in/0x22/filters:strip_icc()/pic8925564.png"
+      },
+      {
+        "seller": "Philibert",
+        "seller_country": "FR",
+        "currency": "EUR",
+        "price": "69.90",
+        "product_url": "https://www.philibertnet.com/fr/super-meeple/105162-ark-nova-3770023051064.html?ae=913",
+        "image_url": "https://cf.geekdo-images.com/VMl0laWYMmoYrJuN-ryPTw__affiliatelogo/img/kUKOohRwVrBG7wD5mkXzvTyz21g=/fit-in/0x22/filters:strip_icc()/pic7977460.png"
+      },
+      {
+        "seller": "Collector Store LLC",
+        "seller_country": "US",
+        "currency": "USD",
+        "price": "59.99",
+        "product_url": "https://collectorstore.com/products/ark-nova?utm_source=bgg&utm_campaign=pay&utm_medium=link",
+        "image_url": "https://cf.geekdo-images.com/MwzzldsekRgfMbPgiEZn0g__affiliatelogo/img/jWTe7CcqjiYGTe5rMDiwfJadPgQ=/fit-in/0x22/filters:strip_icc()/pic8969178.png"
+      },
+      {
+        "seller": "Zulu's Board Game Cafe",
+        "seller_country": "US",
+        "currency": "USD",
+        "price": "74.99",
+        "product_url": "https://zulusgames.com/products/ark-nova?bg_ref=qDC5LicUAs",
+        "image_url": "https://cf.geekdo-images.com/z69lYrv-ab0MkEKIDmOHsA__affiliatelogo/img/oM4xucl2mNytgFZaCHM5OiEQoq8=/fit-in/0x22/filters:strip_icc()/pic7794914.png"
+      },
+      {
+        "seller": "WellPlayed",
+        "seller_country": "CH",
+        "currency": "CHF",
+        "price": "65.00",
+        "product_url": "https://www.wellplayed.ch/products/arche-nova-de?sca_ref=5998042.MFgNkAevzh",
+        "image_url": "https://cf.geekdo-images.com/5C1WupwC11_Dg9LNZi0fKw__affiliatelogo/img/pFUOmtbVFTun6lwezYZUogsubEo=/fit-in/0x22/filters:strip_icc()/pic7802990.jpg"
+      },
+      {
+        "seller": "Zatu Games",
+        "seller_country": "UK",
+        "currency": "GBP",
+        "price": "46.49",
+        "product_url": "https://www.board-game.co.uk/product/ark-nova/?utm_source=boardgamegeek&utm_medium=referral&utm_campaign=product&utm_term=342942",
+        "image_url": "https://cf.geekdo-images.com/S1vbk1pVG1oltyeYAXL4Pg__affiliatelogo/img/9Q53TCdjax0aqPu8p-Tz96gfU-o=/fit-in/0x22/filters:strip_icc()/pic7505443.jpg"
+      },
+      {
+        "seller": "Noble Knight Games",
+        "seller_country": "US",
+        "currency": "USD",
+        "price": "50.00",
+        "product_url": "https://www.nobleknight.com/P/2147955535/Ark-Nova-2nd-Printing?UTM_Campaign=BGG_Shop_Now&awid=1292",
+        "image_url": "https://cf.geekdo-images.com/ICeG7h9NvKUB2TVE01stSQ__affiliatelogo/img/lIxq0R9eyHlSxU4V3BLKyp2RFkY=/fit-in/0x22/filters:strip_icc()/pic7142767.png"
+      }
+    ],
+    "player_count_poll": {
+      "1": [
+        {
+          "votes": "217",
+          "recommendation": "Best",
+          "vote_percent": 14.593140551445863
+        },
+        {
+          "votes": "970",
+          "recommendation": "Recommended",
+          "vote_percent": 65.2320107599193
+        },
+        {
+          "votes": "300",
+          "recommendation": "Not Recommended",
+          "vote_percent": 20.174848688634835
+        }
+      ],
+      "2": [
+        {
+          "votes": "1505",
+          "recommendation": "Best",
+          "vote_percent": 70.85687382297552
+        },
+        {
+          "votes": "574",
+          "recommendation": "Recommended",
+          "vote_percent": 27.024482109227872
+        },
+        {
+          "votes": "45",
+          "recommendation": "Not Recommended",
+          "vote_percent": 2.11864406779661
+        }
+      ],
+      "3": [
+        {
+          "votes": "655",
+          "recommendation": "Best",
+          "vote_percent": 34.76645435244161
+        },
+        {
+          "votes": "1054",
+          "recommendation": "Recommended",
+          "vote_percent": 55.9447983014862
+        },
+        {
+          "votes": "175",
+          "recommendation": "Not Recommended",
+          "vote_percent": 9.288747346072187
+        }
+      ],
+      "4": [
+        {
+          "votes": "109",
+          "recommendation": "Best",
+          "vote_percent": 6.11672278338945
+        },
+        {
+          "votes": "652",
+          "recommendation": "Recommended",
+          "vote_percent": 36.58810325476992
+        },
+        {
+          "votes": "1021",
+          "recommendation": "Not Recommended",
+          "vote_percent": 57.29517396184063
+        }
+      ],
+      "5": [
+        {
+          "votes": "4",
+          "recommendation": "Best",
+          "vote_percent": 0.34071550255536626
+        },
+        {
+          "votes": "8",
+          "recommendation": "Recommended",
+          "vote_percent": 0.6814310051107325
+        },
+        {
+          "votes": "1162",
+          "recommendation": "Not Recommended",
+          "vote_percent": 98.9778534923339
+        }
+      ]
+    }
+  }
+]
