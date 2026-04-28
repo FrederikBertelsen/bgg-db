@@ -7,11 +7,14 @@ ssh -i /Users/frederik/.ssh/id_local_machine root@192.168.1.50
 
 ### Create Tmux Session
 
-#### START SCRAPE
+#### START SCRAPE [WITH SCREEN]
 ```shell
 ssh -i /Users/frederik/.ssh/id_local_machine -t root@192.168.1.50 "tmux new-session -d -s bgg; tmux send-keys -t bgg 'cd /root/bgg-db && xvfb-run -a --server-args=\"-screen 0 1920x1080x24 -ac\" python3 main.py' C-m; tmux attach -t bgg"
 ```
-
+#### START SCRAPE
+```shell
+ssh -i /Users/frederik/.ssh/id_local_machine -t root@192.168.1.50 "tmux new-session -d -s bgg; tmux send-keys -t bgg 'cd /root/bgg-db && python3 main.py' C-m; tmux attach -t bgg"
+```
 
 ### Connect to Tmux Session
 ```shell
@@ -21,7 +24,7 @@ ssh -i /Users/frederik/.ssh/id_local_machine -t root@192.168.1.50 'tmux attach -
 # Sync
 ### Push to Linux server
 ```shell
-git add --all && git commit -m "update" && git push
+DONT USE git add --all && git commit -m "update" && git push
 ssh -i /Users/frederik/.ssh/id_local_machine -t root@192.168.1.50 'cd /root/bgg-db; git pull'
 ```
 
