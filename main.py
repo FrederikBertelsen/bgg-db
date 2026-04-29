@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 import pandas as pd
 
-from old.extract_details_from_json_column import extract_details_from_json_column
+from extract_details_from_json import extract_details_from_json_column
 from old.fetch_boardgame_details_old_2 import fetch_boardgame_details
 from rankings_dump import filter_rankings, fetch_rankings_dump
 from fetch_boardgame_details import pull_bgg_json_data

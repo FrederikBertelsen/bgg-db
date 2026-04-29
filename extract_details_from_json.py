@@ -83,10 +83,10 @@ def extract_details(json_data: dict) -> dict:
         "playthrough_video_id": json_data.get("playthrough_videoid"),
         "focus_video_id": json_data.get("focus_videoid"),
         "howtoplay_video_id": json_data.get("howtoplay_videoid"),
-        "has_danish_edition": any(
-            "danish" in version.get("name", "").lower()
-            for version in json_data.get("links", {}).get("boardgameversion", [])
-        ),
+        # "has_danish_edition": any(
+        #     "danish" in version.get("name", "").lower()
+        #     for version in json_data.get("links", {}).get("boardgameversion", [])
+        # ),
         "categories": [category.get("name") for category in json_data.get("links", {}).get("boardgamecategory", [])],
         "mechanics": [mechanic.get("name") for mechanic in json_data.get("links", {}).get("boardgamemechanic", [])],
         "honors": [honor.get("name") for honor in json_data.get("links", {}).get("boardgamehonor", [])],
