@@ -79,9 +79,9 @@ def filter_rankings(df_ranks: pd.DataFrame) -> pd.DataFrame:
 
 
     df_ranks = df_ranks[
-        (df_ranks['usersrated'] >= 2000) & 
+        (df_ranks['usersrated'] >= 100) & 
         # (df_ranks['yearpublished'] >= 1990) & 
-        (df_ranks['yearpublished'] >= 2025) &
+        # (df_ranks['yearpublished'] >= 2025) &
         (df_ranks['is_expansion'] == False)
     ]
 

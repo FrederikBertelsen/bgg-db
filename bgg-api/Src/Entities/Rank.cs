@@ -10,9 +10,9 @@ public class Rank
 
     public int Placement { get; set; }
 
-    public double? BayesAverage { get; set; }
+    public float? BayesAverage { get; set; }
 
-    public int BoardGameId { get; set; }
+    public required int BoardGameId { get; set; }
     public BoardGame? BoardGame { get; set; }
 
 }

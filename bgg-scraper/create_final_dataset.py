@@ -61,46 +61,78 @@ def add_price_conversions(shopping: list[dict]) -> list[dict]:
 
 def add_estimated_volume_and_weight(versions: list[dict]) -> tuple[float, float]:
     """Estimate average volume (cm^3) and weight (kg) by grouping versions
-    with similar dimensions using simple rounding bins.
-
-    This is a compact, readable approximation. Rounds dimensions to the
-    nearest 0.5 cm (change `mult` to tune tolerance).
+    with similar dimensions
     """
-    if not versions:
-        return 0.0, 0.0
+    if not isinstance(versions, list) or not versions:
+        return (0.0, 0.0)
 
-    # Build a small DataFrame for numeric operations
-    try:
-        df = pd.DataFrame(versions)
-    except Exception:
-        return 0.0, 0.0
+    vols = []
+    weights = []
+    for v in versions:
+        if not isinstance(v, dict):
+            continue
+        try:
+            l = float(v.get('length') or 0)
+            w = float(v.get('width') or 0)
+            d = float(v.get('depth') or 0)
+        except Exception:
+            l = w = d = 0.0
+        try:
+            weight = float(v.get('weight_kg') or 0)
+        except Exception:
+            weight = 0.0
 
-    for col in ('width', 'depth', 'length', 'weight_kg'):
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors='coerce')
+        if l > 0 and w > 0 and d > 0:
+            vols.append({'l': l, 'w': w, 'd': d, 'vol': l * w * d, 'weight': weight if weight > 0 else None})
+        elif weight > 0:
+            weights.append(weight)
+
+    if not vols and not weights:
+        return (0.0, 0.0)
+
+    if vols:
+        # cluster by proximity within tolerance (3 inches = 7.62 cm)
+        tol_cm = 3.0 * 2.54
+        groups = []  # list of lists of entries
+        reps = []    # representative (l,w,d) for each group
+        for e in vols:
+            assigned = False
+            for i, rep in enumerate(reps):
+                dist = math.sqrt((e['l'] - rep[0])**2 + (e['w'] - rep[1])**2 + (e['d'] - rep[2])**2)
+                if dist <= tol_cm:
+                    groups[i].append(e)
+                    grp = groups[i]
+                    reps[i] = (sum(x['l'] for x in grp)/len(grp), sum(x['w'] for x in grp)/len(grp), sum(x['d'] for x in grp)/len(grp))
+                    assigned = True
+                    break
+            if not assigned:
+                groups.append([e])
+                reps.append((e['l'], e['w'], e['d']))
+
+        best = max(groups, key=len)
+        mean_l = sum(x['l'] for x in best) / len(best)
+        mean_w = sum(x['w'] for x in best) / len(best)
+        mean_d = sum(x['d'] for x in best) / len(best)
+        mean_vol = sum(x['vol'] for x in best) / len(best)
+        group_weights = [x['weight'] for x in best if x.get('weight')]
+        if group_weights:
+            mean_weight = sum(group_weights) / len(group_weights)
+        elif weights:
+            mean_weight = sum(weights) / len(weights)
         else:
-            df[col] = pd.NA
+            ratios = [x['weight'] / x['vol'] for x in vols if x.get('weight')]
+            mean_weight = (mean_vol * (sum(ratios) / len(ratios))) if ratios else 0.0
 
-    df = df.dropna(subset=['width', 'depth', 'length'])
-    df = df[(df[['width', 'depth', 'length']] > 0).all(axis=1)]
-    if df.empty:
-        return 0.0, 0.0
+        # print chosen group dims and calculations for verification
+        # print(f"Chosen group dims (LxWxD): {mean_l:.2f} x {mean_w:.2f} x {mean_d:.2f} (cm)")
+        # print(f"Group size: {len(best)}. Estimated volume_cm3: {mean_vol:.2f}. Estimated weight_kg: {mean_weight:.2f}")
 
-    mult = 2  # 0.5 cm bins
-    df['w_r'] = (df['width'] * mult).round() / mult
-    df['d_r'] = (df['depth'] * mult).round() / mult
-    df['l_r'] = (df['length'] * mult).round() / mult
+        return (round(mean_vol, 2), round(mean_weight, 2))
 
-    grp = df.groupby(['w_r', 'd_r', 'l_r'])
-    largest_key = grp.size().idxmax()
-    g = grp.get_group(largest_key)
-
-    avg_volume = ((g['width'] * 2.54) * (g['depth'] * 2.54) * (g['length'] * 2.54)).mean()
-    weights = g['weight_kg']
-    avg_weight = weights[weights > 0].mean() if (weights > 0).any() else 0.0
-
-    return float(avg_volume), float(avg_weight)
-        
+    # only weights available
+    mean_wt = sum(weights) / len(weights)
+    print(f"No dimensions available — using weight-only mean: {mean_wt:.2f} kg")
+    return (0.0, round(mean_wt, 2))
 
 
 def player_count_poll_to_scores(player_count_poll: dict) -> dict:
@@ -110,7 +142,7 @@ def player_count_poll_to_scores(player_count_poll: dict) -> dict:
     more featureful `player_count_poll_to_stats` helper.
     """
     stats = player_count_poll_to_stats(player_count_poll)
-    return {pc: s.get('score', 0.0) for pc, s in stats.items()}
+    return {pc: round(s.get('score', 0.0), 2) for pc, s in stats.items()}
 
 
 def player_count_poll_to_stats(player_count_poll: dict) -> dict:
@@ -196,15 +228,30 @@ def player_count_poll_to_stats(player_count_poll: dict) -> dict:
 def create_final_dataset(json_data: list[dict]) -> pd.DataFrame:
     df_details = pd.DataFrame(json_data)
 
-    df_details['types'] = df_details['ranks'].apply(lambda ranks: [r.get('category').replace('Rank', '').strip() for r in (ranks or []) if r.get('category') and r.get('category') != 'Overall Rank'])
+    # remove "rank" from rank categories
+    df_details['ranks'] = df_details['ranks'].apply(lambda ranks: [{'category': r.get('category', '').replace('Rank', '').strip(), 'rank': r.get('rank'), 'bayes_average': r.get('bayes_average')} for r in (ranks or []) if r.get('category')])
+    df_details['types'] = df_details['ranks'].apply(lambda ranks: [r.get('category') for r in (ranks or []) if r.get('category') and r.get('category') != 'Overall'])
+    
     df_details['weight_votes'] = df_details['weight'].apply(lambda w: w.get('votes', 0) if isinstance(w, dict) else 0)
-    df_details['weight_average'] = df_details['weight'].apply(lambda w: w.get('averageweight', None) if isinstance(w, dict) else None)
+    df_details['weight_average'] = df_details['weight'].apply(lambda w: round(w.get('averageweight', 0.0), 2) if isinstance(w, dict) else None)
+    
     # df_details['Crowdfunded'] = df_details['families'].apply(lambda cats: any('crowdfund' in str(c).lower() for c in (cats or [])))
+    
     df_details['shopping'] = df_details['shopping'].apply(add_price_conversions)
     df_details[['estimated_volume_cm3', 'estimated_weight_kg']] = df_details['versions'].apply(lambda v: pd.Series(add_estimated_volume_and_weight(v)))
-    df_details['player_count_scores'] = df_details['player_count_poll'].apply(player_count_poll_to_scores)
-    df_details['player_count_stats'] = df_details['player_count_poll'].apply(player_count_poll_to_stats)
     
+    df_details['player_count_scores'] = df_details['player_count_poll'].apply(player_count_poll_to_scores)
+    # df_details['player_count_stats'] = df_details['player_count_poll'].apply(player_count_poll_to_stats)
+    df_details['PlayerCountBestMin'] = df_details['player_counts'].apply(lambda pc: pc.get('best', [{}])[0].get('min') if isinstance(pc, dict) else None)
+    df_details['PlayerCountBestMax'] = df_details['player_counts'].apply(lambda pc: pc.get('best', [{}])[0].get('max') if isinstance(pc, dict) else None)
+    df_details['PlayerCountRecommendedMin'] = df_details['player_counts'].apply(lambda pc: pc.get('recommended', [{}])[0].get('min') if isinstance(pc, dict) else None)
+    df_details['PlayerCountRecommendedMax'] = df_details['player_counts'].apply(lambda pc: pc.get('recommended', [{}])[0].get('max') if isinstance(pc, dict) else None)
+    df_details['PlayerCountVotes'] = df_details['player_counts'].apply(lambda pc: int(pc.get('total_votes', 0)) if isinstance(pc, dict) else 0)
+
+    # remove unwanted columns
+    columns_to_drop = ['player_counts', 'weight', 'player_count_poll']
+    df_details = df_details.drop(columns=columns_to_drop, errors='ignore')
+
     return df_details
 
 if __name__ == "__main__":

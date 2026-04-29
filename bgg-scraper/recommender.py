@@ -138,9 +138,6 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
     """
     if weights is None:
         weights = {"cat": 0.3, "mech": 0.4, "rating": 0.2, "weight": 0.1}
-    # treat `types` the same as `categories` by default
-    if 'types' not in weights:
-        weights['types'] = weights.get('cat', 0)
 
     seed_df = df[df['id'] == game_id]
     if seed_df.shape[0] == 0:
@@ -150,18 +147,11 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
     cands = df[df['id'] != game_id].copy()
 
     seed_cats = set(_ensure_list(seed.get('categories', [])))
-    seed_types = set(_ensure_list(seed.get('types', [])))
     seed_mech = set(_ensure_list(seed.get('mechanics', [])))
     seed_weight = _extract_weight(seed.get('weight', None)) or seed.get('average_weight')
 
-    # categories, types and mechanics similarity (0..1)
+    # categories and mechanics similarity (0..1)
     cats_sim = cands['categories'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_cats))
-    # types similarity (same treatment as categories)
-    if 'types' in cands.columns:
-        types_sim = cands['types'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_types))
-    else:
-        types_sim = pd.Series(0.0, index=cands.index)
-
     # mechanics similarity: use weighted Jaccard with precomputed mechanic importances
     mech_weights = load_or_compute_mechanic_importances(df, path='data/mechanic_importances.csv')
     mech_sim = cands['mechanics'].apply(lambda x: weighted_jaccard(seed_mech, set(_ensure_list(x)), mech_weights))
@@ -187,7 +177,6 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
 
     score = (
         weights.get('cat', 0) * cats_sim
-        + weights.get('types', 0) * types_sim
         + weights.get('mech', 0) * mech_sim
         + weights.get('rating', 0) * rating_sim_series
         + weights.get('weight', 0) * weight_sim_series
@@ -201,7 +190,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         results = out.sort_values('score', ascending=False).head(k).copy()
         rows = []
         for _, row in results.iterrows():
-            overall_rank = next((r.get('rank') for r in (row.get('ranks') or []) if r.get('category') == 'Overall Rank'), None)
+            overall_rank = next((r.get('rank') for r in (row.get('ranks') or []) if r.get('category') == 'Overall'), None)
             rows.append({
                 'name': row.get('name', ''),
                 'score': f"{row.get('score', 0):.3f}",

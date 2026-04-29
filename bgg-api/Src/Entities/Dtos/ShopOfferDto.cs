@@ -6,6 +6,6 @@ public record ShopOfferDto
     string Country,
     string ProductUrl,
     string ImageUrl,
-    decimal PriceUSD,
-    decimal PriceDKK
+    float PriceUSD,
+    float PriceDKK
 );
