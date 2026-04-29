@@ -1,219 +1,373 @@
-from datetime import date
-import json
+#!/usr/bin/env python3
 import os
+import sys
 import re
-
+import json
+from time import sleep
+import time
+import cloudscraper
 from dotenv import load_dotenv
-from pandas import DataFrame
-import pandas as pd
-from web_automator import BrowserWrapper, DataCollector, PageWrapper
+import traceback
 
-from utils import get_today_date
+from old.extract_details_from_json_column import extract_details
+from utils import fetch_json, get_today_date
 
-def pull_json_from_page(page: PageWrapper) -> dict | None:
-    """Attempt to pull the boardgame JSON from the page using multiple strategies."""
+# File to persist failed boardgame IDs so they can be retried later
+FAILED_IDS_FILE = "data/failed_ids.json"
+
+def _ensure_failed_ids_dir():
+    dirpath = os.path.dirname(FAILED_IDS_FILE)
+    if dirpath and not os.path.exists(dirpath):
+        os.makedirs(dirpath, exist_ok=True)
+
+def load_failed_ids() -> set:
+    _ensure_failed_ids_dir()
     try:
-        json_str = page.evaluate_js("() => JSON.stringify(window.GEEK?.geekitemPreload?.item ?? null)")
-        s = json_str.strip() if isinstance(json_str, str) else ""
-        if s and s.lower() not in ("null", "undefined", ""):
-            try:
-                parsed = json.loads(s)
-                if isinstance(parsed, dict):
-                    return parsed
-            except Exception:
-                pass
+        if os.path.exists(FAILED_IDS_FILE):
+            with open(FAILED_IDS_FILE, "r", encoding="utf-8") as fh:
+                data = json.load(fh)
+                if isinstance(data, list):
+                    return set(str(x) for x in data)
     except Exception:
         pass
+    return set()
+
+def save_failed_ids(failed_ids: set) -> None:
+    _ensure_failed_ids_dir()
+    try:
+        with open(FAILED_IDS_FILE, "w", encoding="utf-8") as fh:
+            json.dump(sorted(list(failed_ids)), fh, ensure_ascii=False, indent=2)
+    except Exception as exc:
+        print(f"Warning: failed to save failed IDs file: {exc}")
+
+def add_failed_id(failed_ids: set, boardgame_id: str) -> None:
+    if boardgame_id not in failed_ids:
+        failed_ids.add(boardgame_id)
+        save_failed_ids(failed_ids)
+
+def remove_failed_id(failed_ids: set, boardgame_id: str) -> None:
+    if boardgame_id in failed_ids:
+        failed_ids.discard(boardgame_id)
+        save_failed_ids(failed_ids)
+
+
+def pull_geek_item_preload_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> dict | None:
+    url = f"https://boardgamegeek.com/boardgame/{boardgame_id}"
+
+    line_re = re.compile(r"\s*GEEK\.geekitemPreload = (.*}});\s*$", re.MULTILINE)
+    
+    json_data = fetch_json(scraper, url, line_re)
+    if json_data:
+        if "item" in json_data:
+            return json_data.get("item", {})
+        else:
+            print(f"Fetched JSON does not contain 'item' key for boardgame ID {boardgame_id}.")
+            return None
+    
+    print(f"Failed to fetch or parse geekitemPreload JSON for boardgame ID {boardgame_id}.")
+    return None
+
+def pull_versions_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> list[dict] | None:
+    versions_url = f"https://api.geekdo.com/api/geekitem/linkeditems?ajax=1&linkdata_index=boardgameversion&nosession=1&objectid={boardgame_id}&objecttype=thing&pageid=1&showcount=25&sort=yearpublished&subtype=boardgameversion"
+
+    versions_json = fetch_json(scraper, versions_url)
+    if not versions_json:
+        print(f"Failed to fetch or parse version JSON for boardgame ID {boardgame_id}.")
+        return None
+    
+    processed_versions: list[dict] = []
+    try:
+        items = versions_json.get("items", [])
+        if not isinstance(items, list):
+            print(f"Unexpected format for versions JSON for boardgame ID {boardgame_id}: 'linkeditems' is not a list.")
+            return None
+
+        for version in items:
+            name = version.get("versionname")
+            year_published = version.get("yearpublished")
+
+            weight_kg = version.get("weight")
+            width = version.get("width")
+            depth = version.get("depth")
+            length = version.get("length")
+
+            processed_versions.append({
+                "name": name,
+                "year_published": year_published,
+                "weight_kg": float(weight_kg) * 0.45359237 if weight_kg else None,
+                "width": float(width) * 2.54 if width else None,
+                "depth": float(depth) * 2.54 if depth else None,
+                "length": float(length) * 2.54 if length else None,
+            })
+
+        # print(f"Fetched {len(processed_versions)} versions")
+        return processed_versions
+    except Exception as exc:
+        print(f"Exception while processing version JSON for boardgame ID {boardgame_id}: {exc}")
+        traceback.print_exc()
+        return None
+    
+def pull_shopping_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> list[dict] | None:
+    shopping_url = f"https://api.geekdo.com/api/affiliateads?context=gamemarketplace&objectid={boardgame_id}&objecttype=thing&previewid=0"
+
+    shopping_json = fetch_json(scraper, shopping_url)
+    if not shopping_json:
+        print(f"Failed to fetch or parse shopping JSON for boardgame ID {boardgame_id}.")
+        return None
+
+    sellers = []
+    try:
+        shopping_data = shopping_json.get("affiliate_ads", [])
+        if isinstance(shopping_data, list):
+            for ad in shopping_data:
+                seller = ad.get("advertiser").get("name")
+                seller_country = ad.get("advertiser").get("country")
+                currency = ad.get("currency")
+                price = ad.get("price")
+                product_url = ad.get("url")
+                image_url = ad.get("advertiser").get("imageSets").get("affiliatelogo").get("src")
+
+                sellers.append({
+                    "seller": seller,
+                    "seller_country": seller_country,
+                    "currency": currency,
+                    "price": price,
+                    "product_url": product_url,
+                    "image_url": image_url,
+                })
+            # print(f"Fetched {len(sellers)} sellers")
+            return sellers
+        else:
+            print(f"Unexpected format for shopping JSON for boardgame ID {boardgame_id}: 'affiliateads' is not a list.")
+            return None
+    except Exception as exc:
+        print(f"Exception while processing shopping JSON for boardgame ID {boardgame_id}: {exc}")
+        traceback.print_exc()
+        return None
+
+def pull_player_count_poll_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> dict | None:
+    try:
+        poll_url = f"https://boardgamegeek.com/geekitempoll.php?action=view&itempolltype=numplayers&objectid={boardgame_id}&objecttype=thing&ajax=1"
+        headers = {
+            "accept": "application/json, text/plain, /",
+            "referer": f"https://boardgamegeek.com/boardgame/{boardgame_id}",
+        }
+        poll_data = fetch_json(scraper, poll_url, headers=headers)
+
+        if not poll_data or "poll" not in poll_data:
+            print(f"Failed to fetch or parse player count poll JSON for boardgame ID {boardgame_id}.")
+            return None
+        
+        poll_id = poll_data["poll"]["pollid"]
+
+        poll_results_url = f"https://boardgamegeek.com/geekpoll.php?action=results&pollid={poll_id}"
+        poll_results_data = fetch_json(scraper, poll_results_url, headers=headers)
+        if not poll_results_data or "pollquestions" not in poll_results_data:
+            print(f"Failed to fetch or parse player count poll results JSON for boardgame ID {boardgame_id}.")
+            return None
+        
+        poll_questions = poll_results_data["pollquestions"]
+
+        results = [
+            dict(result)
+            for result in poll_questions[0]["results"]["results"]
+            if result.get("votes", "0") != "0"
+        ]
+
+        player_count_dict = {}
+
+        for result in results:
+            num_players = result.get("rowbody")
+            votes = result.get("votes")
+            recommendation = result.get("columnbody")
+            vote_percent = result.get("percent")
+
+            # accumulate multiple entries for the same player count
+            entry = {
+                "votes": votes,
+                "recommendation": recommendation,
+                "vote_percent": vote_percent,
+            }
+            if num_players is None:
+                print(f"Warning: Missing num_players in poll result for boardgame ID {boardgame_id}: {result}")
+                continue
+
+            player_count_dict.setdefault(num_players, []).append(entry)
+
+        # print(f"Fetched poll data for {len(player_count_dict)} player counts")
+        return player_count_dict
+    except Exception as exc:
+        print(f"Failed to fetch or parse player count poll JSON for boardgame ID {boardgame_id}: {exc}")
+        traceback.print_exc()
+        return None
+
+def pull_weight_poll_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> dict | None:
+    poll_url = f"https://boardgamegeek.com/geekitempoll.php?action=view&itempolltype=boardgameweight&objectid={boardgame_id}&objecttype=thing&ajax=1"
+    headers = {
+        "accept": "application/json, text/plain, /",
+        "referer": f"https://boardgamegeek.com/boardgame/{boardgame_id}",
+    }
+
+    try:
+        poll_data = fetch_json(scraper, poll_url, headers=headers)
+        if not poll_data or "poll" not in poll_data:
+            print(f"Failed to fetch or parse player count poll JSON for boardgame ID {boardgame_id}.")
+            return None
+        
+        poll_id = poll_data["poll"]["pollid"]
+
+        poll_results_url = f"https://boardgamegeek.com/geekpoll.php?action=results&pollid={poll_id}"
+        poll_results_data = fetch_json(scraper, poll_results_url, headers=headers)
+        if not poll_results_data or "pollquestions" not in poll_results_data:
+            print(f"Failed to fetch or parse player count poll results JSON for boardgame ID {boardgame_id}.")
+            return None
+        
+        poll_questions = poll_results_data["pollquestions"]
+        results = [
+            dict(result)
+            for result in poll_questions[0]["results"]["results"]
+            if result.get("votes", 0)
+        ]
+
+        weight_dict = {}
+        for result in results:
+            weight = result.get("columnbody")
+            weight_match = re.search(r"([\d.]+)", weight) if weight else None
+            weight = weight_match.group(1) if weight_match else None
+
+            votes = result.get("votes")
+            vote_percent = result.get("percent")
+
+            entry = {
+                "votes": votes,
+                "vote_percent": vote_percent,
+            }
+            if weight is None:
+                print(f"Warning: Missing weight in poll result for boardgame ID {boardgame_id}: {result}")
+                continue
+
+            weight_dict.setdefault(weight, []).append(entry)
+        
+        # print(f"Fetched poll data for {len(weight_dict)} weight categories")
+        return weight_dict
+        
+    except Exception as exc:
+        print(f"Failed to fetch or parse weight poll JSON for boardgame ID {boardgame_id}: {exc}")
+        traceback.print_exc()
+
 
     return None
 
-def reload_until_item_loaded(page: PageWrapper, browser: BrowserWrapper, url: str, wait_between_pages: int, max_attempts: int = 10, boardgame_id: str = "") -> tuple[dict | None, PageWrapper]:
-    """Try multiple strategies to load the page JSON and return (parsed_dict_or_None, page).
+def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
+    scraper = cloudscraper.create_scraper()
 
-    Strategies (in order): direct read, cache-busted navigation, hard reload,
-    occasional fresh page creation. Returns (dict, page) on success or (None, page) on failure.
-    """
-    if boardgame_id == "":
-        print("Warning: reload_until_item_loaded called without boardgame_id.")
+    WAIT_BETWEEN_PAGES = int(os.getenv("WAIT_BETWEEN_PAGES", "2"))
 
-    import time, random
-
-    for attempt in range(1, max_attempts + 1):
-        # 1) try direct read
-        parsed = pull_json_from_page(page)
-        if isinstance(parsed, dict):
-            return parsed, page
-
-        # 2) try cache-busted navigation
+    results = []
+    failed_ids = load_failed_ids()
+    total_ids = len(boardgame_ids)
+    start_time = time.time()
+    for i, boardgame_id in enumerate(boardgame_ids):
         try:
-            ts = int(time.time() * 1000)
-            cur = page.get_url() if hasattr(page, 'get_url') else url
-            ts_url = f"{cur}&_={ts}" if "?" in cur else f"{cur}?_={ts}"
-            page.goto(ts_url)
-            page.sleep(wait_between_pages)
-            page.wait_for_idle()
-        except Exception:
-            pass
-
-        parsed = pull_json_from_page(page)
-        if isinstance(parsed, dict):
-            return parsed, page
-
-        # 3) hard reload
-        try:
-            page.page.reload()
-            page.sleep(wait_between_pages)
-            page.wait_for_idle()
-        except Exception:
-            pass
-
-        parsed = pull_json_from_page(page)
-        if isinstance(parsed, dict):
-            return parsed, page
-
-        # 4) every few attempts, try a fresh page
-        if attempt % 4 == 0 and browser is not None:
+            # Simple time estimate (hours) based on average time per processed id
             try:
-                new_page = browser.new_page()
-                new_page.goto(url)
-                new_page.sleep(wait_between_pages)
-                new_page.wait_for_idle()
-                parsed = pull_json_from_page(new_page)
-                if isinstance(parsed, dict):
-                    try:
-                        page.close()
-                    except Exception:
-                        pass
-                    return parsed, new_page
+                completed = i
+                elapsed = time.time() - start_time
+                if completed > 0:
+                    avg_per_item = elapsed / completed
+                    remaining = max(0, total_ids - completed)
+                    est_seconds = avg_per_item * remaining
+                    est_hours = est_seconds / 3600
+                    est_str = f"{est_hours:.2f}h | {i + 1} -> {remaining}"
+                else:
+                    est_str = "estimating..."
+            except Exception:
+                est_str = "estimating..."
+
+            print(f"Fetching data for boardgame ID {boardgame_id} ( {est_str} )")
+
+            sleep(WAIT_BETWEEN_PAGES)
+            # print(f"Fetching geekitemPreload...")
+            preload_json = pull_geek_item_preload_json(scraper, boardgame_id)
+            
+            if preload_json:
+                # print("Cleaning and normalizing geekitemPreload data...")
+                cleaned_data = extract_details(preload_json)
+                
+                sleep(WAIT_BETWEEN_PAGES)
+                # print(f"Fetching versions data...")
+                version_data = pull_versions_json(scraper, boardgame_id)
+                if version_data:
+                    cleaned_data["versions"] = version_data
+
+                # sleep(WAIT_BETWEEN_PAGES)
+                # print(f"Fetching shopping data...")
+                shopping_data = pull_shopping_json(scraper, boardgame_id)
+                if shopping_data:
+                    cleaned_data["shopping"] = shopping_data
+                
+                sleep(WAIT_BETWEEN_PAGES)
+                # print(f"Fetching player count poll data...")
+                player_count_poll_data = pull_player_count_poll_json(scraper, boardgame_id)
+                if player_count_poll_data:
+                    cleaned_data["player_count_poll"] = player_count_poll_data
+                
+                # sleep(WAIT_BETWEEN_PAGES)
+                # print(f"Fetching weight poll data...")
+                # weight_poll_data = pull_weight_poll_json(scraper, boardgame_id)
+                # if weight_poll_data:
+                #     cleaned_data["weight_poll"] = weight_poll_data
+
+                results.append(cleaned_data)
+                # On success, ensure this id is not marked as failed
                 try:
-                    page.close()
+                    remove_failed_id(failed_ids, boardgame_id)
                 except Exception:
                     pass
-                page = new_page
+            else:
+                print(f"Failed to fetch or parse data for boardgame ID {boardgame_id}.")
+                try:
+                    add_failed_id(failed_ids, boardgame_id)
+                except Exception:
+                    pass
+        except Exception as exc:
+            print(f"Exception while fetching data for boardgame ID {boardgame_id}: {exc}")    
+            traceback.print_exc()
+            try:
+                add_failed_id(failed_ids, boardgame_id)
             except Exception:
                 pass
-
-        time.sleep(wait_between_pages + attempt * 0.2 + random.random() * 0.5)
-
-    return None, page
-
-
-def fetch_boardgame_details(boardgame_ids: list[str]) -> DataFrame:
-    bgg_username = os.getenv("BGG_USERNAME", None)
-    bgg_password = os.getenv("BGG_PASSWORD", None)
-    wait_between_pages = int(os.getenv("WAIT_BETWEEN_PAGES", "2"))
-
-    if not bgg_username or not bgg_password:
-        print("BGG_USERNAME and BGG_PASSWORD must be set in the .env file")
-        exit(1)
-
-    print("Fetching boardgame details...")
-
-
-    dc = DataCollector(print_on_flush=True, print_columns=["id"])
-    
-    dc.set_field("fetch_date", get_today_date())
-    dc.set_current_row_as_base()
-
-    total_failures = 0
-
-    with BrowserWrapper().start_browser(headless=False, block_images=True) as browser:
-        page = browser.new_page()
-
-        for i, boardgame_id in enumerate(boardgame_ids):
-            # print(f"\nFetching details for boardgame ID {boardgame_id}...")
-
-            page.goto(f"https://boardgamegeek.com/boardgame/{boardgame_id}")
-            page.sleep(wait_between_pages)
-            page.wait_for_idle()
-
-            # game_name = page.get_text("div.game-header-title-info h1 a")
-            # game_year = page.get_text("div.game-header-title-info span.game-year")
-            dc.set_fields({
-                "id": boardgame_id,
-                # "name": game_name.strip() if game_name else None,
-                # "year": game_year.replace("(", "").replace(")", "").strip() if game_year else None,
-            })
-
-            # Attempt to load the game's JSON using the robust reload helper
-            game_obj, page = reload_until_item_loaded(
-                page,
-                browser,
-                f"https://boardgamegeek.com/boardgame/{boardgame_id}",
-                wait_between_pages,
-                max_attempts=10,
-                boardgame_id=boardgame_id,
-            )
-
-            if isinstance(game_obj, dict):
-                useful_fields = [
-                    "id",
-                    "name",
-                    "yearpublished",
-                    "short_description",
-                    "primaryname",
-                    "alternatenames",
-
-                    "description",
-                    "wiki",
-                    "website",
-                    "images",
-
-                    "minplayers",
-                    "maxplayers",
-                    "minplaytime",
-                    "maxplaytime",
-                    "minage",
-                    "instructional_videoid",
-                    "summary_videoid",
-                    "playthrough_videoid",
-                    "focus_videoid",
-                    "howtoplay_videoid",
-                    "links",
-
-                    "canonical_link",
-                    "rankinfo",
-                    "polls",
-                    "stats",
-                ]
-
-                game_obj = {key: game_obj.get(key, None) for key in useful_fields}
-                if "name" in game_obj and isinstance(game_obj["name"], str):
-                    print(f"Name: {game_obj['name']}")
-                # # save json to file
-                # with open(f"{boardgame_id}.json", "w") as f:
-                #     json.dump(game_obj, f, indent=4)
-            else:
-                print(f"Failed to fetch details for boardgame ID {boardgame_id}, skipping...")
-                total_failures += 1
-
-                if total_failures >= 10:
-                    print(f"Total failures have reached {total_failures}, stopping the scraper to avoid further issues.")
-                    exit(1)
-
-                game_obj = None
-
-            dc.set_fields({
-                "json": game_obj,
-            })
-
-            dc.commit_row()
-
-            if i % 100 == 0:
-                print(f"\nFetched details for {i} boardgames so far, saving to file...\n")
-                dc.to_dataframe().to_csv(f"data/details/details_{get_today_date()}.csv", index=False)
+        
+        if (i + 1) % 100 == 0:
+            print(f"Saving partial results...")
+            with open(f"downloads/partial_results.json", "w", encoding="utf-8") as fh:
+                json.dump(results, fh, ensure_ascii=False, indent=2)
+            # also persist the failed ids alongside partial results
+            try:
+                save_failed_ids(failed_ids)
+            except Exception:
+                pass
+        
+    # save data
+    with open(f"downloads/results_{get_today_date()}.json", "w", encoding="utf-8") as fh:
+        json.dump(results, fh, ensure_ascii=False, indent=2)
+        
+    return results
 
 
+def main():
+    load_dotenv()
+    boardgame_id = "342942"
+    data = pull_bgg_json_data([boardgame_id])
+    if not data:
+        print("Failed to fetch or parse geekitemPreload JSON.")
+        sys.exit(1)
 
-    df_details = dc.to_dataframe()
-    df_details.to_csv(f"data/details/details_{get_today_date()}.csv", index=False)
-    
-    print(f"\nSaved details for {len(df_details)} boardgames to data/details/details_{get_today_date()}.csv\n")
 
-    return df_details
+    with open("test.json", "w", encoding="utf-8") as fh:
+        json.dump(data, fh, ensure_ascii=False, indent=2)
 
-
+    print("Saved to test.json")
 
 if __name__ == "__main__":
-    load_dotenv()
-    df_test = fetch_boardgame_details(["167791"])
+    main()
