@@ -1,11 +1,13 @@
 
 import os
 
+import cloudscraper
 from dotenv import load_dotenv
 import pandas as pd
 from web_automator import BrowserWrapper
 
 from utils import get_today_date
+
 
 def fetch_rankings_dump() -> pd.DataFrame:
     bgg_username = os.getenv("BGG_USERNAME", None)
@@ -77,9 +79,9 @@ def filter_rankings(df_ranks: pd.DataFrame) -> pd.DataFrame:
 
 
     df_ranks = df_ranks[
-        (df_ranks['usersrated'] >= 200) & 
+        (df_ranks['usersrated'] >= 2000) & 
         # (df_ranks['yearpublished'] >= 1990) & 
-        # (df_ranks['yearpublished'] >= 2026) &
+        (df_ranks['yearpublished'] >= 2025) &
         (df_ranks['is_expansion'] == False)
     ]
 
