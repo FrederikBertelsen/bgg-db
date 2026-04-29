@@ -199,7 +199,7 @@ def create_final_dataset(json_data: list[dict]) -> pd.DataFrame:
     df_details['types'] = df_details['ranks'].apply(lambda ranks: [r.get('category').replace('Rank', '').strip() for r in (ranks or []) if r.get('category') and r.get('category') != 'Overall Rank'])
     df_details['weight_votes'] = df_details['weight'].apply(lambda w: w.get('votes', 0) if isinstance(w, dict) else 0)
     df_details['weight_average'] = df_details['weight'].apply(lambda w: w.get('averageweight', None) if isinstance(w, dict) else None)
-    df_details['Crowdfunded'] = df_details['families'].apply(lambda cats: any('crowdfund' in str(c).lower() for c in (cats or [])))
+    # df_details['Crowdfunded'] = df_details['families'].apply(lambda cats: any('crowdfund' in str(c).lower() for c in (cats or [])))
     df_details['shopping'] = df_details['shopping'].apply(add_price_conversions)
     df_details[['estimated_volume_cm3', 'estimated_weight_kg']] = df_details['versions'].apply(lambda v: pd.Series(add_estimated_volume_and_weight(v)))
     df_details['player_count_scores'] = df_details['player_count_poll'].apply(player_count_poll_to_scores)

@@ -9,7 +9,7 @@ import cloudscraper
 from dotenv import load_dotenv
 import traceback
 
-from old.extract_details_from_json_column import extract_details
+from extract_details_from_json import extract_details
 from utils import fetch_json, get_today_date
 
 # File to persist failed boardgame IDs so they can be retried later
@@ -85,6 +85,8 @@ def pull_versions_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) ->
         for version in items:
             name = version.get("versionname")
             year_published = version.get("yearpublished")
+            url = f"https://boardgamegeek.com{version.get("href").replace(r"\/", "/")}" if version.get("href") else None
+            image_url = version.get("images", {}).get("original", "").replace(r"\/", "/") if version.get("images", {}).get("original") else None
 
             weight_kg = version.get("weight")
             width = version.get("width")
@@ -98,6 +100,8 @@ def pull_versions_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) ->
                 "width": float(width) * 2.54 if width else None,
                 "depth": float(depth) * 2.54 if depth else None,
                 "length": float(length) * 2.54 if length else None,
+                "url": url,
+                "image_url": image_url,
             })
 
         # print(f"Fetched {len(processed_versions)} versions")
