@@ -100,7 +100,7 @@ def extract_details(json_data: dict) -> dict:
         "families": [family.get("name") for family in json_data.get("links", {}).get("boardgamefamily", [])],
         "subdomains": [subdomain.get("name") for subdomain in json_data.get("links", {}).get("boardgamesubdomain", [])],
         "url": json_data.get("canonical_link"),
-        "ranks": [{"category": rank.get("shortprettyname"), "rank": rank.get("rank"), "bayes_average_rank": rank.get("baverage")} for rank in json_data.get("rankinfo", [])],
+        "ranks": [{"category": rank.get("shortprettyname"), "rank": rank.get("rank"), "bayes_average": rank.get("baverage")} for rank in json_data.get("rankinfo", [])],
         "language_dependence": json_data.get("polls", {}).get("languagedependence"),
         "rating_count": stats.get("usersrated"),
         "average_rating": stats.get("average"),

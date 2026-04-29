@@ -11,6 +11,6 @@ public class Expansion
     public required string Name { get; set; }
     public required string Url { get; set; }
 
-    public int BoardGameId { get; set; }
+    public required int BoardGameId { get; set; }
     public BoardGame? BoardGame { get; set; }
 }

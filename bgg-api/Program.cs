@@ -1,11 +1,18 @@
 using BGGAPI.Src.Data;
 using Microsoft.EntityFrameworkCore;
 using BGGAPI.Src.Middleware;
+using BGGAPI.Src.Repositories.Interfaces;
+using BGGAPI.Src.Repositories;
+using BGGAPI.Src.Services.Interfaces;
+using BGGAPI.Src.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // builder.Services.AddScoped<IUserRepository, UserRepository>();
 // builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IBoardGameRepository, BoardGameRepository>();
+builder.Services.AddScoped<IBoardGameService, BoardGameService>();
+builder.Services.AddScoped<IDataLoaderRepository, DataLoaderRepository>();
 
 builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlite("Data Source=app.db"));

@@ -6,8 +6,8 @@ public sealed class Mechanic
     public required string Name { get; set; }
 
     public int DocumentFrequency { get; set; }
-    public double Idf { get; set; }
-    public double Weight { get; set; }
+    public float Idf { get; set; }
+    public float Weight { get; set; }
 
     public ICollection<BoardGame> BoardGames { get; set; } = new HashSet<BoardGame>();
 }

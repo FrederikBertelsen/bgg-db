@@ -19,10 +19,6 @@ public static class DtoExtensions
         PriceUSD: shopOffer.PriceUSD ?? 0,
         PriceDKK: shopOffer.PriceDKK ?? 0
     );
-    public static PlayerCountScoreDto ToDto(this PlayerCountScore playerCountScore) => new(
-        PlayerCount: playerCountScore.PlayerCount,
-        Score: playerCountScore.Score
-    );
     public static RecommendationDto ToDto(this Recommendation recommendation)
     {
         if (recommendation.RecommendedBoardGame == null)
@@ -40,7 +36,7 @@ public static class DtoExtensions
         ShortDescription: boardGame.ShortDescription ?? string.Empty,
         YearPublished: boardGame.YearPublished ?? 0,
         AverageRating: boardGame.AverageRating,
-        AverageWeight: boardGame.AverageWeight,
+        AverageWeight: boardGame.Weight,
         Ranks: boardGame.Ranks.Select(r => r.ToDto()).ToArray(),
         MinPlayers: boardGame.MinPlayers ?? 0,
         MaxPlayers: boardGame.MaxPlayers ?? 0,
@@ -65,7 +61,7 @@ public static class DtoExtensions
         MinPlaytimeMinutes: boardGame.MinPlaytimeMinutes ?? 0,
         MaxPlaytimeMinutes: boardGame.MaxPlaytimeMinutes ?? 0,
         MinAge: boardGame.MinAge ?? 0,
-        AverageWeight: boardGame.AverageWeight,
+        AverageWeight: boardGame.Weight,
         AverageRating: boardGame.AverageRating,
         PlayCountAllTime: boardGame.PlayCount ?? 0,
         PlayCountLastMonth: boardGame.PlayCountLastMonth ?? 0,
@@ -87,7 +83,7 @@ public static class DtoExtensions
         Ranks: boardGame.Ranks.Select(r => r.ToDto()).ToArray(),
         Versions: boardGame.Versions.Select(v => v.ToDto()).ToArray(),
         ShopOffers: boardGame.ShopOffers.Select(s => s.ToDto()).ToArray(),
-        PlayerCountScores: boardGame.PlayerCountScores.Select(p => p.ToDto()).ToArray(),
+        PlayerCountScores: boardGame.PlayerCountScores.Select((p) => new PlayerCountScoreDto(p.Item1, p.Item2)).ToArray(),
         Recommendations: boardGame.RecommendationsFromThis.Select(r => r.ToDto()).ToArray(),
         Honors: boardGame.Honors.ToArray(),
         Subdomains: boardGame.Subdomains.ToArray(),

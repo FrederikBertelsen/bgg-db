@@ -85,8 +85,12 @@ def pull_versions_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) ->
         for version in items:
             name = version.get("versionname")
             year_published = version.get("yearpublished")
-            url = f"https://boardgamegeek.com{version.get("href").replace(r"\/", "/")}" if version.get("href") else None
-            image_url = version.get("images", {}).get("original", "").replace(r"\/", "/") if version.get("images", {}).get("original") else None
+            href = version.get("href")
+            clean_href = href.replace("\\/", "/") if href else None
+            url = f"https://boardgamegeek.com{clean_href}" if clean_href else None
+
+            original_image = version.get("images", {}).get("original")
+            image_url = original_image.replace("\\/", "/") if original_image else None
 
             weight_kg = version.get("weight")
             width = version.get("width")

@@ -20,7 +20,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Reimplements> Reimplements { get; set; } = default!;
     public DbSet<Rank> Ranks { get; set; } = default!;
     public DbSet<ShopOffer> ShopOffers { get; set; } = default!;
-    public DbSet<PlayerCountScore> PlayerCountScores { get; set; } = default!;
     public DbSet<Recommendation> BoardGameRecommendations { get; set; } = default!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -61,10 +60,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             entity.HasMany(boardGame => boardGame.Versions)
                 .WithOne(version => version.BoardGame)
                 .HasForeignKey(version => version.BoardGameId);
-
-            entity.HasMany(boardGame => boardGame.PlayerCountScores)
-                .WithOne(playerCountScore => playerCountScore.BoardGame)
-                .HasForeignKey(playerCountScore => playerCountScore.BoardGameId);
 
             entity.HasMany(boardGame => boardGame.RecommendationsFromThis)
                 .WithOne(recommendation => recommendation.SeedBoardGame)
@@ -129,11 +124,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         {
             entity.HasIndex(alternativeName => new { alternativeName.BoardGameId, alternativeName.Name }).IsUnique();
             entity.HasIndex(alternativeName => alternativeName.Name);
-        });
-
-        modelBuilder.Entity<PlayerCountScore>(entity =>
-        {
-            entity.HasIndex(playerCountScore => new { playerCountScore.BoardGameId, playerCountScore.PlayerCount }).IsUnique();
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -213,7 +203,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                         e.Entity is Reimplements ||
                         e.Entity is Rank ||
                         e.Entity is ShopOffer ||
-                        e.Entity is PlayerCountScore ||
                         e.Entity is Recommendation)
             .ToList();
 
@@ -250,10 +239,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
                 case ShopOffer shopOffer:
                     if (shopOffer.BoardGameId > 0)
                         boardgameIds.Add(shopOffer.BoardGameId);
-                    break;
-                case PlayerCountScore playerCountScore:
-                    if (playerCountScore.BoardGameId > 0)
-                        boardgameIds.Add(playerCountScore.BoardGameId);
                     break;
                 case Recommendation recommendation:
                     if (recommendation.SeedBoardGameId > 0)
