@@ -8,40 +8,39 @@ from data_conversion import *
 app = Flask(__name__)
 db = BoardGameDB()
 
-not_found_error = jsonify({"error": "not found"}), 404
-no_input_error = jsonify({"error": "no input provided"}), 400
-
-
 @app.route("/games/<int:id>")
 def game(id: int): # full_game_info
     row = db.get_game_by_id(str(id))
     if row is None:
-        return not_found_error
+        return jsonify({"error": "Game not found", "id": id}), 404
     
     return to_json_full(row)
 
 @app.route("/cards/<ids_str>")
 def cards(ids_str: str): # list[game_card]
     ids = [i for i in ids_str.split(",") if i.isdigit()]
-    if not ids or len(ids) == 1:
-        return no_input_error
+    if not ids:
+        return jsonify({"error": "No valid game IDs provided"}), 400
+
+    if len(ids) == 1:
+        return jsonify({"error": "Provide at least two game IDs for this endpoint"}), 400
 
     rows = db.get_games_by_ids(ids)
-    if rows is None:
-        return not_found_error
+    if rows is None or len(rows) == 0:
+        return jsonify({"error": "No games found for provided IDs"}), 404
 
     return to_json_cards(rows)
 
 @app.route("/search/<search_term>")
 def search(search_term: str): # list[game_card]
     if not search_term:
-        return no_input_error
+        return jsonify({"error": "Empty search term"}), 400
 
     n = request.args.get("n", default=10, type=int)
 
     rows = db.search_games(search_term)
     if rows is None or len(rows) == 0:
-        return not_found_error
+        return jsonify([])
 
     if isinstance(rows, (list, tuple)):
         rows = rows[:n]
@@ -52,7 +51,7 @@ def search(search_term: str): # list[game_card]
 @app.route("/autocomplete/<search_term>")
 def autocomplete_search(search_term: str): # list[str]
     if not search_term:
-        return no_input_error
+        return jsonify({"error": "Empty query"}), 400
     
     n = request.args.get("n", default=5, type=int)
 
@@ -71,10 +70,10 @@ def recommend_games(game_id: str): # list[game_card]
     try:
         recs = db.recommend_games(game_id, n=n)
     except ValueError:
-        return not_found_error
+        return jsonify({"error": "Game not found", "id": game_id}), 404
 
     if recs is None or len(recs) == 0:
-        return not_found_error
+        return jsonify([])
 
     return to_json_cards(recs)
 
