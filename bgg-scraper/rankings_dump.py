@@ -10,6 +10,13 @@ from utils import get_today_date
 
 
 def fetch_rankings_dump() -> pd.DataFrame:
+    # check if file already exists, and just return that if it does
+    file_path = f"data/ranks/ranks_{get_today_date()}.csv"
+    if os.path.exists(file_path):
+        print(f"Rankings dump for today already exists at {file_path}, loading from there...")
+        return pd.read_csv(file_path)
+
+
     bgg_username = os.getenv("BGG_USERNAME", None)
     bgg_password = os.getenv("BGG_PASSWORD", None)
 
@@ -59,11 +66,10 @@ def fetch_rankings_dump() -> pd.DataFrame:
             zip_ref.extractall("downloads")
             extracted_files = zip_ref.namelist()
             if len(extracted_files) == 1:
-                new_file_name = f"data/ranks/ranks_{get_today_date()}.csv"
-                os.rename(f"downloads/{extracted_files[0]}", new_file_name)
+                os.rename(f"downloads/{extracted_files[0]}", file_path)
                 os.remove(f"downloads/{download.suggested_filename}")
 
-                return pd.read_csv(new_file_name)
+                return pd.read_csv(file_path)
             else:
                 print("Unexpected number of files in the zip archive")
                 exit(1)

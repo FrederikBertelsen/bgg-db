@@ -32,8 +32,6 @@ ssh -i /Users/frederik/.ssh/id_local_machine -t root@192.168.1.50 'cd /root/bgg-
 ```shell
 rsync -e "ssh -i /Users/frederik/.ssh/id_local_machine" -avz --progress \
   --exclude '.venv' \
-  --exclude '*.csv' \
-  --exclude '*.json' \
   --exclude '.git' \
   --exclude '__pycache__' \
   --exclude '.DS_Store' \
@@ -43,6 +41,7 @@ rsync -e "ssh -i /Users/frederik/.ssh/id_local_machine" -avz --progress \
 ### Copy data to local machine
 ```shell
 rsync -e "ssh -i /Users/frederik/.ssh/id_local_machine" -avz --progress root@192.168.1.50:/root/bgg-db/data/ ./data
+rsync -e "ssh -i /Users/frederik/.ssh/id_local_machine" -avz --progress root@192.168.1.50:/root/bgg-db/downloads/ ./downloads
 ```
 ```shell
 DONTUSE rsync -avz --progress /Users/frederik/Home/Python/bgg-db/data/ root@192.168.1.50:/root/bgg-db/data

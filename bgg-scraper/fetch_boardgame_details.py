@@ -12,43 +12,43 @@ import traceback
 from extract_details_from_json import extract_details
 from utils import fetch_json, get_today_date
 
-# File to persist failed boardgame IDs so they can be retried later
-FAILED_IDS_FILE = "data/failed_ids.json"
+# # File to persist failed boardgame IDs so they can be retried later
+# FAILED_IDS_FILE = "data/failed_ids.json"
 
-def _ensure_failed_ids_dir():
-    dirpath = os.path.dirname(FAILED_IDS_FILE)
-    if dirpath and not os.path.exists(dirpath):
-        os.makedirs(dirpath, exist_ok=True)
+# def _ensure_failed_ids_dir():
+#     dirpath = os.path.dirname(FAILED_IDS_FILE)
+#     if dirpath and not os.path.exists(dirpath):
+#         os.makedirs(dirpath, exist_ok=True)
 
-def load_failed_ids() -> set:
-    _ensure_failed_ids_dir()
-    try:
-        if os.path.exists(FAILED_IDS_FILE):
-            with open(FAILED_IDS_FILE, "r", encoding="utf-8") as fh:
-                data = json.load(fh)
-                if isinstance(data, list):
-                    return set(str(x) for x in data)
-    except Exception:
-        pass
-    return set()
+# def load_failed_ids() -> set:
+#     _ensure_failed_ids_dir()
+#     try:
+#         if os.path.exists(FAILED_IDS_FILE):
+#             with open(FAILED_IDS_FILE, "r", encoding="utf-8") as fh:
+#                 data = json.load(fh)
+#                 if isinstance(data, list):
+#                     return set(str(x) for x in data)
+#     except Exception:
+#         pass
+#     return set()
 
-def save_failed_ids(failed_ids: set) -> None:
-    _ensure_failed_ids_dir()
-    try:
-        with open(FAILED_IDS_FILE, "w", encoding="utf-8") as fh:
-            json.dump(sorted(list(failed_ids)), fh, ensure_ascii=False, indent=2)
-    except Exception as exc:
-        print(f"Warning: failed to save failed IDs file: {exc}")
+# def save_failed_ids(failed_ids: set) -> None:
+#     _ensure_failed_ids_dir()
+#     try:
+#         with open(FAILED_IDS_FILE, "w", encoding="utf-8") as fh:
+#             json.dump(sorted(list(failed_ids)), fh, ensure_ascii=False, indent=2)
+#     except Exception as exc:
+#         print(f"Warning: failed to save failed IDs file: {exc}")
 
-def add_failed_id(failed_ids: set, boardgame_id: str) -> None:
-    if boardgame_id not in failed_ids:
-        failed_ids.add(boardgame_id)
-        save_failed_ids(failed_ids)
+# def add_failed_id(failed_ids: set, boardgame_id: str) -> None:
+#     if boardgame_id not in failed_ids:
+#         failed_ids.add(boardgame_id)
+#         save_failed_ids(failed_ids)
 
-def remove_failed_id(failed_ids: set, boardgame_id: str) -> None:
-    if boardgame_id in failed_ids:
-        failed_ids.discard(boardgame_id)
-        save_failed_ids(failed_ids)
+# def remove_failed_id(failed_ids: set, boardgame_id: str) -> None:
+#     if boardgame_id in failed_ids:
+#         failed_ids.discard(boardgame_id)
+#         save_failed_ids(failed_ids)
 
 
 def pull_geek_item_preload_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> dict | None:
@@ -271,13 +271,34 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
 
     WAIT_BETWEEN_PAGES = int(os.getenv("WAIT_BETWEEN_PAGES", "2"))
 
-    results = []
-    failed_ids = load_failed_ids()
+    # use a dated partial results file so resumable runs use the same filename
+    partial_results_file = f"downloads/partial_results_{get_today_date()}.json"
+    results: list[dict] = []
+    existing_ids: set[str] = set()
+    if os.path.exists(partial_results_file):
+        try:
+            with open(partial_results_file, "r", encoding="utf-8") as fh:
+                loaded = json.load(fh)
+                if isinstance(loaded, list):
+                    results = loaded
+                    existing_ids = set(str(entry.get("id")) for entry in results if isinstance(entry, dict) and entry.get("id") is not None)
+                    # print(f"Loaded {len(results)} partial results from {partial_results_file}")
+                else:
+                    print(f"Partial results file {partial_results_file} does not contain a list; ignoring.")
+        except Exception as exc:
+            print(f"Warning: failed to load partial results from {partial_results_file}: {exc}")
+
+
+    # remove existing_ids from boardgame_ids to avoid processing them again
+    boardgame_ids = [bg_id for bg_id in boardgame_ids if str(bg_id) not in existing_ids]
+    
     total_ids = len(boardgame_ids)
+    
+    print(f"\nProcessing {total_ids} boardgame IDs after excluding {len(existing_ids)} already in partial results\n")
+
     start_time = time.time()
     for i, boardgame_id in enumerate(boardgame_ids):
         try:
-            # Simple time estimate (hours) based on average time per processed id
             try:
                 completed = i
                 elapsed = time.time() - start_time
@@ -327,38 +348,39 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
                 #     cleaned_data["weight_poll"] = weight_poll_data
 
                 results.append(cleaned_data)
-                # On success, ensure this id is not marked as failed
+                # record id to avoid duplicates in this run
                 try:
-                    remove_failed_id(failed_ids, boardgame_id)
+                    cid = cleaned_data.get("id")
+                    existing_ids.add(str(cid) if cid is not None else str(boardgame_id))
                 except Exception:
                     pass
             else:
                 print(f"Failed to fetch or parse data for boardgame ID {boardgame_id}.")
-                try:
-                    add_failed_id(failed_ids, boardgame_id)
-                except Exception:
-                    pass
+
         except Exception as exc:
             print(f"Exception while fetching data for boardgame ID {boardgame_id}: {exc}")    
             traceback.print_exc()
-            try:
-                add_failed_id(failed_ids, boardgame_id)
-            except Exception:
-                pass
         
         if (i + 1) % 100 == 0:
-            print(f"Saving partial results...")
-            with open(f"downloads/partial_results.json", "w", encoding="utf-8") as fh:
+            print(f"Saving partial results to {partial_results_file}...")
+            os.makedirs(os.path.dirname(partial_results_file) or "downloads", exist_ok=True)
+            with open(partial_results_file, "w", encoding="utf-8") as fh:
                 json.dump(results, fh, ensure_ascii=False, indent=2)
-            # also persist the failed ids alongside partial results
-            try:
-                save_failed_ids(failed_ids)
-            except Exception:
-                pass
+
         
     # save data
+    # ensure downloads dir exists
+    final_dir = os.path.dirname(partial_results_file)
+    if final_dir and not os.path.exists(final_dir):
+        os.makedirs(final_dir, exist_ok=True)
     with open(f"downloads/results_{get_today_date()}.json", "w", encoding="utf-8") as fh:
         json.dump(results, fh, ensure_ascii=False, indent=2)
+    # also update the partial results file with the full results so it can be resumed if interrupted later
+    try:
+        with open(partial_results_file, "w", encoding="utf-8") as fh:
+            json.dump(results, fh, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
         
     return results
 

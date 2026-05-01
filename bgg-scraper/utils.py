@@ -6,8 +6,16 @@ from time import sleep
 import cloudscraper
 
 
+EXECUTION_START_DATE = None
+
 def get_today_date():
-    return date.today().strftime("%Y%m%d")
+    global EXECUTION_START_DATE
+    
+    if EXECUTION_START_DATE is not None:
+        return EXECUTION_START_DATE.strftime("%Y%m%d")
+
+    EXECUTION_START_DATE = date.today()
+    return EXECUTION_START_DATE.strftime("%Y%m%d")
 
 def normalize_whitespace_and_newlines(value):
     if isinstance(value, str):
