@@ -5,6 +5,7 @@ import numpy as np
 
 import pandas as pd
 
+from load_data import update_scrape_metadata
 from utils import get_today_date
 
 def convert_to_usd(price_str: str, currency: str) -> float:
@@ -43,7 +44,7 @@ def add_price_conversions(shopping: list[dict]) -> list[dict]:
 
         currency = item.get('currency')
         if not currency:
-            print(f"Warning: Missing currency for item '{item.get('name', '')}' - skipping price conversion")
+            # print(f"Warning: Missing currency for item '{item.get('name', '')}' - skipping price conversion")
             continue
 
         price_str = item.get('price', '0')
@@ -131,7 +132,7 @@ def add_estimated_volume_and_weight(versions: list[dict]) -> tuple[float, float]
 
     # only weights available
     mean_wt = sum(weights) / len(weights)
-    print(f"No dimensions available — using weight-only mean: {mean_wt:.2f} kg")
+    # print(f"No dimensions available — using weight-only mean: {mean_wt:.2f} kg")
     return (0.0, round(mean_wt, 2))
 
 
@@ -242,10 +243,32 @@ def create_final_dataset(json_data: list[dict]) -> pd.DataFrame:
     
     df_details['player_count_scores'] = df_details['player_count_poll'].apply(player_count_poll_to_scores)
     # df_details['player_count_stats'] = df_details['player_count_poll'].apply(player_count_poll_to_stats)
-    df_details['PlayerCountBestMin'] = df_details['player_counts'].apply(lambda pc: pc.get('best', [{}])[0].get('min') if isinstance(pc, dict) else None)
-    df_details['PlayerCountBestMax'] = df_details['player_counts'].apply(lambda pc: pc.get('best', [{}])[0].get('max') if isinstance(pc, dict) else None)
-    df_details['PlayerCountRecommendedMin'] = df_details['player_counts'].apply(lambda pc: pc.get('recommended', [{}])[0].get('min') if isinstance(pc, dict) else None)
-    df_details['PlayerCountRecommendedMax'] = df_details['player_counts'].apply(lambda pc: pc.get('recommended', [{}])[0].get('max') if isinstance(pc, dict) else None)
+
+    def _safe_player_count_bound(pc, category, bound):
+        """Return an integer bound (min/max) for a player count category or 0 if missing/invalid."""
+        if not isinstance(pc, dict):
+            return 0
+        vals = pc.get(category)
+        if not isinstance(vals, list) or not vals:
+            return 0
+        first = vals[0]
+        if not isinstance(first, dict):
+            return 0
+        val = first.get(bound)
+        if val is None:
+            return 0
+        try:
+            return int(val)
+        except Exception:
+            try:
+                return int(float(val))
+            except Exception:
+                return 0
+
+    df_details['PlayerCountBestMin'] = df_details['player_counts'].apply(lambda pc: _safe_player_count_bound(pc, 'best', 'min'))
+    df_details['PlayerCountBestMax'] = df_details['player_counts'].apply(lambda pc: _safe_player_count_bound(pc, 'best', 'max'))
+    df_details['PlayerCountRecommendedMin'] = df_details['player_counts'].apply(lambda pc: _safe_player_count_bound(pc, 'recommended', 'min'))
+    df_details['PlayerCountRecommendedMax'] = df_details['player_counts'].apply(lambda pc: _safe_player_count_bound(pc, 'recommended', 'max'))
     df_details['PlayerCountVotes'] = df_details['player_counts'].apply(lambda pc: int(pc.get('total_votes', 0)) if isinstance(pc, dict) else 0)
 
     # remove unwanted columns
@@ -260,6 +283,9 @@ if __name__ == "__main__":
 
     df_final = create_final_dataset(json_data)
 
+    print("\nUpdating scrape metadata...\n")
+    update_scrape_metadata(df_final)
+
     print(f"Final dataset: {df_final.shape}")
     print(df_final.head())
 
@@ -269,3 +295,4 @@ if __name__ == "__main__":
 
     # save one row to as json for testing (pretty print)
     df_final.head(10).to_json(f"data/final_sample.json", orient="records", indent=4)
+    df_final.to_csv(f"data/final/final_{get_today_date()}.csv", index=False)

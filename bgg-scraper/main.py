@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import pandas as pd
 
 from create_final_dataset import create_final_dataset
-from load_data import calc_boardgame_ids_to_scrape
+from load_data import calc_boardgame_ids_to_scrape, update_scrape_metadata
 from rankings_dump import filter_rankings, fetch_rankings_dump
 from fetch_boardgame_details import pull_bgg_json_data
 from utils import get_today_date
@@ -19,9 +19,14 @@ def main():
 
     ids_to_scrape = calc_boardgame_ids_to_scrape(df_filtered_ranks)
 
+    print(f"\nCalculated {len(ids_to_scrape)} board game IDs to scrape based on ranking and metadata criteria.\n")
+
     data_dicts = pull_bgg_json_data(boardgame_ids=ids_to_scrape)
 
     df_final = create_final_dataset(data_dicts)
+
+    print("\nUpdating scrape metadata...\n")
+    update_scrape_metadata(df_final)
 
     print(df_final.head())
 
