@@ -25,7 +25,7 @@ def parse_json_column(json_value):
     return None
     
 
-def extract_details(json_data: dict) -> dict:
+def extract_details(json_data: dict, full_properties_and_credits_data: dict) -> dict:
     credit_role_mapping = {
         "boardgamedesigner": "boardgame_designer",
         "boardgamesolodesigner": "boardgame_solo_designer",
@@ -40,7 +40,7 @@ def extract_details(json_data: dict) -> dict:
     }
         
     credits = []
-    for link in json_data.get("links", {}).keys():
+    for link in full_properties_and_credits_data.get("links", {}).keys():
         if link in credit_role_mapping:
             credit_entries = json_data.get("links", {}).get(link, [])
             if isinstance(credit_entries, list) and credit_entries:
@@ -51,15 +51,15 @@ def extract_details(json_data: dict) -> dict:
                 })
 
     expansions = []
-    for expansion in json_data.get("links", {}).get("boardgameexpansion", []):
+    for expansion in full_properties_and_credits_data.get("links", {}).get("boardgameexpansion", []):
         expansions.append({
             "id": expansion.get("objectid"),
             "name": expansion.get("name"),
             "url": expansion.get("canonical_link"),
         })
-
+        
     stats = json_data.get("stats", {})
-
+    
     return {
         "id": json_data.get("id"),
         "name": json_data.get("name"),
@@ -87,9 +87,9 @@ def extract_details(json_data: dict) -> dict:
         #     "danish" in version.get("name", "").lower()
         #     for version in json_data.get("links", {}).get("boardgameversion", [])
         # ),
-        "categories": [category.get("name") for category in json_data.get("links", {}).get("boardgamecategory", [])],
-        "mechanics": [mechanic.get("name") for mechanic in json_data.get("links", {}).get("boardgamemechanic", [])],
-        "honors": [honor.get("name") for honor in json_data.get("links", {}).get("boardgamehonor", [])],
+        "categories": [category.get("name") for category in full_properties_and_credits_data.get("links", {}).get("boardgamecategory", [])],
+        "mechanics": [mechanic.get("name") for mechanic in full_properties_and_credits_data.get("links", {}).get("boardgamemechanic", [])],
+        "honors": [honor.get("name") for honor in full_properties_and_credits_data.get("links", {}).get("boardgamehonor", [])],
         "credits": credits,
         "expansions": expansions,
         "reimplementation": [{
@@ -97,8 +97,13 @@ def extract_details(json_data: dict) -> dict:
             "name": reimpl.get("name"),
             "url": reimpl.get("canonical_link"),
         } for reimpl in json_data.get("links", {}).get("reimplementation", [])],
-        "families": [family.get("name") for family in json_data.get("links", {}).get("boardgamefamily", [])],
-        "subdomains": [subdomain.get("name") for subdomain in json_data.get("links", {}).get("boardgamesubdomain", [])],
+        "reimplements": [{
+            "id": reimpl.get("objectid"),
+            "name": reimpl.get("name"),
+            "url": reimpl.get("canonical_link"),
+        } for reimpl in json_data.get("links", {}).get("reimplements", [])],
+        "families": [family.get("name") for family in full_properties_and_credits_data.get("links", {}).get("boardgamefamily", [])],
+        "subdomains": [subdomain.get("name") for subdomain in full_properties_and_credits_data.get("links", {}).get("boardgamesubdomain", [])],
         "url": json_data.get("canonical_link"),
         "ranks": [{"category": rank.get("shortprettyname"), "rank": rank.get("rank"), "bayes_average": rank.get("baverage")} for rank in json_data.get("rankinfo", [])],
         "language_dependence": json_data.get("polls", {}).get("languagedependence"),
@@ -127,36 +132,36 @@ def extract_details(json_data: dict) -> dict:
         "fan_count": stats.get("numfans"),
     }
 
-def extract_details_from_json_column(df_details: pd.DataFrame) -> pd.DataFrame:
+# def extract_details_from_json_column(df_details: pd.DataFrame) -> pd.DataFrame:
 
-    print("Extracting details from JSON column...")
+#     print("Extracting details from JSON column...")
     
-    df_details["json"] = df_details["json"].apply(parse_json_column)
+#     df_details["json"] = df_details["json"].apply(parse_json_column)
 
-    extracted_data = []
-    for index, row in df_details.iterrows():
-        json_data = row["json"]
-        if json_data is not None:
-            extracted_data.append(extract_details(json_data))
-        else:
-            print(f"Missing JSON data for: https://boardgamegeek.com/boardgame/{row['id']}")
+#     extracted_data = []
+#     for index, row in df_details.iterrows():
+#         json_data = row["json"]
+#         if json_data is not None:
+#             extracted_data.append(extract_details(json_data))
+#         else:
+#             print(f"Missing JSON data for: https://boardgamegeek.com/boardgame/{row['id']}")
     
-    df_extracted = pd.DataFrame(extracted_data)
+#     df_extracted = pd.DataFrame(extracted_data)
 
-    # run normalize_whitespace_and_newlines() on all object/string column
-    for col in df_extracted.select_dtypes(include=["object", "string"]):
-        df_extracted[col] = df_extracted[col].apply(normalize_whitespace_and_newlines)
+#     # run normalize_whitespace_and_newlines() on all object/string column
+#     for col in df_extracted.select_dtypes(include=["object", "string"]):
+#         df_extracted[col] = df_extracted[col].apply(normalize_whitespace_and_newlines)
 
-    df_extracted.to_csv(f"data/final/final_{get_today_date()}.csv", index=False)
+#     df_extracted.to_csv(f"data/final/final_{get_today_date()}.csv", index=False)
 
-    print("Extraction complete. Extracted data saved to:", f"data/final/final_{get_today_date()}.csv")
+#     print("Extraction complete. Extracted data saved to:", f"data/final/final_{get_today_date()}.csv")
 
-    return df_extracted
+#     return df_extracted
 
 
-if __name__ == "__main__":
-    load_dotenv()
+# if __name__ == "__main__":
+#     load_dotenv()
     
-    df_details = pd.read_csv(f"data/details/details_{get_today_date()}.csv")
-    df_final = extract_details_from_json_column(df_details)
-    print(df_final.head())
+#     df_details = pd.read_csv(f"data/details/details_{get_today_date()}.csv")
+#     df_final = extract_details_from_json_column(df_details)
+#     print(df_final.head())

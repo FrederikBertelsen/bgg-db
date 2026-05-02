@@ -67,6 +67,16 @@ def pull_geek_item_preload_json(scraper: cloudscraper.CloudScraper, boardgame_id
     print(f"Failed to fetch or parse geekitemPreload JSON for boardgame ID {boardgame_id}.")
     return None
 
+def pull_full_properties_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> dict | None:
+    url = f"https://api.geekdo.com/api/geekitems?nosession=1&objectid={boardgame_id}&objecttype=thing&subtype=boardgame&type=thing"
+
+    json_data = fetch_json(scraper, url)
+    if json_data:
+        return json_data.get("item", None)
+
+    print(f"Failed to fetch or parse full properties and credits JSON for boardgame ID {boardgame_id}.")
+    return None
+
 def pull_versions_json(scraper: cloudscraper.CloudScraper, boardgame_id: str) -> list[dict] | None:
     versions_url = f"https://api.geekdo.com/api/geekitem/linkeditems?ajax=1&linkdata_index=boardgameversion&nosession=1&objectid={boardgame_id}&objecttype=thing&pageid=1&showcount=25&sort=yearpublished&subtype=boardgameversion"
 
@@ -318,10 +328,12 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
             sleep(WAIT_BETWEEN_PAGES)
             # print(f"Fetching geekitemPreload...")
             preload_json = pull_geek_item_preload_json(scraper, boardgame_id)
+            # some of the property lists are cut off on main preload json.
+            full_properties_json = pull_full_properties_json(scraper, boardgame_id)
             
-            if preload_json:
+            if preload_json and full_properties_json:
                 # print("Cleaning and normalizing geekitemPreload data...")
-                cleaned_data = extract_details(preload_json)
+                cleaned_data = extract_details(preload_json, full_properties_json)
                 
                 sleep(WAIT_BETWEEN_PAGES)
                 # print(f"Fetching versions data...")

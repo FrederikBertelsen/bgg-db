@@ -3,6 +3,9 @@ import glob
 import pandas as pd
 import re
 import ast
+import json
+import pickle
+import hashlib
 from thefuzz import process, fuzz
 from data_conversion import parse_json_like_columns
 from recommender import _ensure_list, compute_mechanic_importances, recommend
@@ -66,7 +69,89 @@ class BoardGameDB:
             "min_alt_name_length": 3,
         }
 
+        # Cache paths
+        self.cache_dir = "data/cache"
+        self.manifest_path = "data/cache_manifest.json"
+
         self.prepare_db()
+
+    def _get_data_files_signature(self) -> tuple[int, str]:
+        """Return (file_count, hash_of_sorted_filenames)."""
+        data_folder_path = "data/final/"
+        pattern = os.path.join(data_folder_path, "*.csv")
+        files = sorted(glob.glob(pattern))
+        
+        if not files:
+            return 0, ""
+        
+        filenames = [os.path.basename(f) for f in files]
+        signature_str = ",".join(filenames)
+        file_hash = hashlib.md5(signature_str.encode()).hexdigest()
+        
+        return len(files), file_hash
+
+    def _load_cache_manifest(self) -> dict | None:
+        """Load the cache manifest if it exists."""
+        if os.path.exists(self.manifest_path):
+            try:
+                with open(self.manifest_path, "r") as f:
+                    return json.load(f)
+            except Exception:
+                pass
+        return None
+
+    def _save_cache_manifest(self, manifest: dict) -> None:
+        """Save the cache manifest."""
+        os.makedirs(os.path.dirname(self.manifest_path), exist_ok=True)
+        with open(self.manifest_path, "w") as f:
+            json.dump(manifest, f)
+
+    def _load_cached_data(self) -> bool:
+        """Load all cached data. Return True if successful, False otherwise."""
+        try:
+            with open(os.path.join(self.cache_dir, "df_games.pkl"), "rb") as f:
+                self.df_games = pickle.load(f)
+            
+            with open(os.path.join(self.cache_dir, "unique_mechanics.pkl"), "rb") as f:
+                self.unique_mechanics = pickle.load(f)
+            
+            with open(os.path.join(self.cache_dir, "unique_categories.pkl"), "rb") as f:
+                self.unique_categories = pickle.load(f)
+            
+            with open(os.path.join(self.cache_dir, "unique_types.pkl"), "rb") as f:
+                self.unique_types = pickle.load(f)
+            
+            with open(os.path.join(self.cache_dir, "unique_subdomains.pkl"), "rb") as f:
+                self.unique_subdomains = pickle.load(f)
+            
+            with open(os.path.join(self.cache_dir, "unique_families.pkl"), "rb") as f:
+                self.unique_families = pickle.load(f)
+            
+            return True
+        except Exception:
+            return False
+
+    def _save_cached_data(self) -> None:
+        """Save all cached data."""
+        os.makedirs(self.cache_dir, exist_ok=True)
+        
+        with open(os.path.join(self.cache_dir, "df_games.pkl"), "wb") as f:
+            pickle.dump(self.df_games, f)
+        
+        with open(os.path.join(self.cache_dir, "unique_mechanics.pkl"), "wb") as f:
+            pickle.dump(self.unique_mechanics, f)
+        
+        with open(os.path.join(self.cache_dir, "unique_categories.pkl"), "wb") as f:
+            pickle.dump(self.unique_categories, f)
+        
+        with open(os.path.join(self.cache_dir, "unique_types.pkl"), "wb") as f:
+            pickle.dump(self.unique_types, f)
+        
+        with open(os.path.join(self.cache_dir, "unique_subdomains.pkl"), "wb") as f:
+            pickle.dump(self.unique_subdomains, f)
+        
+        with open(os.path.join(self.cache_dir, "unique_families.pkl"), "wb") as f:
+            pickle.dump(self.unique_families, f)
 
     def get_game_by_id(self, id: str) -> pd.Series | None:
         """
@@ -904,20 +989,37 @@ class BoardGameDB:
     def prepare_db(self):
         print("\n------------------ Preparing BoardGameDB ------------------")
 
-        self.load_data()
-                
-        self.cache_unique_mechanics()
-        self.cache_unique_categories()
-        self.cache_unique_types()
-        self.cache_unique_subdomains()
-        self.cache_and_convert_unique_wanted_families()
+        # Check if cache is valid
+        file_count, file_hash = self._get_data_files_signature()
+        manifest = self._load_cache_manifest()
+        
+        cache_valid = (
+            manifest is not None
+            and manifest.get("file_count") == file_count
+            and manifest.get("file_hash") == file_hash
+        )
 
-        self.load_property_mappings()
-        self.collect_and_translate_properties()
-        self.load_categorization_data_and_categorize_properties()
+        if cache_valid and self._load_cached_data():
+            print("\nLoaded from cache (data unchanged).")
+        else:
+            print("\nRebuilding dataset (data changed or cache missing).")
+            self.load_data()
+                    
+            self.cache_unique_mechanics()
+            self.cache_unique_categories()
+            self.cache_unique_types()
+            self.cache_unique_subdomains()
+            self.cache_and_convert_unique_wanted_families()
+
+            self.load_property_mappings()
+            self.collect_and_translate_properties()
+            self.load_categorization_data_and_categorize_properties()
+
+            # Save cache
+            self._save_cached_data()
+            self._save_cache_manifest({"file_count": file_count, "file_hash": file_hash})
 
         self.cache_all_names()
-
         self.cache_recommendations()
 
         print("\n------------------------------------------------------------\n")

@@ -60,6 +60,53 @@ def add_price_conversions(shopping: list[dict]) -> list[dict]:
 
     return shopping
 
+
+def add_estimated_price(shopping: list[dict]) -> float:
+    """Estimate a realistic purchase price in USD from non-zero shop prices.
+
+    Uses the median for small samples and a lightly trimmed mean for larger
+    samples so the estimate tracks the main price cluster while ignoring
+    obvious outliers.
+    """
+    if not isinstance(shopping, list) or not shopping:
+        return 0.0
+
+    prices_usd = []
+    for item in shopping:
+        if not isinstance(item, dict):
+            continue
+
+        try:
+            price_usd = float(item.get('price_usd') or 0)
+        except Exception:
+            price_usd = 0.0
+
+        try:
+            price_dkk = float(item.get('price_dkk') or 0)
+        except Exception:
+            price_dkk = 0.0
+
+        if price_usd > 0:
+            prices_usd.append(price_usd)
+
+    if not prices_usd:
+        return 0.0
+
+    prices_usd.sort()
+
+    def robust_estimate(values: list[float]) -> float:
+        if not values:
+            return 0.0
+        if len(values) < 5:
+            return float(np.median(values))
+
+        trim = max(1, int(round(len(values) * 0.15)))
+        if len(values) - (2 * trim) >= 2:
+            values = values[trim:-trim]
+        return float(np.mean(values))
+
+    return round(robust_estimate(prices_usd), 2)
+
 def add_estimated_volume_and_weight(versions: list[dict]) -> tuple[float, float]:
     """Estimate average volume (cm^3) and weight (kg) by grouping versions
     with similar dimensions
@@ -239,6 +286,8 @@ def create_final_dataset(json_data: list[dict]) -> pd.DataFrame:
     # df_details['Crowdfunded'] = df_details['families'].apply(lambda cats: any('crowdfund' in str(c).lower() for c in (cats or [])))
     
     df_details['shopping'] = df_details['shopping'].apply(add_price_conversions)
+    df_details['estimated_price_usd'] = df_details['shopping'].apply(add_estimated_price)
+    df_details['estimated_price_dkk'] = df_details['estimated_price_usd'].apply(lambda usd: round(usd * 6.38, 2))
     df_details[['estimated_volume_cm3', 'estimated_weight_kg']] = df_details['versions'].apply(lambda v: pd.Series(add_estimated_volume_and_weight(v)))
     
     df_details['player_count_scores'] = df_details['player_count_poll'].apply(player_count_poll_to_scores)

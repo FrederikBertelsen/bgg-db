@@ -1,5 +1,3 @@
-
-
 import os
 import math
 import ast
@@ -62,7 +60,7 @@ def compute_mechanic_importances(df: pd.DataFrame, out_csv: str = 'data/mechanic
     N = int(len(df))
     counts: dict[str, int] = {}
     for _, row in df.iterrows():
-        mechs = set(_ensure_list(row.get('mechanics')))
+        mechs = set(_ensure_list(row.get('p_mechanics')))
         for m in mechs:
             counts[m] = counts.get(m, 0) + 1
 
@@ -130,21 +128,23 @@ def weighted_jaccard(a: set, b: set, weights: dict, default_weight: float = 1e-6
 
 
 def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 10, weights: dict | None = None, print_results: bool = False) -> pd.DataFrame:
-    """Basic recommender: Jaccard on `categories` and `mechanics` plus numeric similarity on `rating_average` and `weight`.
+    """Recommender using p_ columns: p_types, p_mechanics, p_components, p_themes.
+    
+    Each property type gets its own weight for fine-grained control.
 
     Args:
         game_id: id of the seed game (compared against `df['id']`).
         df: dataframe with game details.
         method: reserved (only 'simple' supported now).
         k: number of results to return.
-        weights: dict with keys `cat`, `mech`, `rating`, `weight` controlling contribution.
+        weights: dict with keys `types`, `mech`, `comp`, `themes`, `rating`, `weight` controlling contribution.
         print_results: whether to print the recommended games.
 
     Returns:
         DataFrame of top-k candidates with a `score` column.
     """
     if weights is None:
-        weights = {"cat": 0.3, "mech": 0.4, "rating": 0.2, "weight": 0.1}
+        weights = {"types": 0.3, "mech": 0.25, "comp": 0.25, "themes": 0.0, "rating": 0.1, "weight": 0.1}
 
     seed_df = df[df['id'] == game_id]
     if seed_df.shape[0] == 0:
@@ -153,15 +153,24 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
 
     cands = df[df['id'] != game_id].copy()
 
-    seed_cats = set(_ensure_list(seed.get('categories', [])))
-    seed_mech = set(_ensure_list(seed.get('mechanics', [])))
+    seed_types = set(_ensure_list(seed.get('p_types', [])))
+    seed_mech = set(_ensure_list(seed.get('p_mechanics', [])))
+    seed_comp = set(_ensure_list(seed.get('p_components', [])))
+    seed_themes = set(_ensure_list(seed.get('p_themes', [])))
     seed_weight = _extract_weight(seed.get('weight_average', None)) or seed.get('weight_average')
 
-    # categories and mechanics similarity (0..1)
-    cats_sim = cands['categories'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_cats))
+    # types similarity (0..1)
+    types_sim = cands['p_types'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_types))
+    
     # mechanics similarity: use weighted Jaccard with precomputed mechanic importances
     mech_weights = load_or_compute_mechanic_importances(df, path='data/mechanic_importances.csv')
-    mech_sim = cands['mechanics'].apply(lambda x: weighted_jaccard(seed_mech, set(_ensure_list(x)), mech_weights))
+    mech_sim = cands['p_mechanics'].apply(lambda x: weighted_jaccard(seed_mech, set(_ensure_list(x)), mech_weights))
+    
+    # components similarity (0..1)
+    comp_sim = cands['p_components'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_comp))
+    
+    # themes similarity (0..1)
+    themes_sim = cands['p_themes'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_themes))
 
     # rating bonus: higher-rated games receive a small global quality bonus (avg_rating/10)
     def rating_bonus(x):
@@ -183,8 +192,10 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
     weight_sim_series = cands['weight_average'].apply(weight_sim)
 
     score = (
-        weights.get('cat', 0) * cats_sim
+        weights.get('types', 0) * types_sim
         + weights.get('mech', 0) * mech_sim
+        + weights.get('comp', 0) * comp_sim
+        + weights.get('themes', 0) * themes_sim
         + weights.get('rating', 0) * rating_sim_series
         + weights.get('weight', 0) * weight_sim_series
     )

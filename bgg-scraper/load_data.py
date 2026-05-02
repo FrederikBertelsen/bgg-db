@@ -12,15 +12,15 @@ def load_scrape_metadata() -> pd.DataFrame:
     if os.path.exists(metadata_file):
         return pd.read_csv(metadata_file)
     else:
-        print(f"No scrape metadata file found at {metadata_file}. Returning empty DataFrame.")
-        return pd.DataFrame()
+        df_metadata = pd.DataFrame(columns=["id", "rating_count", "last_scraped_date"])
+        print(f"No scrape metadata file found at {metadata_file}. Creating new empty metadata DataFrame.")
+        return df_metadata
 
 def save_scrape_metadata(df_metadata: pd.DataFrame) -> None:
     metadata_file = f"data/scrape_metadata.csv"
-    if os.path.exists(metadata_file):
-        df_metadata.to_csv(metadata_file, mode='a', header=False, index=False)
-    else:
-        df_metadata.to_csv(metadata_file, index=False)
+    # deduplicate metadata by game ID, keeping the most recent entry for each game
+    df_metadata = df_metadata.drop_duplicates(subset=["id"], keep="last")
+    df_metadata.to_csv(metadata_file, index=False)
 
 def update_scrape_metadata(df_final: pd.DataFrame):
     df_metadata = load_scrape_metadata()
@@ -42,6 +42,7 @@ def update_scrape_metadata(df_final: pd.DataFrame):
             new_rows.append(new_metadata)
         
     df_metadata = pd.concat([df_metadata, pd.DataFrame(new_rows)], ignore_index=True)
+    df_metadata = df_metadata.drop_duplicates(subset=["id"], keep="last")
     
     save_scrape_metadata(df_metadata)
 
@@ -76,3 +77,7 @@ def calc_boardgame_ids_to_scrape(df_filtered_ranks: pd.DataFrame) -> list[str]:
     return ids_to_scrape
 
 
+if __name__ == "__main__":
+    df_metadata = load_scrape_metadata()
+    print(df_metadata.head())
+    save_scrape_metadata(df_metadata)
