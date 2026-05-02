@@ -43,10 +43,10 @@ Creatures,Theme
 Crime,Theme
 Critical Hits and Failures,Mechanic
 Crowdfunded,Tag
-Customizable,Mechanic
 Deck Building,Mechanic
 Delayed Purchase,Mechanic
 Dexterity,Mechanic
+Dice Game,Type
 Dice,Component
 Digital Hybrid,Component
 Digital Implementation,Tag
@@ -203,7 +203,8 @@ Team-Based Game,Type
 Tech Trees / Tech Tracks,Mechanic
 Territory Building,Mechanic
 Thematic,Theme
-Tile Placement,Component
+Tile Placement,Mechanic
+Tiles,Component
 Timer,Component
 Track Movement,Mechanic
 Trading,Mechanic
@@ -231,3 +232,5 @@ history,Theme
 strategy,Type
 Childrens Game,Type
 Turn Order,Mechanic
+Pirates,Theme
+Customizable Game,Type
