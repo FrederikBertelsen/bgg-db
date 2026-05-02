@@ -524,6 +524,23 @@ class BoardGameDB:
         unique_types_df.sort_values(by='type', inplace=True)
         unique_types_df.to_csv('data/unique_types.csv', index=False)
 
+    def cache_unique_subdomains(self) -> None:
+        """
+        Precompute and cache the unique subdomains across all games in the dataset.
+        This can speed up recommendation computations that rely on subdomain similarity.
+        """
+
+        print("\nCaching unique subdomains...")
+
+        self.unique_subdomains = set()
+        for subdomains in self.df_games['subdomains'].dropna():
+            self.unique_subdomains.update(_ensure_list(subdomains))
+
+        # create dataframe and save to .csv file
+        unique_subdomains_df = pd.DataFrame(list(self.unique_subdomains), columns=['subdomain'])
+        unique_subdomains_df.sort_values(by='subdomain', inplace=True)
+        unique_subdomains_df.to_csv('data/unique_subdomains.csv', index=False)
+
     def cache_and_convert_unique_wanted_families(self) -> None:
         """
         Precompute and cache the unique families across all games in the dataset.
@@ -709,7 +726,7 @@ class BoardGameDB:
 
         pre_remove_contains = ["Hall of Fame"]
 
-        print("\nCaching unique families...")
+        print("\nCaching and converting unique families...")
 
         # filter families based on wanted_families mapping (if value contains key from wanted_families, keep it and translate to the mapped value; otherwise discard) and remove families that contain any of the pre_remove_contains substrings (case-insensitive)
         # each games list of families should not have duplicates after this filtering, but we can keep track of the unique families across all games in a set for caching and later use in recommendations. We can also save the unique families to a .csv file for reference.
@@ -743,7 +760,7 @@ class BoardGameDB:
 
         existing_properties = set(self.property_mappings['property'])
         all_properties = set()
-        for prop_set in [self.unique_mechanics, self.unique_categories, self.unique_types, self.unique_families]:
+        for prop_set in [self.unique_mechanics, self.unique_categories, self.unique_types, self.unique_families, self.unique_subdomains]:
             all_properties.update(prop_set)
         
         missing_properties = all_properties - existing_properties
@@ -824,8 +841,25 @@ class BoardGameDB:
         self.property_categorizations.set_index('property', inplace=True)
         
         # convert properties to dict of categories to list of properties
-        self.df_games['properties_categorized'] = self.df_games['properties'].apply(lambda props: {self.property_categorizations.loc[prop, 'category'] if prop in self.property_categorizations.index and pd.notna(self.property_categorizations.loc[prop, 'category']) else 'uncategorized': prop for prop in props} if isinstance(props, list) else props)
-        
+        # use only the properties and the property categories. the unique lists on this class are NOT the same as the p_ columns. so DON'T USE self.unique_mechanics, etc.
+        def _categorize_properties(props, category):
+            if props is None or props is pd.NA:
+                return []
+            if isinstance(props, float) and pd.isna(props):
+                return []
+            if not isinstance(props, (list, tuple, set, pd.Index)):
+                return []
+            return [
+                prop for prop in props
+                if prop in self.property_categorizations.index and self.property_categorizations.loc[prop, 'category'] == category
+            ]
+
+        self.df_games['p_mechanics'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Mechanic'))
+        self.df_games['p_types'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Type'))
+        self.df_games['p_components'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Component'))
+        self.df_games['p_themes'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Theme'))
+        self.df_games['p_tags'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Tag'))
+
 
     def load_data(self) -> None:
         """
@@ -875,6 +909,7 @@ class BoardGameDB:
         self.cache_unique_mechanics()
         self.cache_unique_categories()
         self.cache_unique_types()
+        self.cache_unique_subdomains()
         self.cache_and_convert_unique_wanted_families()
 
         self.load_property_mappings()
