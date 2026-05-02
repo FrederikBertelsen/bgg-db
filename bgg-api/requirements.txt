@@ -3,6 +3,3 @@ pandas
 thefuzz
 uvicorn
 werkzeug
-sentence-transformers
-faiss-cpu
-scikit-learn

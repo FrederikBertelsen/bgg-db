@@ -11,38 +11,21 @@ import pandas as pd
 
 from boardgame_db import BoardGameDB
 from data_conversion import to_json_full
-from description_recommender import recommend_by_description
-from hybrid_recommender import recommend_hybrid
 
 
-df_games = BoardGameDB().df_games
+db = BoardGameDB()
+df_games = db.df_games
 
-column_name = 'properties'
+# catan = db.get_game_by_id("13")
+# if catan is None:
+#     print("Catan not found in database")
+#     exit()
+    
+# print(to_json_full(catan))
 
-series = df_games[column_name].dropna()
-
-
-from itertools import combinations
-from collections import Counter
-
-def find_common_combinations(series: pd.Series, n: int = 3, top_k: int = 20):
-    combo_counter = Counter()
-    for mech_list in series.dropna():
-        combos = combinations(set(mech_list), n)
-        combo_counter.update(combos)
-        
-    return combo_counter.most_common(top_k)
-
-
-for i in range(1,2):
-    print(f"\nTop 10 most common combinations of {i} {column_name}:")
-    results = find_common_combinations(series, n=i, top_k=9999999)
-
-    if len(results) == 0:
-        print("No combinations found.")
-        exit()
-
-    for combo, count in results:
-            print(f"{count}: {', '.join(combo)}")
-
-print(f"\nUnique {column_name}: {len(series.explode().unique())}")
+# print nunmber of unique values in each of these columns
+for col in ['p_mechanics', 'p_types', 'p_components', 'p_themes', 'p_tags']:
+    unique_values = set()
+    for sublist in df_games[col]:
+        unique_values.update(sublist)
+    print(f"{col}: {len(unique_values)} unique values")
