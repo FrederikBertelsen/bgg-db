@@ -328,18 +328,24 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
                 version_data = pull_versions_json(scraper, boardgame_id)
                 if version_data:
                     cleaned_data["versions"] = version_data
+                else:
+                    cleaned_data["versions"] = []
 
                 # sleep(WAIT_BETWEEN_PAGES)
                 # print(f"Fetching shopping data...")
                 shopping_data = pull_shopping_json(scraper, boardgame_id)
                 if shopping_data:
                     cleaned_data["shopping"] = shopping_data
+                else:
+                    cleaned_data["shopping"] = []
                 
                 sleep(WAIT_BETWEEN_PAGES)
                 # print(f"Fetching player count poll data...")
                 player_count_poll_data = pull_player_count_poll_json(scraper, boardgame_id)
                 if player_count_poll_data:
                     cleaned_data["player_count_poll"] = player_count_poll_data
+                else:
+                    cleaned_data["player_count_poll"] = {}
                 
                 # sleep(WAIT_BETWEEN_PAGES)
                 # print(f"Fetching weight poll data...")
