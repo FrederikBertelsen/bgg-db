@@ -1,6 +1,9 @@
 /data/**
 
-!/data/final/.gitkeep
+!/data/final/
+!/data/final/*.csv
+!/data/property_metadata/
+!/data/property_metadata/*.csv
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode,python,macos
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode,python,macos
