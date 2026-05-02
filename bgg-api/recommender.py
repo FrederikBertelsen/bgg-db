@@ -130,7 +130,7 @@ def weighted_jaccard(a: set, b: set, weights: dict, default_weight: float = 1e-6
 
 
 def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 10, weights: dict | None = None, print_results: bool = False) -> pd.DataFrame:
-    """Basic recommender: Jaccard on `categories` and `mechanics` plus numeric similarity on `average_rating` and `weight`.
+    """Basic recommender: Jaccard on `categories` and `mechanics` plus numeric similarity on `rating_average` and `weight`.
 
     Args:
         game_id: id of the seed game (compared against `df['id']`).
@@ -171,7 +171,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         except Exception:
             return 0.0
 
-    rating_sim_series = cands['average_rating'].apply(rating_bonus)
+    rating_sim_series = cands['rating_average'].apply(rating_bonus)
 
     # weight similarity: assume typical boardgame weight range ~ [1,5]
     def weight_sim(x):
@@ -180,7 +180,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
             return 0.0
         return max(0.0, 1.0 - (abs(w - float(seed_weight)) / 4.0))
 
-    weight_sim_series = cands['weight'].apply(weight_sim)
+    weight_sim_series = cands['weight_average'].apply(weight_sim)
 
     score = (
         weights.get('cat', 0) * cats_sim
@@ -202,7 +202,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
                 'name': row.get('name', ''),
                 'score': f"{row.get('score', 0):.3f}",
                 'overall_rank': overall_rank or '',
-                'avg_rating': row.get('average_rating') or '',
+                'avg_rating': row.get('rating_average') or '',
                 'weight': _extract_weight(row.get('weight')) or row.get('average_weight') or '',
                 'year': row.get('year_published') or '',
                 'url': f"https://boardgamegeek.com/boardgame/{row.get('id')}"

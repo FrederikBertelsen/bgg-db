@@ -65,7 +65,7 @@ def autocomplete_search(search_term: str): # list[str]
 
 @app.route("/recommend/<game_id>")
 def recommend_games(game_id: str): # list[game_card]
-    n = request.args.get("n", default=5, type=int)
+    n = request.args.get("n", default=10, type=int)
 
     try:
         recs = db.recommend_games(game_id, n=n)
@@ -78,4 +78,4 @@ def recommend_games(game_id: str): # list[game_card]
     return to_json_cards(recs)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=8443, debug=True)

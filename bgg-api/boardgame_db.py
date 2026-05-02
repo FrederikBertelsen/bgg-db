@@ -2,7 +2,9 @@ import os
 import glob
 import pandas as pd
 import re
+import ast
 from thefuzz import process, fuzz
+from data_conversion import parse_json_like_columns
 from recommender import _ensure_list, compute_mechanic_importances, recommend
 
 # Common stopwords to ignore for token-based matching/penalties
@@ -436,7 +438,7 @@ class BoardGameDB:
         
         recommendations = recommend(id, self.df_games, k=n, print_results=False)
 
-        return recommendations.sort_values('score', ascending=False)
+        return recommendations
     
     def cache_all_names(self) -> None:
         """
@@ -453,7 +455,7 @@ class BoardGameDB:
             name_to_id[row['name']] = row['id']
             name_is_canonical.add(row['name'])
             # alternate names
-            if pd.notnull(row['alternate_names']):
+            if len(row['alternate_names']) > 0:
                 for alt_name in _ensure_list(row['alternate_names']):
                     alt_clean = alt_name.strip()
                     # skip very short alternate names which are noisy (e.g., 'Ion')
@@ -481,6 +483,7 @@ class BoardGameDB:
 
         # create dataframe and save to .csv file
         unique_mechanics_df = pd.DataFrame(list(self.unique_mechanics), columns=['mechanic'])
+        unique_mechanics_df.sort_values(by='mechanic', inplace=True)
         unique_mechanics_df.to_csv('data/unique_mechanics.csv', index=False)
 
     def cache_unique_categories(self) -> None:
@@ -497,11 +500,332 @@ class BoardGameDB:
 
         # create dataframe and save to .csv file
         unique_categories_df = pd.DataFrame(list(self.unique_categories), columns=['category'])
+        unique_categories_df.sort_values(by='category', inplace=True)
         unique_categories_df.to_csv('data/unique_categories.csv', index=False)
 
-    def compute_recommendations(self):
+    def cache_recommendations(self):
         print("\nPrecomputing mechanic importances...")
         compute_mechanic_importances(self.df_games)
+
+    def cache_unique_types(self) -> None:
+        """
+        Precompute and cache the unique types across all games in the dataset.
+        This can speed up recommendation computations that rely on type similarity.
+        """
+
+        print("\nCaching unique types...")
+
+        self.unique_types = set()
+        for types in self.df_games['types'].dropna():
+            self.unique_types.update(_ensure_list(types))
+
+        # create dataframe and save to .csv file
+        unique_types_df = pd.DataFrame(list(self.unique_types), columns=['type'])
+        unique_types_df.sort_values(by='type', inplace=True)
+        unique_types_df.to_csv('data/unique_types.csv', index=False)
+
+    def cache_and_convert_unique_wanted_families(self) -> None:
+        """
+        Precompute and cache the unique families across all games in the dataset.
+        This can speed up recommendation computations that rely on family similarity.
+        """
+        wanted_families = {
+            "animals": "Animals",
+            "Safari Parks": "Animals",
+            "zoos": "Animals",
+            "Aquaria": "Animals",
+
+            "adventure": "Adventure",
+
+            "Creatures": "Creatures",
+
+            "Crowdfunding": "Crowdfunded",
+
+            "Digital Implementation": "Digital Implementation",
+
+            "vehicles": "Vehicles",
+            "automotive": "Vehicles",
+            "cars": "Vehicles",
+            "airline": "Vehicles",
+            "Trains": "Vehicles",
+            "Trucks": "Vehicles",
+
+            "Tropical": "Nature",
+            "Nature": "Nature",
+            "trees": "Nature",
+            "wildlife": "Nature",
+            "Forest": "Nature",
+            "Weather": "Nature",
+            "Swamps": "Nature",
+            "bogs": "Nature",
+            "Wetlands": "Nature",
+
+            "Witches": "Magic",
+            "magic": "Magic",
+            "Wizards": "Magic",
+            "Spells": "Magic",
+            "Sorcery": "Magic",
+
+            "disney": "Fairy Tales",
+            "Folk Tales & Fairy Tales": "Fairy Tales",
+            "Storytelling": "Fairy Tales",
+
+            "Tableau Building": "Tableau Building",
+
+            "Food": "Food",
+            "Restaurant": "Food",
+            "Café": "Food",
+            "cafe": "Food",
+
+            "ocean": "Ocean",
+            "Under the Sea": "Ocean",
+            "sea": "Ocean",
+
+            "history": "History",
+            "History": "History",
+            "Vikings": "History",
+
+            "card game": "Card Game",
+            "Playing Card": "Card Game",
+
+            "simulation": "Simulation",
+
+            "crossword": "Word Game",
+            "Word Games": "Word Game",
+            "words": "Word Game",
+
+            "dungeon Crawler": "Dungeon Crawler",
+
+            "escape Room": "Escape Room",
+
+            "two-player": "Two-Player",
+            "Two Player": "Two-Player",
+
+            "fighting": "Fighting",
+
+            "cities": "Location",
+            "City": "Location",
+            "Continent": "Location",
+            "Country": "Location",
+            "ancient": "Location",
+            "Islands": "Location",
+            "Mountains": "Location",
+            "Region": "Location",
+            "Rivers": "Location",
+            "States:": "Location",
+            
+            "Sports": "Sports",
+
+            "Space": "Science Fiction",
+            "Cyberpunk": "Science Fiction",
+            "Robots": "Science Fiction",
+            "Sci-Fi": "Science Fiction",
+            "Steampunk": "Science Fiction",
+
+            "Spooky": "Horror",
+            "Horror": "Horror",
+            "scary": "Horror",
+
+            "Mythology": "Mythology",
+            "Religious": "Mythology",
+            "Cryptids": "Mythology",
+            "Cthulhu": "Mythology",
+
+            "Pirates": "Ocean",
+            "Sealife": "Ocean",
+
+            "Post-Apocalyptic": "Post-Apocalyptic",
+
+            "4X": "4X",
+
+            "Bluffing": "Bluffing",
+
+            "Campaign": "Campaign",
+
+            "Trading Game": "Trading",
+            "trading": "Trading",
+
+            "Medical": "Science",
+            "doctors": "Science",
+            "Scientist": "Science",
+            "Biology": "Science",
+            "science": "Science",
+
+            "Crime": "Crime",
+            "burglary": "Crime",
+            "Heist": "Crime",
+
+            "Detective": "Murder / Mystery",
+
+            "Cooperative": "Cooperative",
+
+            "Hidden Movement": "Hidden Movement",
+
+            "Deckbuilding": "Deckbuilding",
+
+            "Roll-and-Write": "Roll-and-Write",
+            "roll and write": "Roll-and-Write",
+
+            "Construction": "Construction",
+
+            "collectible": "Collectible",
+
+            "grid": "Grid",
+
+            "Hex": "Hexagonal",
+
+            "Polyominoes": "Polyominoes",
+
+            "Timer": "Timer",
+
+            "Meeples": "Meeples",
+            "Standees": "Meeples",
+
+            "Miniature": "Miniatures",
+            
+            "3d": "3D",
+            "3 dimensional": "3D",
+            "3-dimensional": "3D",
+
+            "dice": "Dice",
+            "Drop Tower": "Dice",
+            
+            "War games": "War Game",
+            "war game": "War Game",
+            "war-game": "War Game",
+            "war ": "War Game",
+            "war-": "War Game",
+            "warfare": "War Game",
+
+            "drawing": "Drawing",
+            "Crayons": "Drawing",
+            "Dry Erase Markers": "Drawing",
+
+            "Digital Hybrid": "Digital Hybrid",
+
+            "Trivia": "Trivia",
+            "Quiz": "Trivia",
+        }
+
+        pre_remove_contains = ["Hall of Fame"]
+
+        print("\nCaching unique families...")
+
+        # filter families based on wanted_families mapping (if value contains key from wanted_families, keep it and translate to the mapped value; otherwise discard) and remove families that contain any of the pre_remove_contains substrings (case-insensitive)
+        # each games list of families should not have duplicates after this filtering, but we can keep track of the unique families across all games in a set for caching and later use in recommendations. We can also save the unique families to a .csv file for reference.
+        self.df_games['families'] = self.df_games['families'].apply(lambda fams: [family for family in _ensure_list(fams) if not any(substring.lower() in family.lower() for substring in pre_remove_contains)] if fams is not None else fams)
+        self.df_games['families'] = self.df_games['families'].apply(lambda fams: list(set(wanted_families[key] for family in _ensure_list(fams) for key in wanted_families if key.lower() in family.lower())) if fams is not None else fams)
+
+        self.unique_families = set()
+        for families in self.df_games['families'].dropna():
+            self.unique_families.update(_ensure_list(families))
+
+        # create dataframe and save to .csv file
+        unique_families_df = pd.DataFrame(list(self.unique_families), columns=['family'])
+        unique_families_df.sort_values(by='family', inplace=True)
+        # add a count of how many games have each family as a new column
+        unique_families_df['count'] = unique_families_df['family'].apply(lambda f: self.df_games['families'].dropna().apply(lambda fams: f in _ensure_list(fams)).sum())
+        unique_families_df.to_csv('data/unique_families.csv', index=False)
+
+
+    def load_property_mappings(self) -> None:
+        # check if data/property_mappings.csv exists and load it if so, otherwise create an empty mapping
+        # check if all types, mechanics, and categories in the dataset are present in the mapping, and add the missing ones and save the updated mapping back to the CSV file
+        # the columns are: 'property', 'type'
+        # use unique values from cache.
+        mapping_file = 'data/property_metadata/property_mappings.csv'
+        if os.path.exists(mapping_file):
+            self.property_mappings = pd.read_csv(mapping_file)
+            # ensure 'name' is loaded as a list of strings (if it is not a string representation of a list, convert it to a list; if it is NaN, convert to empty list)
+            self.property_mappings['name'] = self.property_mappings['name'].apply(lambda x: _ensure_list(x) if pd.notna(x) else [])
+        else:
+            self.property_mappings = pd.DataFrame(columns=['property', 'name'])
+
+        existing_properties = set(self.property_mappings['property'])
+        all_properties = set()
+        for prop_set in [self.unique_mechanics, self.unique_categories, self.unique_types, self.unique_families]:
+            all_properties.update(prop_set)
+        
+        missing_properties = all_properties - existing_properties
+        if missing_properties:
+            print(f"\nAdding {len(missing_properties)} missing properties to mapping...")
+            new_rows = pd.DataFrame({
+                'property': list(missing_properties), 
+                'name': [None] * len(missing_properties), 
+            })
+            self.property_mappings = pd.concat([self.property_mappings, new_rows], ignore_index=True)
+            # sort before saving
+            # self.property_mappings.sort_values(by='property', inplace=True)
+            self.property_mappings.to_csv(mapping_file, index=False)
+        
+        self.property_mappings.set_index('property', inplace=True)
+
+    def collect_and_translate_properties(self) -> None:
+        # collect all unique mechanics, categories, types, and families from the dataset and translate them to a common language using the property_mappings (if a mapping exists for a given property, use the mapped name; otherwise keep the original name)
+        # this can be used to create a more unified representation of game properties for recommendation computations
+        def translate_property(prop: str) -> list[str]:
+            if prop in self.property_mappings.index:
+                name = self.property_mappings.loc[prop, 'name']
+                if isinstance(name, str) and len(name) > 0:
+                    return [name]
+                if isinstance(name, list) and len(name) > 0:
+                    return name
+            return [prop]
+
+        # collect all to single list column of unique properties for mechanics, categories, types, and families
+        # translate_property(prop) returns a list -> flatten and deduplicate
+        self.df_games['properties'] = self.df_games.apply(
+            lambda row: list(
+                set(
+                    name
+                    for prop in (
+                        _ensure_list(row['mechanics'])
+                        + _ensure_list(row['categories'])
+                        + _ensure_list(row['types'])
+                        + _ensure_list(row['families'])
+                    )
+                    if pd.notna(prop)
+                    for name in translate_property(prop)
+                )
+            ),
+            axis=1,
+        )
+
+
+    def load_categorization_data_and_categorize_properties(self) -> None:
+        # nearly same as load_property_mappings(), but load data/property_metadata/property_categorizations.csv which has columns 'property' and 'category', and use it to categorize properties into broader categories (e.g., 'worker placement' mechanic might be categorized under 'mechanic' category, while 'Fantasy' family might be categorized under 'theme' category).
+        # This can help with recommendation computations that want to consider properties at different levels of granularity.
+
+        categorization_file = 'data/property_metadata/property_categorizations.csv'
+        if os.path.exists(categorization_file):
+            self.property_categorizations = pd.read_csv(categorization_file)
+        else:
+            self.property_categorizations = pd.DataFrame(columns=['property', 'category'])
+
+        existing_properties = set(self.property_categorizations['property'])
+        all_properties = set()
+        # use properties column
+        for props in self.df_games['properties'].dropna():
+            all_properties.update(props)
+
+        
+        missing_properties = all_properties - existing_properties
+        if missing_properties:
+            print(f"\nAdding {len(missing_properties)} missing properties to categorization...")
+            new_rows = pd.DataFrame({
+                'property': list(missing_properties), 
+                'category': [None] * len(missing_properties), 
+            })
+            self.property_categorizations = pd.concat([self.property_categorizations, new_rows], ignore_index=True)
+            # sort before saving
+            # self.property_categorizations.sort_values(by='property', inplace=True)
+            self.property_categorizations.to_csv(categorization_file, index=False)
+        
+        self.property_categorizations.set_index('property', inplace=True)
+        
+        # convert properties to dict of categories to list of properties
+        self.df_games['properties_categorized'] = self.df_games['properties'].apply(lambda props: {self.property_categorizations.loc[prop, 'category'] if prop in self.property_categorizations.index and pd.notna(self.property_categorizations.loc[prop, 'category']) else 'uncategorized': prop for prop in props} if isinstance(props, list) else props)
+        
 
     def load_data(self) -> None:
         """
@@ -522,6 +846,7 @@ class BoardGameDB:
 
         # Load base (oldest) file
         base = pd.read_csv(files[0])
+        base = parse_json_like_columns(base)
         if "id" not in base.columns:
             raise ValueError(f"CSV file {files[0]} does not contain required 'id' column")
         base["id"] = base["id"].astype(str)
@@ -531,6 +856,7 @@ class BoardGameDB:
         # Apply updates in filename order so newer files overwrite older values.
         for f in files[1:]:
             upd = pd.read_csv(f)
+            upd = parse_json_like_columns(upd)
             if "id" not in upd.columns:
                 raise ValueError(f"CSV file {f} does not contain required 'id' column")
             upd["id"] = upd["id"].astype(str)
@@ -545,9 +871,18 @@ class BoardGameDB:
         print("\n------------------ Preparing BoardGameDB ------------------")
 
         self.load_data()
-        self.compute_recommendations()
+                
         self.cache_unique_mechanics()
         self.cache_unique_categories()
+        self.cache_unique_types()
+        self.cache_and_convert_unique_wanted_families()
+
+        self.load_property_mappings()
+        self.collect_and_translate_properties()
+        self.load_categorization_data_and_categorize_properties()
+
         self.cache_all_names()
+
+        self.cache_recommendations()
 
         print("\n------------------------------------------------------------\n")

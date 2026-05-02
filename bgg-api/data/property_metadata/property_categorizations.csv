@@ -1,0 +1,233 @@
+property,category
+3D,Component
+4X,Type
+Abstract,Type
+Action / Event,Mechanic
+Action Points,Mechanic
+Action Queue,Mechanic
+Action Retrieval,Mechanic
+Advantage Token,Mechanic
+Adventure,Theme
+Alliances,Mechanic
+Animals,Theme
+Arabian,Theme
+Area Majority / Influence,Mechanic
+Area Movement,Mechanic
+Area-Impulse,Mechanic
+Auction,Mechanic
+Automatic Resource Growth,Mechanic
+Betting,Mechanic
+Bias,Mechanic
+Bidding,Mechanic
+Bingo,Mechanic
+Bluffing,Mechanic
+Book,Theme
+Bribery,Mechanic
+Campaign,Theme
+Card Game,Type
+Card Play Conflict Resolution,Mechanic
+Catch the Leader,Mechanic
+Chaining,Mechanic
+Chit-Pull System,Mechanic
+Civilization,Theme
+Collectible,Component
+Comic Book / Strip,Theme
+Command Cards,Component
+Commodity Speculation,Mechanic
+Communication Limits,Mechanic
+Connections,Mechanic
+Construction,Mechanic
+Contracts,Mechanic
+Cooperative,Type
+Creatures,Theme
+Crime,Theme
+Critical Hits and Failures,Mechanic
+Crowdfunded,Tag
+Customizable,Mechanic
+Deck Building,Mechanic
+Delayed Purchase,Mechanic
+Dexterity,Mechanic
+Dice,Component
+Digital Hybrid,Component
+Digital Implementation,Tag
+Drafting,Mechanic
+Drawing,Mechanic
+Dungeon Crawler,Theme
+Economic,Type
+Educational,Type
+Electronic,Tag
+Enclosure,Mechanic
+End Game Bonuses,Mechanic
+Escape Room,Type
+Events,Mechanic
+Expansion,Tag
+Exploration,Mechanic
+Fairy Tales,Theme
+Family,Type
+Fantasy,Theme
+Farming,Type
+Fighting,Type
+Finale Ending,Mechanic
+Flicking,Mechanic
+Follow,Mechanic
+Food,Theme
+Force Commitment,Mechanic
+Game System,Component
+Grid,Component
+Hand Management,Mechanic
+Hexagonal,Component
+Hidden Movement,Mechanic
+Hidden Roles,Mechanic
+Hidden Victory Points,Mechanic
+Highest-Lowest Scoring,Mechanic
+History,Theme
+Horror,Theme
+Hot Potato,Mechanic
+Humor,Theme
+"I Cut, You Choose",Mechanic
+Impulse Movement,Mechanic
+Income,Mechanic
+Increase Value of Unchosen Resources,Mechanic
+Induction / Deduction,Mechanic
+Industry / Manufacturing,Type
+Interrupts,Mechanic
+Investment,Mechanic
+Kill Steal,Mechanic
+King of the Hill,Mechanic
+Ladder Climbing,Mechanic
+Layering,Mechanic
+Legacy Game,Type
+Line of Sight,Mechanic
+Loans,Mechanic
+Location,Theme
+Lose a Turn,Mechanic
+Magic,Theme
+Mancala,Type
+Map Addition,Component
+Map Deformation,Component
+Map Reduction,Component
+Market,Mechanic
+Matching,Mechanic
+Math,Mechanic
+Mature / Adult,Type
+Maze,Mechanic
+Measurement Movement,Mechanic
+Meeples,Component
+Melding and Splaying,Mechanic
+Memory,Mechanic
+Miniatures,Component
+Minimap Resolution,Mechanic
+Modular Board,Component
+Move Through Deck,Mechanic
+Movement Points,Mechanic
+Movement Template,Mechanic
+Movies / TV / Radio theme,Theme
+Moving Multiple Units,Mechanic
+Multi-Use Cards,Component
+Multiple Maps,Component
+Murder / Mystery,Type
+Music,Type
+Mythology,Theme
+Narrative Choice / Paragraph,Theme
+Nature,Theme
+Negotiation,Mechanic
+Neighbor Scope,Mechanic
+Network and Route Building,Component
+Novel-based,Theme
+Number,Type
+Ocean,Theme
+Once-Per-Game Abilities,Mechanic
+Order Counters,Component
+Ordering,Mechanic
+Ownership,Mechanic
+Party Game,Type
+Passed Action Token,Component
+Pattern Building,Mechanic
+Pattern Movement,Mechanic
+Pattern Recognition,Mechanic
+Physical Removal,Mechanic
+Pick-up and Deliver,Mechanic
+Pieces as Map,Component
+Pike and Shot,Mechanic
+Player Elimination,Mechanic
+Player Judge,Mechanic
+Point to Point Movement,Mechanic
+Political,Theme
+Polyominoes,Component
+Post-Apocalyptic,Theme
+Print & Play,Type
+Prisoner's Dilemma,Mechanic
+Programmed Movement,Mechanic
+Push Your Luck,Mechanic
+Puzzle,Mechanic
+Questions and Answers,Mechanic
+Racing,Type
+Random Production,Mechanic
+Ratio / Combat Results Table,Mechanic
+Re-rolling and Locking,Mechanic
+Real-Time,Type
+Relative Movement,Mechanic
+Resource Queue,Mechanic
+Resource to Move,Mechanic
+Rock-Paper-Scissors,Mechanic
+Role Playing,Type
+Roles with Asymmetric Information,Mechanic
+Roll / Spin and Move,Mechanic
+Roll-and-Write,Mechanic
+Rondel,Component
+Science,Theme
+Science Fiction,Theme
+Score-and-Reset Game,Mechanic
+Secret Unit Deployment,Mechanic
+Set Collection,Mechanic
+Simulation,Mechanic
+Simultaneous Action Selection,Mechanic
+Single Loser Game,Mechanic
+Slide / Push,Mechanic
+Solitaire,Type
+Speed Matching,Mechanic
+Spies / Secret Agents,Theme
+Sports,Theme
+Stacking and Balancing,Mechanic
+Stat Check Resolution,Mechanic
+Static Capture,Mechanic
+Stock Holding,Mechanic
+Storytelling,Theme
+Strategy,Type
+Sudden Death Ending,Mechanic
+Tableau Building,Mechanic
+Tags,Mechanic
+Take That,Type
+Targeted Clues,Mechanic
+Team-Based Game,Type
+Tech Trees / Tech Tracks,Mechanic
+Territory Building,Mechanic
+Thematic,Theme
+Tile Placement,Component
+Timer,Component
+Track Movement,Mechanic
+Trading,Mechanic
+Traitor Game,Type
+Transportation,Theme
+Travel,Theme
+Trick-taking,Type
+Trivia,Type
+Tug of War,Mechanic
+Two-Player,Type
+Variable Phase Order,Mechanic
+Variable Player Powers,Mechanic
+Variable Set-up,Mechanic
+Vehicles,Theme
+Victory Points as a Resource,Mechanic
+Video Game Theme,Theme
+Voting,Mechanic
+War Game,Type
+Word Game,Type
+Worker Placement,Mechanic
+Zombies,Theme
+Zone of Control,Mechanic
+abstract,Type
+history,Theme
+strategy,Type
+Childrens Game,Type
+Turn Order,Mechanic

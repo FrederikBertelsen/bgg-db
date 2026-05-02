@@ -1,2 +1,2 @@
 #!/bin/bash
-uvicorn app:app --reload --port 8000
+gunicorn -w 1 -b 0.0.0.0:8443 app:app

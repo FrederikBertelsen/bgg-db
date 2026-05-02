@@ -1,5 +1,8 @@
-Flask
+flask
 pandas
 thefuzz
 uvicorn
-Werkzeug
+werkzeug
+sentence-transformers
+faiss-cpu
+scikit-learn
