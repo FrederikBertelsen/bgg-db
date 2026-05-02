@@ -1,0 +1,142 @@
+{
+  "PlayerCountBestMax": 4,
+  "PlayerCountBestMin": 4,
+  "PlayerCountRecommendedMax": 4,
+  "PlayerCountRecommendedMin": 2,
+  "PlayerCountVotes": 0,
+  "alternate_names": [
+    "Bombay Bazaar"
+  ],
+  "bayes_rating_average": 5.50072,
+  "categories": [
+    "Animals"
+  ],
+  "comment_count": 42,
+  "credits": [
+    {
+      "names": [
+        "Sylvie Barc",
+        "Juan Rodriguez"
+      ],
+      "role": "boardgame_designer"
+    },
+    {
+      "names": [
+        "Jussi Wallenius"
+      ],
+      "role": "boardgame_artist"
+    },
+    {
+      "names": [
+        "Tactic"
+      ],
+      "role": "boardgame_publisher"
+    }
+  ],
+  "description": "<p><strong>Bombay Bazar</strong> is a game of tactics, where players try to grow their elephants the longest trunk of all.</p>\\n\\n<p>Patience and inventiveness get results, as the pieces of trunk - and options - decrease. Luck can also play it's part in this game for the whole family.</p>\\n\\n<p><strong><a class=\"\" href=\"/wiki/page/Awards#\">Awards</a></strong></p>\\n\\n<p>2001 <a class=\"\" href=\"/wiki/page/%C3%85rets_Spil#\">Årets Familiespil</a>, Family Game of the Year Denmark<br />\\n2001 <a class=\"\" href=\"/wiki/page/Vuoden_Perhepeli#\">Vuoden Perhepeli</a></p>\\n\\n<p><strong>Re-implemented by:</strong></p>\\n\\n<p><a href=\"/boardgame/23426/valtra-tractors\" >Valtra Tractors</a></p>\\n\\n",
+  "estimated_volume_cm3": 5656.75,
+  "estimated_weight_kg": 0,
+  "expansions": [],
+  "families": [
+    "Animals: Elephants",
+    "Cities: Mumbai (India)",
+    "Country: India"
+  ],
+  "fan_count": 2,
+  "focus_video_id": null,
+  "geeklist_count": 36,
+  "has_parts_count": 0,
+  "honors": [
+    "2001 Årets Spil Best Family Game Winner",
+    "2001 Vuoden Peli Family Game of the Year Winner"
+  ],
+  "howtoplay_video_id": null,
+  "id": "5640",
+  "image_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__original/img/hJCobF8YOmfvkhKiSiWHbWz87GE=/0x0/filters:format(jpeg)/pic453846.jpg",
+  "instructional_video_id": null,
+  "language_dependence": "No necessary in-game text",
+  "max_players": 4,
+  "max_playtime": 45,
+  "mechanics": [
+    "Tile Placement"
+  ],
+  "min_age": 7,
+  "min_players": 1,
+  "min_playtime": 45,
+  "name": "Bombay Bazar",
+  "owned_count": 167,
+  "play_count": 234,
+  "play_count_last_month": 3,
+  "player_count_scores": {
+    "1": 0.25,
+    "2": 0.5,
+    "3": 0.75,
+    "4": 1,
+    "5": 0
+  },
+  "playthrough_video_id": null,
+  "preorder_count": 0,
+  "prev_owned_count": 54,
+  "ranks": [
+    {
+      "bayes_average": "5.50072",
+      "category": "Overall",
+      "rank": "25485"
+    }
+  ],
+  "rating_average": 5.49058,
+  "rating_count": 138,
+  "reimplementation": [],
+  "shopping": [],
+  "short_description": null,
+  "stddev_rating": 1.34907,
+  "subdomains": [],
+  "summary_video_id": null,
+  "thumbnail_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__previewthumb/img/XJcQEBUM7L-GhDYJbL5k1CQKvko=/fit-in/300x320/filters:strip_icc()/pic453846.jpg",
+  "trading_count": 6,
+  "types": [],
+  "url": "https://boardgamegeek.com/boardgame/5640/bombay-bazar",
+  "versions": [
+    {
+      "depth": 0,
+      "image_url": "https://cf.geekdo-images.com/oc5NcuNCD28g0Jtu6NizNQ__original/img/-W0gozE1IX9CMVfzJOz_lEGtjdo=/0x0/filters:format(jpeg)/pic75972.jpg",
+      "length": 0,
+      "name": "Multilingual edition 2002",
+      "url": "https://boardgamegeek.com/boardgameversion/32730/multilingual-edition-2002",
+      "weight_kg": 0,
+      "width": 0,
+      "year_published": "2002"
+    },
+    {
+      "depth": 5.5999888,
+      "image_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__original/img/hJCobF8YOmfvkhKiSiWHbWz87GE=/0x0/filters:format(jpeg)/pic453846.jpg",
+      "length": 37.2999,
+      "name": "Multilingual edition 2001",
+      "url": "https://boardgamegeek.com/boardgameversion/42971/multilingual-edition-2001",
+      "weight_kg": 0,
+      "width": 27.200098,
+      "year_published": "2001"
+    },
+    {
+      "depth": 5.588000000000001,
+      "image_url": "https://cf.geekdo-images.com/RvOyvWQPyaV-RaCs_ok18A__original/img/VNRFMQ2gc3drz6PrYhirIvnLb5Y=/0x0/filters:format(jpeg)/pic1080899.jpg",
+      "length": 37.083999999999996,
+      "name": "Multilingual edition with Vuoden Perhepeli and Årets Familiespil awards",
+      "url": "https://boardgamegeek.com/boardgameversion/136401/multilingual-edition-with-vuoden-perhepeli-and-are",
+      "weight_kg": 0,
+      "width": 27.177999999999997,
+      "year_published": "0"
+    }
+  ],
+  "view_count": 52443,
+  "want_parts_count": 0,
+  "want_to_buy_count": 2,
+  "want_to_play_count": 7,
+  "wanting_count": 1,
+  "website_url": "False",
+  "weight_average": 1.33,
+  "weight_votes": 15,
+  "wish_count": 11,
+  "wishlist_comment_count": 2,
+  "year_published": 2001
+}

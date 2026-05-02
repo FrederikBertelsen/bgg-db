@@ -1,0 +1,127 @@
+[
+  {
+    "id": "256065",
+    "max_players": 5,
+    "max_playtime": 35,
+    "min_players": 2,
+    "min_playtime": 35,
+    "name": "Carcassonne: Safari",
+    "ranks": [
+      {
+        "bayes_average": "5.9555",
+        "category": "Overall",
+        "rank": "3448"
+      },
+      {
+        "bayes_average": "6.07316",
+        "category": "Family",
+        "rank": "1063"
+      }
+    ],
+    "rating_average": 6.99919,
+    "score": 0.6899838,
+    "short_description": "Build the landscape in Africa and make waterwells for the animals.",
+    "thumbnail_url": "https://cf.geekdo-images.com/MuL2J7uZrxrnesCm9Ok76w__previewthumb/img/Lh5qWnG6-2vI7Sjsun4y5QhZ3Iw=/fit-in/300x320/filters:strip_icc()/pic4307408.png",
+    "weight_average": 1.81,
+    "year_published": 2018
+  },
+  {
+    "id": "406708",
+    "max_players": 4,
+    "max_playtime": 20,
+    "min_players": 2,
+    "min_playtime": 20,
+    "name": "Alpina",
+    "ranks": [
+      {
+        "bayes_average": "5.58138",
+        "category": "Overall",
+        "rank": "10459"
+      }
+    ],
+    "rating_average": 6.59706,
+    "score": 0.6819412,
+    "short_description": "Photograph animals in the Swiss National Park.",
+    "thumbnail_url": "https://cf.geekdo-images.com/nAxDdfP9AcpgzfQhoQFWfA__previewthumb/img/WE2Vbiy2trSmSjL7mTkOvsUOuws=/fit-in/300x320/filters:strip_icc()/pic7867467.jpg",
+    "weight_average": 1.67,
+    "year_published": 2024
+  },
+  {
+    "id": "146963",
+    "max_players": 5,
+    "max_playtime": 20,
+    "min_players": 2,
+    "min_playtime": 20,
+    "name": "Let Them Eat Shrimp!",
+    "ranks": [
+      {
+        "bayes_average": "5.585",
+        "category": "Overall",
+        "rank": "10243"
+      },
+      {
+        "bayes_average": "5.61426",
+        "category": "Family",
+        "rank": "2437"
+      }
+    ],
+    "rating_average": 6.57955,
+    "score": 0.6815910000000001,
+    "short_description": null,
+    "thumbnail_url": "https://cf.geekdo-images.com/BeVF2DaghubYn0PCVBtSvQ__previewthumb/img/ZnATidn6G76EzMB_Z6FdfrvST-I=/fit-in/300x320/filters:strip_icc()/pic1906526.jpg",
+    "weight_average": 1.5,
+    "year_published": 2014
+  },
+  {
+    "id": "33155",
+    "max_players": 5,
+    "max_playtime": 45,
+    "min_players": 2,
+    "min_playtime": 45,
+    "name": "Burrows",
+    "ranks": [
+      {
+        "bayes_average": "5.5896",
+        "category": "Overall",
+        "rank": "9933"
+      },
+      {
+        "bayes_average": "5.6236",
+        "category": "Family",
+        "rank": "2385"
+      }
+    ],
+    "rating_average": 6.16365,
+    "score": 0.673273,
+    "short_description": null,
+    "thumbnail_url": "https://cf.geekdo-images.com/GMSzSp3Bh4_da5Ih5qi_3w__previewthumb/img/sHdWOcYvq2bENKSrb1ikzXpxgx4=/fit-in/300x320/filters:strip_icc()/pic650564.jpg",
+    "weight_average": 1.5,
+    "year_published": 2010
+  },
+  {
+    "id": "34194",
+    "max_players": 5,
+    "max_playtime": 45,
+    "min_players": 2,
+    "min_playtime": 45,
+    "name": "Aquaretto",
+    "ranks": [
+      {
+        "bayes_average": "6.23977",
+        "category": "Overall",
+        "rank": "2074"
+      },
+      {
+        "bayes_average": "6.37193",
+        "category": "Family",
+        "rank": "617"
+      }
+    ],
+    "rating_average": 6.96527,
+    "score": 0.66580047116154,
+    "short_description": "Manage your water-themed zoo by making impressive exhibits maybe even baby animals!",
+    "thumbnail_url": "https://cf.geekdo-images.com/Uy_XB4UjqR3iwouKDMqxNg__previewthumb/img/3xG8T7dHoAflj4Ba1BzoVQdDHcg=/fit-in/300x320/filters:strip_icc()/pic1603517.jpg",
+    "weight_average": 2.12,
+    "year_published": 2008
+  }
+]

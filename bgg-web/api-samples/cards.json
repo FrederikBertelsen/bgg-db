@@ -1,0 +1,49 @@
+[
+  {
+    "id": "5640",
+    "max_players": 4,
+    "max_playtime": 45,
+    "min_players": 1,
+    "min_playtime": 45,
+    "name": "Bombay Bazar",
+    "ranks": [
+      {
+        "bayes_average": "5.50072",
+        "category": "Overall",
+        "rank": "25485"
+      }
+    ],
+    "rating_average": 5.49058,
+    "score": null,
+    "short_description": null,
+    "thumbnail_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__previewthumb/img/XJcQEBUM7L-GhDYJbL5k1CQKvko=/fit-in/300x320/filters:strip_icc()/pic453846.jpg",
+    "weight_average": 1.33,
+    "year_published": 2001
+  },
+  {
+    "id": "1406",
+    "max_players": 8,
+    "max_playtime": 180,
+    "min_players": 2,
+    "min_playtime": 60,
+    "name": "Monopoly",
+    "ranks": [
+      {
+        "bayes_average": "4.29346",
+        "category": "Overall",
+        "rank": "30530"
+      },
+      {
+        "bayes_average": "4.22039",
+        "category": "Family",
+        "rank": "3593"
+      }
+    ],
+    "rating_average": 4.36917,
+    "score": null,
+    "short_description": "In this competitive real estate market, there's only one possible outcome: Monopoly!",
+    "thumbnail_url": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__previewthumb/img/cO-1s_fAx_dqsuJxmwYjf3QG7ss=/fit-in/300x320/filters:strip_icc()/pic5786795.jpg",
+    "weight_average": 1.62,
+    "year_published": 1935
+  }
+]
