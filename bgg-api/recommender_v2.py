@@ -127,6 +127,121 @@ def weighted_jaccard(a: set, b: set, weights: dict, default_weight: float = 1e-6
     return sum_inter / sum_uni
 
 
+def _resolve_game(game: Any, df: pd.DataFrame | None = None, game_id_map: dict | None = None) -> Any:
+    """Resolve a game id or row-like object into something with .get access.
+    
+    Args:
+        game: game id, pd.Series, or dict
+        df: DataFrame (fallback for lookup if game_id_map not provided)
+        game_id_map: optional dict mapping game_id -> row for O(1) lookup
+    """
+    if isinstance(game, pd.Series):
+        return game
+    if isinstance(game, dict):
+        return game
+    
+    # Fast path: use pre-built mapping
+    if game_id_map is not None and game in game_id_map:
+        return game_id_map[game]
+    
+    # Fallback: use dataframe lookup
+    if df is None:
+        raise ValueError("df is required when passing game ids")
+
+    seed_df = df[df['id'] == game]
+    if seed_df.shape[0] == 0:
+        raise ValueError(f"game id not found: {game}")
+    return seed_df.iloc[0]
+
+
+def score_connection(
+    game_a: Any,
+    game_b: Any,
+    df: pd.DataFrame | None = None,
+    weights: dict | None = None,
+    mech_weights: dict | None = None,
+    game_id_map: dict | None = None,
+) -> dict:
+    """Return a symmetric connection score between two games.
+
+    The score reuses the same property-family comparisons as the recommender,
+    but compares two games directly instead of comparing a seed against a
+    candidate pool.
+    
+    Args:
+        game_a, game_b: game ids or row-like objects
+        df: DataFrame (fallback)
+        weights: property weights
+        mech_weights: mechanic importance weights
+        game_id_map: optional dict mapping game_id -> row for O(1) lookup (recommended for performance)
+    """
+    if weights is None:
+        weights = {"types": 0.3, "mech": 0.35, "comp": 0.2, "themes": 0.1, "rating": 0.0, "weight": 0.05}
+
+    a = _resolve_game(game_a, df, game_id_map=game_id_map)
+    b = _resolve_game(game_b, df, game_id_map=game_id_map)
+
+    if mech_weights is None and df is not None:
+        mech_weights = load_or_compute_mechanic_importances(df, path='data/mechanic_importances.csv')
+    elif mech_weights is None:
+        mech_weights = {}
+
+    a_types = set(_ensure_list(a.get('p_types', [])))
+    b_types = set(_ensure_list(b.get('p_types', [])))
+    a_mech = set(_ensure_list(a.get('p_mechanics', [])))
+    b_mech = set(_ensure_list(b.get('p_mechanics', [])))
+    a_comp = set(_ensure_list(a.get('p_components', [])))
+    b_comp = set(_ensure_list(b.get('p_components', [])))
+    a_themes = set(_ensure_list(a.get('p_themes', [])))
+    b_themes = set(_ensure_list(b.get('p_themes', [])))
+
+    types_sim = jaccard(a_types, b_types)
+    mech_sim = weighted_jaccard(a_mech, b_mech, mech_weights)
+    comp_sim = jaccard(a_comp, b_comp)
+    themes_sim = jaccard(a_themes, b_themes)
+
+    def rating_similarity(x: Any, y: Any) -> float:
+        try:
+            ax = float(x)
+            ay = float(y)
+            return max(0.0, 1.0 - (abs(ax - ay) / 10.0))
+        except Exception:
+            return 0.0
+
+    def weight_similarity(x: Any, y: Any) -> float:
+        ax = _extract_weight(x) or (x if isinstance(x, (int, float)) else None)
+        ay = _extract_weight(y) or (y if isinstance(y, (int, float)) else None)
+        if ax is None or ay is None:
+            return 0.0
+        return max(0.0, 1.0 - (abs(float(ax) - float(ay)) / 4.0))
+
+    rating_sim = rating_similarity(a.get('rating_average'), b.get('rating_average'))
+    weight_sim = weight_similarity(a.get('weight_average'), b.get('weight_average'))
+
+    score = (
+        weights.get('types', 0.0) * types_sim
+        + weights.get('mech', 0.0) * mech_sim
+        + weights.get('comp', 0.0) * comp_sim
+        + weights.get('themes', 0.0) * themes_sim
+        + weights.get('rating', 0.0) * rating_sim
+        + weights.get('weight', 0.0) * weight_sim
+    )
+
+    return {
+        'score': float(score),
+        'types': float(types_sim),
+        'mechanics': float(mech_sim),
+        'components': float(comp_sim),
+        'themes': float(themes_sim),
+        'rating': float(rating_sim),
+        'weight': float(weight_sim),
+        'game_a_id': a.get('id'),
+        'game_b_id': b.get('id'),
+        'game_a_name': a.get('name'),
+        'game_b_name': b.get('name'),
+    }
+
+
 def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 10, weights: dict | None = None, print_results: bool = False) -> pd.DataFrame:
     """Recommender using p_ columns: p_types, p_mechanics, p_components, p_themes.
     
