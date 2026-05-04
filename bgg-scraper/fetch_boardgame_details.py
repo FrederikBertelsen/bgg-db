@@ -328,6 +328,8 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
             sleep(WAIT_BETWEEN_PAGES)
             # print(f"Fetching geekitemPreload...")
             preload_json = pull_geek_item_preload_json(scraper, boardgame_id)
+
+            sleep(WAIT_BETWEEN_PAGES)
             # some of the property lists are cut off on main preload json.
             full_properties_json = pull_full_properties_json(scraper, boardgame_id)
             
