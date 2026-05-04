@@ -1,19 +1,28 @@
-import os
-import glob
-import re
 import pandas as pd
-import json
-from collections import defaultdict
-import pickle
-import hashlib
-from data_conversion import parse_json_like_columns
 from recommender import _ensure_list, compute_mechanic_importances, recommend
 from game_search import GameSearchEngine
 from niche_detector import discover_niches
+from boardgame_db_properties import (
+    collect_and_translate_properties,
+    load_or_create_property_categorizations,
+    load_or_create_property_mappings,
+    normalize_families,
+)
+from boardgame_db_features import collect_unique_values
+from boardgame_db_io import (
+    get_data_files_signature,
+    load_cache_manifest,
+    load_cached_boardgame_state,
+    load_merged_data,
+    save_cache_manifest,
+    save_cached_boardgame_state,
+)
+from boardgame_db_niches import create_and_persist_niches as persist_niche_artifacts
+from boardgame_db_pipeline import prepare_boardgame_db
 
 
 class BoardGameDB:
-    def __init__(self):        
+    def __init__(self, prepare_postprocessing: bool = True):        
         self.df_games: pd.DataFrame = pd.DataFrame()
         self.unique_mechanics: set[str] = set()
         self.unique_categories: set[str] = set()
@@ -31,99 +40,7 @@ class BoardGameDB:
         self.cache_dir = "data/cache"
         self.manifest_path = "data/cache_manifest.json"
 
-        self.prepare_db()
-
-    def _get_data_files_signature(self) -> tuple[int, str]:
-        """Return (file_count, hash_of_sorted_filenames)."""
-        data_folder_path = "data/final/"
-        pattern = os.path.join(data_folder_path, "*.csv")
-        files = sorted(glob.glob(pattern))
-        
-        if not files:
-            return 0, ""
-        
-        filenames = [os.path.basename(f) for f in files]
-        signature_str = ",".join(filenames)
-        file_hash = hashlib.md5(signature_str.encode()).hexdigest()
-        
-        return len(files), file_hash
-
-    def _load_cache_manifest(self) -> dict | None:
-        """Load the cache manifest if it exists."""
-        if os.path.exists(self.manifest_path):
-            try:
-                with open(self.manifest_path, "r") as f:
-                    return json.load(f)
-            except Exception:
-                pass
-        return None
-
-    def _save_cache_manifest(self, manifest: dict) -> None:
-        """Save the cache manifest."""
-        os.makedirs(os.path.dirname(self.manifest_path), exist_ok=True)
-        with open(self.manifest_path, "w") as f:
-            json.dump(manifest, f)
-
-    def _load_cached_data(self) -> bool:
-        """Load all cached data. Return True if successful, False otherwise."""
-        try:
-            with open(os.path.join(self.cache_dir, "df_games.pkl"), "rb") as f:
-                self.df_games = pickle.load(f)
-            
-            with open(os.path.join(self.cache_dir, "unique_mechanics.pkl"), "rb") as f:
-                self.unique_mechanics = pickle.load(f)
-            
-            with open(os.path.join(self.cache_dir, "unique_categories.pkl"), "rb") as f:
-                self.unique_categories = pickle.load(f)
-            
-            with open(os.path.join(self.cache_dir, "unique_types.pkl"), "rb") as f:
-                self.unique_types = pickle.load(f)
-            
-            with open(os.path.join(self.cache_dir, "unique_subdomains.pkl"), "rb") as f:
-                self.unique_subdomains = pickle.load(f)
-            
-            with open(os.path.join(self.cache_dir, "unique_families.pkl"), "rb") as f:
-                self.unique_families = pickle.load(f)
-            
-            with open(os.path.join(self.cache_dir, "mechanic_importances.pkl"), "rb") as f:
-                self.mechanic_importances = pickle.load(f)
-
-            # load niches cache if present
-            with open(os.path.join(self.cache_dir, "niches.pkl"), "rb") as f:
-                self._niches_cache = pickle.load(f)
-            
-            return True
-        except Exception:
-            return False
-
-    def _save_cached_data(self) -> None:
-        """Save all cached data."""
-        os.makedirs(self.cache_dir, exist_ok=True)
-        
-        with open(os.path.join(self.cache_dir, "df_games.pkl"), "wb") as f:
-            pickle.dump(self.df_games, f)
-        
-        with open(os.path.join(self.cache_dir, "unique_mechanics.pkl"), "wb") as f:
-            pickle.dump(self.unique_mechanics, f)
-        
-        with open(os.path.join(self.cache_dir, "unique_categories.pkl"), "wb") as f:
-            pickle.dump(self.unique_categories, f)
-        
-        with open(os.path.join(self.cache_dir, "unique_types.pkl"), "wb") as f:
-            pickle.dump(self.unique_types, f)
-        
-        with open(os.path.join(self.cache_dir, "unique_subdomains.pkl"), "wb") as f:
-            pickle.dump(self.unique_subdomains, f)
-        
-        with open(os.path.join(self.cache_dir, "unique_families.pkl"), "wb") as f:
-            pickle.dump(self.unique_families, f)
-        
-        with open(os.path.join(self.cache_dir, "mechanic_importances.pkl"), "wb") as f:
-            pickle.dump(self.mechanic_importances, f)
-
-        # save niches cache if available
-        with open(os.path.join(self.cache_dir, "niches.pkl"), "wb") as f:
-            pickle.dump(self._niches_cache, f)
+        self.prepare_db(prepare_postprocessing=prepare_postprocessing)
 
     def get_game_by_id(self, id: str) -> pd.Series | None:
         """
@@ -252,15 +169,6 @@ class BoardGameDB:
         return niches
 
     def create_and_persist_niches(self, niche_csv_path: str = "data/niches.csv", verbose: bool = True, params: dict | None = None, save_cache: bool = True) -> None:
-        """
-        Compute niches (using discover_niches), persist them to a CSV and add
-        `niches` (list of niche_ids) to `self.df_games` so the dataset knows which
-        niches each game qualifies for.
-
-        The CSV columns are: `niche_id`, `name`, `description`, `properties`, `games_count`.
-        `name` and `description` are left empty for manual editing later.
-        `properties` is stored as a JSON array string.
-        """
         if self.df_games.empty:
             if verbose:
                 print("No games loaded; skipping niche creation.")
@@ -269,46 +177,25 @@ class BoardGameDB:
         # Ensure niches are computed and cached by get_niches
         niches = self.get_niches(verbose=verbose, params=params)
 
-        os.makedirs(os.path.dirname(niche_csv_path), exist_ok=True)
-
-        niche_rows = []
-        game_to_niches = defaultdict(list)
-
-        for i, niche in enumerate(niches):
-            cluster_set, niche_props, selected, qualifying_games = niche
-            niche_id = f"niche_{i+1}"
-            properties = selected if selected is not None else []
-            games_list = [gid for gid, _, _, _ in qualifying_games]
-
-            for gid in games_list:
-                game_to_niches[gid].append(niche_id)
-
-            niche_rows.append({
-                "niche_id": niche_id,
-                "name": "",
-                "description": "",
-                "properties": json.dumps(properties, ensure_ascii=False),
-                "games_count": len(games_list),
-            })
-
-        niches_df = pd.DataFrame(niche_rows, columns=["niche_id", "name", "description", "properties", "games_count"])
-        niches_df.to_csv(niche_csv_path, index=False)
-
-        # Attach niche ids to df_games as a list column `niches`
-        # Preserve existing values if column exists by merging
-        def _assign_niches(gid):
-            return game_to_niches.get(str(gid), [])
-
-        self.df_games["niches"] = self.df_games["id"].apply(_assign_niches)
+        self.df_games = persist_niche_artifacts(self.df_games, niches, niche_csv_path=niche_csv_path)
 
         if save_cache:
             # Persist updated df_games (and other cached artifacts)
             try:
-                self._save_cached_data()
+                save_cached_boardgame_state(self.cache_dir, {
+                    "df_games": self.df_games,
+                    "unique_mechanics": self.unique_mechanics,
+                    "unique_categories": self.unique_categories,
+                    "unique_types": self.unique_types,
+                    "unique_subdomains": self.unique_subdomains,
+                    "unique_families": self.unique_families,
+                    "mechanic_importances": self.mechanic_importances,
+                    "niches_cache": self._niches_cache,
+                })
             except Exception:
                 if verbose:
                     print("Warning: failed to save cache after persisting niches.")
-    
+
     def cache_all_names(self) -> None:
         """Initialize search engine (renamed from cache_all_names)."""
         self.init_search_engine()
@@ -320,10 +207,7 @@ class BoardGameDB:
         """
 
         print("\nCaching unique mechanics...")
-
-        self.unique_mechanics = set()
-        for mechanics in self.df_games['mechanics'].dropna():
-            self.unique_mechanics.update(_ensure_list(mechanics))
+        self.unique_mechanics = collect_unique_values(self.df_games, 'mechanics')
 
         # create dataframe and save to .csv file
         unique_mechanics_df = pd.DataFrame(list(self.unique_mechanics), columns=['mechanic'])
@@ -337,10 +221,7 @@ class BoardGameDB:
         """
 
         print("\nCaching unique categories...")
-
-        self.unique_categories = set()
-        for categories in self.df_games['categories'].dropna():
-            self.unique_categories.update(_ensure_list(categories))
+        self.unique_categories = collect_unique_values(self.df_games, 'categories')
 
         # create dataframe and save to .csv file
         unique_categories_df = pd.DataFrame(list(self.unique_categories), columns=['category'])
@@ -358,10 +239,7 @@ class BoardGameDB:
         """
 
         print("\nCaching unique types...")
-
-        self.unique_types = set()
-        for types in self.df_games['types'].dropna():
-            self.unique_types.update(_ensure_list(types))
+        self.unique_types = collect_unique_values(self.df_games, 'types')
 
         # create dataframe and save to .csv file
         unique_types_df = pd.DataFrame(list(self.unique_types), columns=['type'])
@@ -375,10 +253,7 @@ class BoardGameDB:
         """
 
         print("\nCaching unique subdomains...")
-
-        self.unique_subdomains = set()
-        for subdomains in self.df_games['subdomains'].dropna():
-            self.unique_subdomains.update(_ensure_list(subdomains))
+        self.unique_subdomains = collect_unique_values(self.df_games, 'subdomains')
 
         # create dataframe and save to .csv file
         unique_subdomains_df = pd.DataFrame(list(self.unique_subdomains), columns=['subdomain'])
@@ -386,404 +261,29 @@ class BoardGameDB:
         # unique_subdomains_df.to_csv('data/unique_subdomains.csv', index=False)
 
     def cache_and_convert_unique_wanted_families(self) -> None:
-        """
-        Precompute and cache the unique families across all games in the dataset.
-        This can speed up recommendation computations that rely on family similarity.
-        """
-        wanted_families = {
-            "animals": "Animals",
-            "Safari Parks": "Animals",
-            "zoos": "Animals",
-            "Aquaria": "Animals",
-
-            "adventure": "Adventure",
-
-            "Creatures": "Creatures",
-
-            "Crowdfunding": "Crowdfunded",
-
-            "Digital Implementation": "Digital Implementation",
-
-            "vehicles": "Vehicles",
-            "automotive": "Vehicles",
-            "cars": "Vehicles",
-            "airline": "Vehicles",
-            "Trains": "Vehicles",
-            "Trucks": "Vehicles",
-
-            "Tropical": "Nature",
-            "Nature": "Nature",
-            "trees": "Nature",
-            "wildlife": "Nature",
-            "Forest": "Nature",
-            "Weather": "Nature",
-            "Swamps": "Nature",
-            "bogs": "Nature",
-            "Wetlands": "Nature",
-
-            "Witches": "Magic",
-            "magic": "Magic",
-            "Wizards": "Magic",
-            "Spells": "Magic",
-            "Sorcery": "Magic",
-
-            "disney": "Fairy Tales",
-            "Folk Tales & Fairy Tales": "Fairy Tales",
-            "Storytelling": "Fairy Tales",
-
-            "Tableau Building": "Tableau Building",
-
-            "Food": "Food",
-            "Restaurant": "Food",
-            "Café": "Food",
-            "cafe": "Food",
-
-            "ocean": "Ocean",
-            "Under the Sea": "Ocean",
-            "sea": "Ocean",
-
-            "history": "History",
-            "History": "History",
-            "Vikings": "History",
-
-            "card game": "Card Game",
-            "Playing Card": "Card Game",
-
-            "simulation": "Simulation",
-
-            "crossword": "Word Game",
-            "Word Games": "Word Game",
-            "words": "Word Game",
-
-            "dungeon Crawler": "Dungeon Crawler",
-
-            "escape Room": "Escape Room",
-
-            "two-player": "Two-Player",
-            "Two Player": "Two-Player",
-
-            "fighting": "Fighting",
-
-            "cities": "Location",
-            "City": "Location",
-            "Continent": "Location",
-            "Country": "Location",
-            "ancient": "Location",
-            "Islands": "Location",
-            "Mountains": "Location",
-            "Region": "Location",
-            "Rivers": "Location",
-            "States:": "Location",
-            
-            "Sports": "Sports",
-
-            "Space": "Science Fiction",
-            "Cyberpunk": "Science Fiction",
-            "Robots": "Science Fiction",
-            "Sci-Fi": "Science Fiction",
-            "Steampunk": "Science Fiction",
-
-            "Spooky": "Horror",
-            "Horror": "Horror",
-            "scary": "Horror",
-
-            "Mythology": "Mythology",
-            "Religious": "Mythology",
-            "Cryptids": "Mythology",
-            "Cthulhu": "Mythology",
-
-            "Pirates": "Ocean",
-            "Sealife": "Ocean",
-
-            "Post-Apocalyptic": "Post-Apocalyptic",
-
-            "4X": "4X",
-
-            "Bluffing": "Bluffing",
-
-            "Campaign": "Campaign",
-
-            "Trading Game": "Trading",
-            "trading": "Trading",
-
-            "Medical": "Science",
-            "doctors": "Science",
-            "Scientist": "Science",
-            "Biology": "Science",
-            "science": "Science",
-
-            "Crime": "Crime",
-            "burglary": "Crime",
-            "Heist": "Crime",
-
-            "Detective": "Murder / Mystery",
-
-            "Cooperative": "Cooperative",
-
-            "Hidden Movement": "Hidden Movement",
-
-            "Deckbuilding": "Deckbuilding",
-
-            "Roll-and-Write": "Roll-and-Write",
-            "roll and write": "Roll-and-Write",
-
-            "Construction": "Construction",
-
-            "collectible": "Collectible",
-
-            "grid": "Grid",
-
-            "Hex": "Hexagonal",
-
-            "Polyominoes": "Polyominoes",
-
-            "Timer": "Timer",
-
-            "Meeples": "Meeples",
-            "Standees": "Meeples",
-
-            "Miniature": "Miniatures",
-            
-            "3d": "3D",
-            "3 dimensional": "3D",
-            "3-dimensional": "3D",
-
-            "dice": "Dice",
-            "Drop Tower": "Dice",
-            
-            "War games": "War Game",
-            "war game": "War Game",
-            "war-game": "War Game",
-            "war ": "War Game",
-            "war-": "War Game",
-            "warfare": "War Game",
-
-            "drawing": "Drawing",
-            "Crayons": "Drawing",
-            "Dry Erase Markers": "Drawing",
-
-            "Digital Hybrid": "Digital Hybrid",
-
-            "Trivia": "Trivia",
-            "Quiz": "Trivia",
-        }
-
-        pre_remove_contains = ["Hall of Fame"]
-
-        print("\nCaching and converting unique families...")
-
-        # filter families based on wanted_families mapping (if value contains key from wanted_families, keep it and translate to the mapped value; otherwise discard) and remove families that contain any of the pre_remove_contains substrings (case-insensitive)
-        # each games list of families should not have duplicates after this filtering, but we can keep track of the unique families across all games in a set for caching and later use in recommendations. We can also save the unique families to a .csv file for reference.
-        self.df_games['families'] = self.df_games['families'].apply(lambda fams: [family for family in _ensure_list(fams) if not any(substring.lower() in family.lower() for substring in pre_remove_contains)] if fams is not None else fams)
-        self.df_games['families'] = self.df_games['families'].apply(lambda fams: list(set(wanted_families[key] for family in _ensure_list(fams) for key in wanted_families if key.lower() in family.lower())) if fams is not None else fams)
-
-        self.unique_families = set()
-        for families in self.df_games['families'].dropna():
-            self.unique_families.update(_ensure_list(families))
-
-        # create dataframe and save to .csv file
-        unique_families_df = pd.DataFrame(list(self.unique_families), columns=['family'])
-        unique_families_df.sort_values(by='family', inplace=True)
-        # add a count of how many games have each family as a new column
-        unique_families_df['count'] = unique_families_df['family'].apply(lambda f: self.df_games['families'].dropna().apply(lambda fams: f in _ensure_list(fams)).sum())
-        # unique_families_df.to_csv('data/unique_families.csv', index=False)
+        """Normalize family names and cache the resulting unique values."""
+        self.unique_families = normalize_families(self.df_games)
 
 
     def load_property_mappings(self) -> None:
-        # check if data/property_mappings.csv exists and load it if so, otherwise create an empty mapping
-        # check if all types, mechanics, and categories in the dataset are present in the mapping, and add the missing ones and save the updated mapping back to the CSV file
-        # the columns are: 'property', 'type'
-        # use unique values from cache.
-        mapping_file = 'data/property_metadata/property_mappings.csv'
-        if os.path.exists(mapping_file):
-            self.property_mappings = pd.read_csv(mapping_file)
-            # ensure 'name' is loaded as a list of strings (if it is not a string representation of a list, convert it to a list; if it is NaN, convert to empty list)
-            self.property_mappings['name'] = self.property_mappings['name'].apply(lambda x: _ensure_list(x) if pd.notna(x) else [])
-        else:
-            self.property_mappings = pd.DataFrame(columns=['property', 'name'])
-
-        existing_properties = set(self.property_mappings['property'])
-        all_properties = set()
-        for prop_set in [self.unique_mechanics, self.unique_categories, self.unique_types, self.unique_families, self.unique_subdomains]:
-            all_properties.update(prop_set)
-        
-        missing_properties = all_properties - existing_properties
-        if missing_properties:
-            print(f"\nAdding {len(missing_properties)} missing properties to mapping...")
-            new_rows = pd.DataFrame({
-                'property': list(missing_properties), 
-                'name': [None] * len(missing_properties), 
-            })
-            self.property_mappings = pd.concat([self.property_mappings, new_rows], ignore_index=True)
-            # sort before saving
-            # self.property_mappings.sort_values(by='property', inplace=True)
-            self.property_mappings.to_csv(mapping_file, index=False)
-        
-        self.property_mappings.set_index('property', inplace=True)
+        self.property_mappings = load_or_create_property_mappings(
+            self.unique_mechanics,
+            self.unique_categories,
+            self.unique_types,
+            self.unique_families,
+            self.unique_subdomains,
+        )
 
     def collect_and_translate_properties(self) -> None:
-        # collect all unique mechanics, categories, types, and families from the dataset and translate them to a common language using the property_mappings (if a mapping exists for a given property, use the mapped name; otherwise keep the original name)
-        # this can be used to create a more unified representation of game properties for recommendation computations
-        def translate_property(prop: str) -> list[str]:
-            if prop in self.property_mappings.index:
-                name = self.property_mappings.loc[prop, 'name']
-                if isinstance(name, str) and len(name) > 0:
-                    return [name]
-                if isinstance(name, list) and len(name) > 0:
-                    return name
-            return [prop]
-
-        # collect all to single list column of unique properties for mechanics, categories, types, and families
-        # translate_property(prop) returns a list -> flatten and deduplicate
-        self.df_games['properties'] = self.df_games.apply(
-            lambda row: list(
-                set(
-                    name
-                    for prop in (
-                        _ensure_list(row['mechanics'])
-                        + _ensure_list(row['categories'])
-                        + _ensure_list(row['types'])
-                        + _ensure_list(row['families'])
-                    )
-                    if pd.notna(prop)
-                    for name in translate_property(prop)
-                )
-            ),
-            axis=1,
-        )
+        collect_and_translate_properties(self.df_games, self.property_mappings)
 
 
     def load_categorization_data_and_categorize_properties(self) -> None:
-        # nearly same as load_property_mappings(), but load data/property_metadata/property_categorizations.csv which has columns 'property' and 'category', and use it to categorize properties into broader categories (e.g., 'worker placement' mechanic might be categorized under 'mechanic' category, while 'Fantasy' family might be categorized under 'theme' category).
-        # This can help with recommendation computations that want to consider properties at different levels of granularity.
-
-        categorization_file = 'data/property_metadata/property_categorizations.csv'
-        if os.path.exists(categorization_file):
-            self.property_categorizations = pd.read_csv(categorization_file)
-        else:
-            self.property_categorizations = pd.DataFrame(columns=['property', 'category'])
-
-        existing_properties = set(self.property_categorizations['property'])
-        all_properties = set()
-        # use properties column
-        for props in self.df_games['properties'].dropna():
-            all_properties.update(props)
-
-        
-        missing_properties = all_properties - existing_properties
-        if missing_properties:
-            print(f"\nAdding {len(missing_properties)} missing properties to categorization...")
-            new_rows = pd.DataFrame({
-                'property': list(missing_properties), 
-                'category': [None] * len(missing_properties), 
-            })
-            self.property_categorizations = pd.concat([self.property_categorizations, new_rows], ignore_index=True)
-            # sort before saving
-            # self.property_categorizations.sort_values(by='property', inplace=True)
-            self.property_categorizations.to_csv(categorization_file, index=False)
-        
-        self.property_categorizations.set_index('property', inplace=True)
-        
-        # convert properties to dict of categories to list of properties
-        # use only the properties and the property categories. the unique lists on this class are NOT the same as the p_ columns. so DON'T USE self.unique_mechanics, etc.
-        def _categorize_properties(props, category):
-            if props is None or props is pd.NA:
-                return []
-            if isinstance(props, float) and pd.isna(props):
-                return []
-            if not isinstance(props, (list, tuple, set, pd.Index)):
-                return []
-            return [
-                prop for prop in props
-                if prop in self.property_categorizations.index and self.property_categorizations.loc[prop, 'category'] == category
-            ]
-
-        self.df_games['p_mechanics'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Mechanic'))
-        self.df_games['p_types'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Type'))
-        self.df_games['p_components'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Component'))
-        self.df_games['p_themes'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Theme'))
-        self.df_games['p_tags'] = self.df_games['properties'].apply(lambda props: _categorize_properties(props, 'Tag'))
+        self.property_categorizations = load_or_create_property_categorizations(self.df_games)
 
 
     def load_data(self) -> None:
-        """
-        Load CSVs from `data/final/` in filename order (oldest -> newest).
-        The first file is treated as the full dataset; subsequent files are
-        updates that overwrite older values by `id` (keeps older values where
-        an update doesn't provide a value). Returns a combined DataFrame
-        with `id` as a regular column.
-        """
-        data_folder_path = "data/final/"
-        pattern = os.path.join(data_folder_path, "*.csv")
-        files = sorted(glob.glob(pattern))
-
-        if not files:
-            raise ValueError(f"No CSV files found in {data_folder_path}")
-
-        print("\nLoading Data:")
-
-        # Load base (oldest) file
-        base = pd.read_csv(files[0])
-        base = parse_json_like_columns(base)
-        if "id" not in base.columns:
-            raise ValueError(f"CSV file {files[0]} does not contain required 'id' column")
-        base["id"] = base["id"].astype(str)
-        base = base.drop_duplicates(subset="id", keep="last").set_index("id")
-        print(f"    Base dataset: {len(base)}   - '{files[0]}'")
-
-        # Apply updates in filename order so newer files overwrite older values.
-        for f in files[1:]:
-            upd = pd.read_csv(f)
-            upd = parse_json_like_columns(upd)
-            if "id" not in upd.columns:
-                raise ValueError(f"CSV file {f} does not contain required 'id' column")
-            upd["id"] = upd["id"].astype(str)
-            upd = upd.drop_duplicates(subset="id", keep="last").set_index("id")
-            # prefer values from the update where present, otherwise keep existing
-            base = upd.combine_first(base)
-            print(f"    Applied update: {len(upd)}   -> {len(base)} - '{f}'")
-
-        self.df_games = base.reset_index()
+        self.df_games = load_merged_data()
     
-    def prepare_db(self):
-        print("\n------------------ Preparing BoardGameDB ------------------")
-
-        # Check if cache is valid
-        file_count, file_hash = self._get_data_files_signature()
-        manifest = self._load_cache_manifest()
-        
-        cache_valid = (
-            manifest is not None
-            and manifest.get("file_count") == file_count
-            and manifest.get("file_hash") == file_hash
-        )
-
-        if cache_valid and self._load_cached_data():
-            print("\nLoaded from cache (data unchanged).")
-        else:
-            print("\nRebuilding dataset (data changed or cache missing).")
-            self.load_data()
-                    
-            self.cache_unique_mechanics()
-            self.cache_unique_categories()
-            self.cache_unique_types()
-            self.cache_unique_subdomains()
-            self.cache_and_convert_unique_wanted_families()
-
-            self.load_property_mappings()
-            self.collect_and_translate_properties()
-            self.load_categorization_data_and_categorize_properties()
-
-            # Save cache
-            self._save_cached_data()
-            self._save_cache_manifest({"file_count": file_count, "file_hash": file_hash})
-
-        self.init_search_engine()
-        self.cache_recommendations()
-        # Compute and persist niches, and attach niche ids to games
-        try:
-            self.create_and_persist_niches()
-        except Exception:
-            print("Warning: failed to compute/persist niches.")
-
-        print("\n------------------------------------------------------------\n")
+    def prepare_db(self, prepare_postprocessing: bool = True):
+        prepare_boardgame_db(self, prepare_postprocessing=prepare_postprocessing)

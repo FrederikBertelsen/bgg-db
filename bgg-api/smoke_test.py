@@ -13,7 +13,7 @@ from boardgame_db import BoardGameDB
 
 
 def main() -> int:
-    db = BoardGameDB()
+    db = BoardGameDB(prepare_postprocessing=True)
 
     assert not db.df_games.empty, "BoardGameDB loaded no games"
     assert "id" in db.df_games.columns, "Missing required id column"
