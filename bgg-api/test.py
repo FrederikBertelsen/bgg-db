@@ -64,7 +64,7 @@ df_games = df_games[df_games['rating_average'] > 0]
 df_games = df_games[df_games['median_price_usd'] < 500]
 df_games = df_games[df_games['median_price_usd'] > 5]
 # df_games = df_games[df_games['year_published'] > 2015]
-df_games = df_games[df_games['estimated_volume_cm3'] <= 3000]
+df_games = df_games[df_games['estimated_volume_cm3'] <= 4000]
 
 # normalize values
 RATING_WEIGHT = 0.5

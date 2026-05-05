@@ -108,7 +108,7 @@ Map Deformation,Component
 Map Reduction,Component
 Market,Mechanic
 Matching,Mechanic
-Math,Mechanic
+Math,Type   
 Mature / Adult,Type
 Maze,Mechanic
 Measurement Movement,Mechanic
@@ -227,10 +227,8 @@ Word Game,Type
 Worker Placement,Mechanic
 Zombies,Theme
 Zone of Control,Mechanic
-abstract,Type
-history,Theme
-strategy,Type
 Childrens Game,Type
 Turn Order,Mechanic
 Pirates,Theme
 Customizable Game,Type
+history,

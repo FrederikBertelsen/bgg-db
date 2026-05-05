@@ -10,7 +10,6 @@ from typing import Any
 from boardgame_db import BoardGameDB
 import recommender as rec
 import recommender_v2 as rec_v2
-import recommender_sparse as rec_sp
 
 # ============================================================================
 # CONFIGURATION: Set your two game IDs here
@@ -242,105 +241,6 @@ def analyze_original_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame
     }
 
 
-def analyze_sparse_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> dict:
-    """Analyze sparse recommender similarity components between two games."""
-    try:
-        # Load or build artifacts
-        artifacts = rec_sp.build_recommender_artifacts(df)
-        
-        seed_idx = artifacts.id_to_index.get(str(game_id_1))
-        cand_idx = artifacts.id_to_index.get(str(game_id_2))
-        
-        if seed_idx is None or cand_idx is None:
-            return {"error": "One or both game IDs not found"}
-        
-        seed_df = df[df['id'] == game_id_1]
-        cand_df = df[df['id'] == game_id_2]
-        seed = seed_df.iloc[0]
-        cand = cand_df.iloc[0]
-        
-        # Calculate cosine similarity for each block
-        components_score = {}
-        total_block_score = 0.0
-        
-        for block_name, matrix in artifacts.block_matrices.items():
-            seed_vec = matrix[seed_idx]
-            cand_vec = matrix[cand_idx]
-            # Cosine similarity: (A · B) / (||A|| ||B||)
-            # But since vectors are normalized, it's just the dot product
-            sim = seed_vec.dot(cand_vec.T).toarray().ravel()[0]
-            sim = float(sim) if not np.isnan(sim) else 0.0
-            
-            block_weight = rec_sp.DEFAULT_BLOCK_WEIGHTS.get(block_name, 0.0)
-            contribution = block_weight * sim
-            total_block_score += contribution
-            
-            components_score[block_name] = {
-                "cosine": sim,
-                "weight": block_weight,
-                "contribution": contribution
-            }
-        
-        # Rating bonus
-        seed_rating = float(artifacts.rating_bonus[seed_idx])
-        rating_weight = rec_sp.DEFAULT_RATING_WEIGHT
-        rating_contribution = rating_weight * seed_rating
-        
-        components_score["rating_bonus"] = {
-            "score": seed_rating,
-            "weight": rating_weight,
-            "contribution": rating_contribution
-        }
-        
-        # Weight penalty (soft penalty for large gaps)
-        seed_weight_val = artifacts.weight_values[seed_idx]
-        cand_weight_val = artifacts.weight_values[cand_idx]
-        seed_weight_num = None if np.isnan(seed_weight_val) else float(seed_weight_val)
-        cand_weight_num = None if np.isnan(cand_weight_val) else float(cand_weight_val)
-        
-        weight_penalty = 1.0
-        if seed_weight_num is not None and cand_weight_num is not None:
-            gap = abs(cand_weight_num - seed_weight_num)
-            max_gap = rec_sp.DEFAULT_WEIGHT_PENALTY_MAX_GAP
-            if gap > max_gap:
-                weight_penalty = 1.0 - (rec_sp.DEFAULT_WEIGHT_PENALTY_STRENGTH * (gap - max_gap) / max_gap)
-                weight_penalty = max(0.0, weight_penalty)
-        
-        components_score["weight_penalty"] = {
-            "factor": weight_penalty,
-            "seed_weight": seed_weight_num,
-            "cand_weight": cand_weight_num,
-        }
-        
-        # Total score: (blocks + rating) * penalty
-        total_score = (total_block_score + rating_contribution) * weight_penalty
-        
-        return {
-            "game1_name": seed.get('name'),
-            "game2_name": cand.get('name'),
-            "components": components_score,
-            "total_score": total_score,
-            "seed_details": {
-                "mechanics": list(_ensure_list(seed.get('p_mechanics', []))),
-                "types": list(_ensure_list(seed.get('p_types', []))),
-                "components": list(_ensure_list(seed.get('p_components', []))),
-                "themes": list(_ensure_list(seed.get('p_themes', []))),
-                "rating": seed.get('rating_average'),
-                "weight": seed_weight_num,
-            },
-            "cand_details": {
-                "mechanics": list(_ensure_list(cand.get('p_mechanics', []))),
-                "types": list(_ensure_list(cand.get('p_types', []))),
-                "components": list(_ensure_list(cand.get('p_components', []))),
-                "themes": list(_ensure_list(cand.get('p_themes', []))),
-                "rating": cand.get('rating_average'),
-                "weight": cand_weight_num,
-            },
-        }
-    except Exception as e:
-        return {"error": f"Error in sparse analysis: {str(e)}"}
-
-
 def print_analysis(analysis: dict):
     """Pretty print analysis results."""
     if "error" in analysis:
@@ -401,10 +301,5 @@ print_analysis(v2_analysis)
 print("\n\n[RECOMMENDER ORIGINAL - categories/mechanics]")
 orig_analysis = analyze_original_similarity(game_id_1, game_id_2, df_games)
 print_analysis(orig_analysis)
-
-# Quick sparse summary (if artifacts are available)
-print("\n\n[RECOMMENDER SPARSE - TF-IDF based]")
-sparse_analysis = analyze_sparse_similarity(game_id_1, game_id_2, df_games)
-print_analysis(sparse_analysis)
 
 print("\n" + "="*70 + "\n")

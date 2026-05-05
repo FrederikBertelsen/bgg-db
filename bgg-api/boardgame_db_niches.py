@@ -12,8 +12,24 @@ def create_and_persist_niches(
     niches: list,
     niche_csv_path: str = "data/niches.csv",
 ) -> pd.DataFrame:
-    """Persist niche metadata to CSV and return df_games with a `niches` column added."""
+    """Persist niche metadata to CSV and return df_games with a `niches` column added.
+    
+    Preserves existing names and descriptions for niches with unchanged properties.
+    """
     os.makedirs(os.path.dirname(niche_csv_path), exist_ok=True)
+
+    # Load existing niches and create a mapping from properties to metadata
+    existing_niches_by_properties = {}
+    if os.path.exists(niche_csv_path):
+        existing_df = pd.read_csv(niche_csv_path)
+        for _, row in existing_df.iterrows():
+            props = json.loads(row["properties"])
+            # Use sorted tuple as key for reliable comparison
+            props_key = tuple(sorted(props))
+            existing_niches_by_properties[props_key] = {
+                "name": row["name"] if pd.notna(row["name"]) else "",
+                "description": row["description"] if pd.notna(row["description"]) else "",
+            }
 
     niche_rows = []
     game_to_niches = defaultdict(list)
@@ -27,11 +43,15 @@ def create_and_persist_niches(
         for gid in games_list:
             game_to_niches[str(gid)].append(niche_id)
 
+        # Check if this property set already exists
+        props_key = tuple(sorted(properties))
+        existing_metadata = existing_niches_by_properties.get(props_key, {})
+
         niche_rows.append(
             {
                 "niche_id": niche_id,
-                "name": "",
-                "description": "",
+                "name": existing_metadata.get("name", ""),
+                "description": existing_metadata.get("description", ""),
                 "properties": json.dumps(properties, ensure_ascii=False),
                 "games_count": len(games_list),
             }

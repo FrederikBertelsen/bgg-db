@@ -259,7 +259,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         DataFrame of top-k candidates with a `score` column.
     """
     if weights is None:
-        weights = {"types": 0.3, "mech": 0.25, "comp": 0.25, "themes": 0.0, "rating": 0.1, "weight": 0.1}
+        weights = {"types": 0.3, "mech": 0.20, "comp": 0.30, "themes": 0.0, "rating": 0.10, "weight": 0.10}
 
     seed_df = df[df['id'] == game_id]
     if seed_df.shape[0] == 0:

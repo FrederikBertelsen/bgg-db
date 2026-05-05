@@ -17,7 +17,7 @@ from boardgame_db_io import (
     save_cache_manifest,
     save_cached_boardgame_state,
 )
-from boardgame_db_niches import create_and_persist_niches as persist_niche_artifacts
+from boardgame_db_niches import create_and_persist_niches
 from boardgame_db_pipeline import prepare_boardgame_db
 
 
@@ -177,7 +177,7 @@ class BoardGameDB:
         # Ensure niches are computed and cached by get_niches
         niches = self.get_niches(verbose=verbose, params=params)
 
-        self.df_games = persist_niche_artifacts(self.df_games, niches, niche_csv_path=niche_csv_path)
+        self.df_games = create_and_persist_niches(self.df_games, niches, niche_csv_path=niche_csv_path)
 
         if save_cache:
             # Persist updated df_games (and other cached artifacts)

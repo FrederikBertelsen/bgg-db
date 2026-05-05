@@ -1,7 +1,7 @@
 property,name
 3D,[]
 4X,['War Game']
-Abstract,['Abstract']
+Abstract,[]
 Abstract Strategy,"['Abstract', 'Strategy']"
 Acting,['Role Playing']
 Action / Dexterity,['Dexterity']
@@ -322,4 +322,4 @@ Party Games,['Party Game']
 Children's Games,['Childrens Game']
 Customizable Games,['Customizable Game']
 Family Games,['Family']
-Deck Building,
+Deck Building,[]
