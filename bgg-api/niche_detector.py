@@ -56,6 +56,11 @@ def discover_niches(df_games, params=None, verbose=True):
     Returns:
         List of niches, each as tuple:
             (cluster_set, niche_props_dict, selected_props_list, qualifying_games_list)
+            where:
+            - cluster_set: set of game ids in the niche cluster
+            - niche_props_dict: dict of niche properties (e.g. {'type': [...], 'mech': [...], 'comp': [...]})
+            - selected_props_list: list of the selected properties that define the niche (e.g. ['type::Strategy', 'mech::Dice Rolling', ...])
+            - qualifying_games_list: list of (game_id, matches, coverage, game_name) for games that meet the coverage threshold for the selected properties
     """
     
     # Merge parameters

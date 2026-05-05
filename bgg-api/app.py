@@ -31,6 +31,40 @@ def cards(ids_str: str): # list[game_card]
 
     return to_json_cards(rows)
 
+@app.route("/niches/<niche_name>")
+def niche(niche_name: str): # niche_info
+    row = db.get_niche_by_name(niche_name)
+    if row is None:
+        return jsonify({"error": "Niche not found", "name": niche_name}), 404
+
+    # only first 20 game_ids for the niche, to avoid too much data in the response
+    game_ids = row.get("games_ids", [])[:20]
+    game_rows = db.get_games_by_ids(game_ids) if game_ids else None
+    row["games"] = [to_json_card(game_row) for _, game_row in game_rows.iterrows()] if game_rows is not None else []
+    row.pop("games_ids")
+
+    return to_json_full(row)
+
+@app.route("/niches/<niche_name>/games")
+def niche_games(niche_name: str): # list[game_card]
+    row = db.get_niche_by_name(niche_name)
+    if row is None:
+        return jsonify({"error": "Niche not found", "name": niche_name}), 404
+
+    game_ids = row.get("games_ids", [])
+    if not game_ids:
+        return jsonify([])
+    
+    start = request.args.get("start", default=0, type=int)
+    end = request.args.get("end", default=start + 20, type=int)
+    game_ids = game_ids[start:end]
+
+    rows = db.get_games_by_ids(game_ids)
+    if rows is None or len(rows) == 0:
+        return jsonify({"error": "No games found for provided IDs"}), 404
+
+    return to_json_cards(rows)
+
 @app.route("/search/<search_term>")
 def search(search_term: str): # list[game_card]
     if not search_term:

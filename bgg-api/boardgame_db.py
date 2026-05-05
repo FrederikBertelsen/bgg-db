@@ -1,5 +1,5 @@
 import pandas as pd
-from recommender import _ensure_list, compute_mechanic_importances, recommend
+from recommender import compute_mechanic_importances, recommend
 from game_search import GameSearchEngine
 from niche_detector import discover_niches
 from boardgame_db_properties import (
@@ -17,7 +17,7 @@ from boardgame_db_io import (
     save_cache_manifest,
     save_cached_boardgame_state,
 )
-from boardgame_db_niches import create_and_persist_niches
+from boardgame_db_niches import build_niche_name_cache, create_and_persist_niches
 from boardgame_db_pipeline import prepare_boardgame_db
 
 
@@ -32,6 +32,7 @@ class BoardGameDB:
         
         # Niches cache (lazy loaded)
         self._niches_cache = None
+        self._niche_name_cache: dict[str, dict] | None = None
         
         # Mechanic importances cache
         self.mechanic_importances = None
@@ -87,6 +88,28 @@ class BoardGameDB:
         if self.search_engine is None:
             return None
         return self.search_engine.get_games_by_names(names)
+
+    def get_niche_by_name(self, niche_name: str) -> pd.Series | None:
+        """
+        Return a Series for the niche with the given `niche_name`, or `None` if not found.
+
+        Uses an in-memory cache so repeated lookups are O(1) and avoid re-reading
+        `data/niches.csv` on each request.
+        """
+        self._ensure_niche_name_cache()
+        if self._niche_name_cache is None:
+            return None
+
+        niche = self._niche_name_cache.get(niche_name)
+        if niche is None:
+            return None
+        return pd.Series(niche)
+
+    def _ensure_niche_name_cache(self, niche_csv_path: str = "data/niches.csv") -> None:
+        """Build niche-name cache once: name -> metadata + games list."""
+        if self._niche_name_cache is not None:
+            return
+        self._niche_name_cache = build_niche_name_cache(self.df_games, niche_csv_path=niche_csv_path)
 
     def get_english_names_deduplicated(self, names: list[str]) -> list[str]:
         """
@@ -178,6 +201,9 @@ class BoardGameDB:
         niches = self.get_niches(verbose=verbose, params=params)
 
         self.df_games = create_and_persist_niches(self.df_games, niches, niche_csv_path=niche_csv_path)
+        # Invalidate and rebuild niche-name cache after persistence updates.
+        self._niche_name_cache = None
+        self._ensure_niche_name_cache(niche_csv_path=niche_csv_path)
 
         if save_cache:
             # Persist updated df_games (and other cached artifacts)

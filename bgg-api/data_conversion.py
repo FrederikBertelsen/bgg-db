@@ -6,6 +6,8 @@ import numpy as np
 from numbers import Integral, Real
 import json
 
+from boardgame_db import BoardGameDB
+
 
 def to_json_full(input: pd.Series) -> Response:
     return jsonify(_normalize_dict(input.to_dict()))
@@ -25,6 +27,7 @@ def to_json_card(input: pd.Series) -> dict:
         "min_playtime": input["min_playtime"],
         "max_playtime": input["max_playtime"],
         "thumbnail_url": input["thumbnail_url"],
+        "niches": input.get("niches", []),
         "score": input.get("score", None)
     }
 
