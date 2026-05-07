@@ -13,9 +13,3 @@ export function clamp01(x: number) {
   if (x > 1) return 1
   return x
 }
-
-export function normalizeDescriptionHtml(html: string) {
-  // Backend may embed literal "\\n" sequences inside HTML.
-  // Convert them to actual newlines so they don't render as "\n".
-  return html.replaceAll('\\n', '\n')
-}

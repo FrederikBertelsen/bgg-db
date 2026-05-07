@@ -7,6 +7,7 @@ from numbers import Integral, Real
 import json
 
 def to_json_full(input: pd.Series) -> Response:
+    input['description'] = input['description'].replace(r'\n', '\n').strip()
     return jsonify(_normalize_dict(input.to_dict()))
 
 

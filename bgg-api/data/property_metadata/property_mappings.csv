@@ -47,8 +47,8 @@ Book,
 Bribery,
 Campaign,
 Campaign / Battle Card Driven,['Campaign']
-Card Game,
-Card Play Conflict Resolution,
+Card Game,"['Card Game', 'Cards']"
+Card Play Conflict Resolution,"['Card Play Conflict Resolution', 'Cards']"
 Catch the Leader,
 Chaining,
 Children's,['Childrens Game']
@@ -62,7 +62,7 @@ Closed Economy Auction,['Auction']
 Collectible,
 Collectible Components,['Collectible']
 Comic Book / Strip,
-Command Cards,
+Command Cards,"['Command Cards', 'Cards']"
 Commodity Speculation,
 Communication Limits,
 Connections,
@@ -173,7 +173,7 @@ Movement Points,
 Movement Template,
 Movies / TV / Radio theme,
 Moving Multiple Units,
-Multi-Use Cards,
+Multi-Use Cards,"['Multi-Use Cards','Cards']"
 Multiple Maps,
 Murder / Mystery,
 Music,

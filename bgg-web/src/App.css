@@ -411,6 +411,7 @@
 .desc {
   font-size: 14px;
   color: color-mix(in oklab, var(--text) 65%, var(--text-h));
+  white-space: pre-line;
 }
 
 .muted {
@@ -863,8 +864,10 @@
 
 .section h3 {
   margin: 0 0 8px;
-  font-size: 14px;
+  font-size: 18px;
   color: var(--text-h);
+  font-weight: 900;
+  letter-spacing: -0.2px;
 }
 
 .statsGrid {
@@ -920,6 +923,7 @@
   padding: 12px;
   background: var(--code-bg);
   color: var(--text-h);
+  white-space: pre-line;
 }
 
 .description p {
@@ -1046,4 +1050,235 @@
 
 .navLink:hover {
   text-decoration: underline;
+}
+
+.appShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100svh;
+}
+
+.siteHeader {
+  padding: 14px 16px 0;
+}
+
+.siteHeaderInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: color-mix(in oklab, var(--bg) 92%, var(--code-bg));
+  box-shadow: var(--shadow);
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.brandMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent), color-mix(in oklab, var(--accent) 45%, var(--bg)));
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.brandName {
+  color: var(--text-h);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.brandTag {
+  color: var(--text);
+  font-size: 13px;
+}
+
+.siteSearch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 420px;
+  justify-content: flex-end;
+}
+
+.siteSearch .searchBox {
+  width: min(560px, 100%);
+  flex: 1 1 auto;
+}
+
+.siteSearch input {
+  width: 100%;
+}
+
+.siteSearchButton {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--social-bg);
+  color: var(--text-h);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.siteSearchButton:hover {
+  background: color-mix(in oklab, var(--social-bg) 75%, var(--bg));
+}
+
+.homePage {
+  gap: 18px;
+}
+
+.homeHero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(240px, 0.75fr);
+  gap: 18px;
+}
+
+.homeHeroCopy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.eyebrow {
+  margin: 0;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.homeTitle {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.02;
+  letter-spacing: -0.04em;
+}
+
+.homeLead {
+  color: var(--text);
+  max-width: 68ch;
+}
+
+.homeHeroAside {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.homeStat {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--social-bg);
+}
+
+.homeStatValue {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text-h);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.homeStatLabel {
+  color: var(--text-h);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.homeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.homeCard {
+  min-height: 100%;
+}
+
+.homeFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.homeCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-border);
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.resultsHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.resultsPill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--social-bg);
+  color: var(--text-h);
+  font-weight: 800;
+}
+
+@media (max-width: 920px) {
+
+  .homeHero,
+  .homeGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .siteSearch {
+    width: 100%;
+    justify-content: stretch;
+  }
 }

@@ -16,13 +16,13 @@ from recommender_v2 import _ensure_list, load_or_compute_mechanic_importances, s
 
 # Default tunable parameters
 PARAMS = {
-    'max_prop_freq': 6000,
+    'max_prop_freq': 8000,
     'max_pairs_per_token': 700,
     'edge_cutoff': 0.20,
     'cluster_edge_cutoff': 0.30,
     'min_niche_props': 5,
     'min_games_per_niche': 50,
-    'min_coverage': 0.70,
+    'min_coverage': 0.65,
     'max_cluster_size_for_direct_niche': 400,
     'split_edge_multipliers': (1.05, 1.20, 1.35, 1.50),
     'max_global_prop_support': 0.45,

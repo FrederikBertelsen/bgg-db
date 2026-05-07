@@ -5,7 +5,7 @@ import type { FullGame, GameCard } from '../api/types'
 import { GameCard as GameCardComponent } from '../components/GameCard'
 import { PlayerCountGraph } from '../components/PlayerCountGraph'
 import { ScoreRing } from '../components/ScoreRing'
-import { formatNumber, formatRange, normalizeDescriptionHtml } from '../lib/format'
+import { formatNumber, formatRange } from '../lib/format'
 
 export function GamePage() {
   const params = useParams()
@@ -15,7 +15,6 @@ export function GamePage() {
   const [recs, setRecs] = useState<GameCard[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [descriptionOpen, setDescriptionOpen] = useState(false)
 
   const abortRef = useRef<AbortController | null>(null)
 
@@ -30,7 +29,6 @@ export function GamePage() {
     setError(null)
     setGame(null)
     setRecs([])
-    setDescriptionOpen(false)
 
     ;(async () => {
       try {
@@ -62,7 +60,7 @@ export function GamePage() {
     if (!game || typeof game.description !== 'string') return null
     const trimmed = game.description.trim()
     if (!trimmed) return null
-    return normalizeDescriptionHtml(trimmed)
+    return trimmed
   }, [game])
 
   const creditsByRole = useMemo(() => {
@@ -172,7 +170,7 @@ export function GamePage() {
 
                   {playerCountScores && Object.keys(playerCountScores).length ? (
                     <section className="section cardLike">
-                      <h3>Player count</h3>
+                      <h3>Player count Recommendations</h3>
                       <PlayerCountGraph scores={playerCountScores} />
                     </section>
                   ) : null}
@@ -183,22 +181,7 @@ export function GamePage() {
                 {descriptionHtml ? (
                   <section className="section cardLike">
                     <h3>Description</h3>
-                    {!descriptionOpen && typeof game.short_description === 'string' ? (
-                      <p className="desc">{game.short_description}</p>
-                    ) : null}
-                    <details
-                      className="expander"
-                      open={descriptionOpen}
-                      onToggle={(event) => setDescriptionOpen((event.target as HTMLDetailsElement).open)}
-                    >
-                      <summary>{descriptionOpen ? 'Hide description' : 'Show description'}</summary>
-                      <div className="description" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
-                    </details>
-                  </section>
-                ) : typeof game.short_description === 'string' ? (
-                  <section className="section cardLike">
-                    <h3>Description</h3>
-                    <p className="desc">{game.short_description}</p>
+                    <div className="description" dangerouslySetInnerHTML={{ __html: descriptionHtml }} />
                   </section>
                 ) : null}
 
@@ -208,7 +191,7 @@ export function GamePage() {
 
                 {recs.length ? (
                   <section className="section cardLike">
-                    <h3>Recommendations</h3>
+                    <h3>Similar</h3>
                     <div className="recs recs--top">
                       {recs.map((rec) => (
                         <GameCardComponent key={rec.id} game={rec} to={`/game/${rec.id}`} />

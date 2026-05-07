@@ -60,7 +60,7 @@ export function GameCard({ game, to, selected }: Props) {
           <ScoreRing value={game.rating} outOf={10} label="Rating" />
           <ScoreRing value={game.weight ?? null} reverse={true} outOf={5} label="Weight" />
           {typeof game.score === 'number' && game.score < 100 ? (
-            <ScoreRing value={game.score} outOf={1} label="Rec" />
+            <ScoreRing value={game.score} outOf={1} label="Similarity" />
           ) : null}
         </div>
 
