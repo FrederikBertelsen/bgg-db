@@ -8,6 +8,7 @@ from recommender import _ensure_list
 
 
 WANTED_FAMILIES = {
+    "Engineer": "Engineering",
     "animals": "Animals",
     "Safari Parks": "Animals",
     "zoos": "Animals",
@@ -134,7 +135,7 @@ WANTED_FAMILIES = {
     "Quiz": "Trivia",
 }
 
-PRE_REMOVE_CONTAINS = ["Hall of Fame"]
+PRE_REMOVE_CONTAINS = ["Hall of Fame", "Organizations"]
 
 
 def normalize_families(df_games: pd.DataFrame) -> set[str]:

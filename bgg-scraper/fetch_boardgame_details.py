@@ -279,7 +279,7 @@ def pull_weight_poll_json(scraper: cloudscraper.CloudScraper, boardgame_id: str)
 def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
     scraper = cloudscraper.create_scraper()
 
-    WAIT_BETWEEN_PAGES = int(os.getenv("WAIT_BETWEEN_PAGES", "2"))
+    WAIT_BETWEEN_REQUESTS = int(os.getenv("WAIT_BETWEEN_REQUESTS", "2"))
 
     # use a dated partial results file so resumable runs use the same filename
     partial_results_file = f"downloads/partial_results_{get_today_date()}.json"
@@ -325,11 +325,11 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
 
             print(f"Fetching data for boardgame ID {boardgame_id} ( {est_str} )")
 
-            sleep(WAIT_BETWEEN_PAGES)
+            sleep(WAIT_BETWEEN_REQUESTS)
             # print(f"Fetching geekitemPreload...")
             preload_json = pull_geek_item_preload_json(scraper, boardgame_id)
 
-            sleep(WAIT_BETWEEN_PAGES)
+            sleep(WAIT_BETWEEN_REQUESTS)
             # some of the property lists are cut off on main preload json.
             full_properties_json = pull_full_properties_json(scraper, boardgame_id)
             
@@ -337,7 +337,7 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
                 # print("Cleaning and normalizing geekitemPreload data...")
                 cleaned_data = extract_details(preload_json, full_properties_json)
                 
-                sleep(WAIT_BETWEEN_PAGES)
+                sleep(WAIT_BETWEEN_REQUESTS)
                 # print(f"Fetching versions data...")
                 version_data = pull_versions_json(scraper, boardgame_id)
                 if version_data:
@@ -345,7 +345,7 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
                 else:
                     cleaned_data["versions"] = []
 
-                # sleep(WAIT_BETWEEN_PAGES)
+                # sleep(WAIT_BETWEEN_REQUESTS)
                 # print(f"Fetching shopping data...")
                 shopping_data = pull_shopping_json(scraper, boardgame_id)
                 if shopping_data:
@@ -353,7 +353,7 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
                 else:
                     cleaned_data["shopping"] = []
                 
-                sleep(WAIT_BETWEEN_PAGES)
+                sleep(WAIT_BETWEEN_REQUESTS)
                 # print(f"Fetching player count poll data...")
                 player_count_poll_data = pull_player_count_poll_json(scraper, boardgame_id)
                 if player_count_poll_data:
@@ -361,7 +361,7 @@ def pull_bgg_json_data(boardgame_ids: list[str]) -> list[dict]:
                 else:
                     cleaned_data["player_count_poll"] = {}
                 
-                # sleep(WAIT_BETWEEN_PAGES)
+                # sleep(WAIT_BETWEEN_REQUESTS)
                 # print(f"Fetching weight poll data...")
                 # weight_poll_data = pull_weight_poll_json(scraper, boardgame_id)
                 # if weight_poll_data:

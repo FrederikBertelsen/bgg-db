@@ -32,12 +32,12 @@ def update_scrape_metadata(df_final: pd.DataFrame):
 
         # update or add metadata for this game_id
         if not existing_metadata.empty:
-            df_metadata.loc[df_metadata["id"] == game_id, ["rating_count", "last_scraped_date"]] = [row["rating_count"], get_today_date()]
+            df_metadata.loc[df_metadata["id"] == game_id, ["rating_count", "last_scraped_date"]] = [row["rating_count"], int(get_today_date())]
         else:
             new_metadata = {
                 "id": game_id,
                 "rating_count": row["rating_count"],
-                "last_scraped_date": get_today_date()
+                "last_scraped_date": int(get_today_date())
             }
             new_rows.append(new_metadata)
         

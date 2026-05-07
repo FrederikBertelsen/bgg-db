@@ -3,8 +3,8 @@ import json
 import cloudscraper
 import pandas as pd
 
-df_test = pd.read_csv('data/final/final_20260502.csv')
+df_final = pd.read_csv("data/final/final_20260506.csv")
 
-print(df_test[['id','estimated_price_usd','estimated_price_dkk']].head(10))
+df_final['description'] = df_final['description'].str.replace('\n', '\\n')
 
-print(df_test.head())
+df_final.to_csv("data/final/final_20260506.csv", index=False)
