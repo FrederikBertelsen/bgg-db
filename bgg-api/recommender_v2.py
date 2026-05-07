@@ -40,7 +40,7 @@ def _extract_weight(w: Any) -> float | None:
     if isinstance(w, (int, float)):
         return float(w)
     if isinstance(w, dict):
-        for key in ("weight_average", "averageweight", "average_weight", "averageWeight", "weight"):
+        for key in ("weight", "averageweight", "average_weight", "averageWeight", "weight"):
             if key in w:
                 try:
                     return float(w[key])
@@ -60,7 +60,7 @@ def compute_mechanic_importances(df: pd.DataFrame, out_csv: str = 'data/mechanic
     N = int(len(df))
     counts: dict[str, int] = {}
     for _, row in df.iterrows():
-        mechs = set(_ensure_list(row.get('p_mechanics')))
+        mechs = set(_ensure_list(row.get('mechanics')))
         for m in mechs:
             counts[m] = counts.get(m, 0) + 1
 
@@ -176,7 +176,7 @@ def score_connection(
         game_id_map: optional dict mapping game_id -> row for O(1) lookup (recommended for performance)
     """
     if weights is None:
-        weights = {"types": 0.3, "mech": 0.35, "comp": 0.2, "themes": 0.1, "rating": 0.0, "weight": 0.05}
+        weights = {"types": 0.25, "mech": 0.30, "comp": 0.15, "themes": 0.1, "niches": 0.15, "rating": 0.0, "weight": 0.05}
 
     a = _resolve_game(game_a, df, game_id_map=game_id_map)
     b = _resolve_game(game_b, df, game_id_map=game_id_map)
@@ -186,19 +186,22 @@ def score_connection(
     elif mech_weights is None:
         mech_weights = {}
 
-    a_types = set(_ensure_list(a.get('p_types', [])))
-    b_types = set(_ensure_list(b.get('p_types', [])))
-    a_mech = set(_ensure_list(a.get('p_mechanics', [])))
-    b_mech = set(_ensure_list(b.get('p_mechanics', [])))
-    a_comp = set(_ensure_list(a.get('p_components', [])))
-    b_comp = set(_ensure_list(b.get('p_components', [])))
-    a_themes = set(_ensure_list(a.get('p_themes', [])))
-    b_themes = set(_ensure_list(b.get('p_themes', [])))
+    a_types = set(_ensure_list(a.get('types', [])))
+    b_types = set(_ensure_list(b.get('types', [])))
+    a_mech = set(_ensure_list(a.get('mechanics', [])))
+    b_mech = set(_ensure_list(b.get('mechanics', [])))
+    a_comp = set(_ensure_list(a.get('components', [])))
+    b_comp = set(_ensure_list(b.get('components', [])))
+    a_themes = set(_ensure_list(a.get('themes', [])))
+    b_themes = set(_ensure_list(b.get('themes', [])))
+    a_niches = set(_ensure_list(a.get('niches', [])))
+    b_niches = set(_ensure_list(b.get('niches', [])))
 
     types_sim = jaccard(a_types, b_types)
     mech_sim = weighted_jaccard(a_mech, b_mech, mech_weights)
     comp_sim = jaccard(a_comp, b_comp)
     themes_sim = jaccard(a_themes, b_themes)
+    niches_sim = jaccard(a_niches, b_niches)
 
     def rating_similarity(x: Any, y: Any) -> float:
         try:
@@ -215,14 +218,15 @@ def score_connection(
             return 0.0
         return max(0.0, 1.0 - (abs(float(ax) - float(ay)) / 4.0))
 
-    rating_sim = rating_similarity(a.get('rating_average'), b.get('rating_average'))
-    weight_sim = weight_similarity(a.get('weight_average'), b.get('weight_average'))
+    rating_sim = rating_similarity(a.get('rating'), b.get('rating'))
+    weight_sim = weight_similarity(a.get('weight'), b.get('weight'))
 
     score = (
         weights.get('types', 0.0) * types_sim
         + weights.get('mech', 0.0) * mech_sim
         + weights.get('comp', 0.0) * comp_sim
         + weights.get('themes', 0.0) * themes_sim
+        + weights.get('niches', 0.0) * niches_sim
         + weights.get('rating', 0.0) * rating_sim
         + weights.get('weight', 0.0) * weight_sim
     )
@@ -233,6 +237,7 @@ def score_connection(
         'mechanics': float(mech_sim),
         'components': float(comp_sim),
         'themes': float(themes_sim),
+        'niches': float(niches_sim),
         'rating': float(rating_sim),
         'weight': float(weight_sim),
         'game_a_id': a.get('id'),
@@ -252,14 +257,14 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         df: dataframe with game details.
         method: reserved (only 'simple' supported now).
         k: number of results to return.
-        weights: dict with keys `types`, `mech`, `comp`, `themes`, `rating`, `weight` controlling contribution.
+        weights: dict with keys `types`, `mech`, `comp`, `themes`, `niches`, `rating`, `weight` controlling contribution.
         print_results: whether to print the recommended games.
 
     Returns:
         DataFrame of top-k candidates with a `score` column.
     """
     if weights is None:
-        weights = {"types": 0.3, "mech": 0.20, "comp": 0.30, "themes": 0.0, "rating": 0.10, "weight": 0.10}
+        weights = {"types": 0.25, "mech": 0.20, "comp": 0.25, "themes": 0.0, "niches": 0.20, "rating": 0.05, "weight": 0.05}
 
     seed_df = df[df['id'] == game_id]
     if seed_df.shape[0] == 0:
@@ -268,24 +273,28 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
 
     cands = df[df['id'] != game_id].copy()
 
-    seed_types = set(_ensure_list(seed.get('p_types', [])))
-    seed_mech = set(_ensure_list(seed.get('p_mechanics', [])))
-    seed_comp = set(_ensure_list(seed.get('p_components', [])))
-    seed_themes = set(_ensure_list(seed.get('p_themes', [])))
-    seed_weight = _extract_weight(seed.get('weight_average', None)) or seed.get('weight_average')
+    seed_types = set(_ensure_list(seed.get('types', [])))
+    seed_mech = set(_ensure_list(seed.get('mechanics', [])))
+    seed_comp = set(_ensure_list(seed.get('components', [])))
+    seed_themes = set(_ensure_list(seed.get('themes', [])))
+    seed_niches = set(_ensure_list(seed.get('niches', [])))
+    seed_weight = _extract_weight(seed.get('weight', None)) or seed.get('weight')
 
     # types similarity (0..1)
-    types_sim = cands['p_types'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_types))
+    types_sim = cands['types'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_types))
     
     # mechanics similarity: use weighted Jaccard with precomputed mechanic importances
     mech_weights = load_or_compute_mechanic_importances(df, path='data/mechanic_importances.csv')
-    mech_sim = cands['p_mechanics'].apply(lambda x: weighted_jaccard(seed_mech, set(_ensure_list(x)), mech_weights))
+    mech_sim = cands['mechanics'].apply(lambda x: weighted_jaccard(seed_mech, set(_ensure_list(x)), mech_weights))
     
     # components similarity (0..1)
-    comp_sim = cands['p_components'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_comp))
+    comp_sim = cands['components'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_comp))
     
     # themes similarity (0..1)
-    themes_sim = cands['p_themes'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_themes))
+    themes_sim = cands['themes'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_themes))
+    
+    # niches similarity (0..1)
+    niches_sim = cands['niches'].apply(lambda x: jaccard(set(_ensure_list(x)), seed_niches))
 
     # rating bonus: higher-rated games receive a small global quality bonus (avg_rating/10)
     def rating_bonus(x):
@@ -295,7 +304,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         except Exception:
             return 0.0
 
-    rating_sim_series = cands['rating_average'].apply(rating_bonus)
+    rating_sim_series = cands['rating'].apply(rating_bonus)
 
     # weight similarity: assume typical boardgame weight range ~ [1,5]
     def weight_sim(x):
@@ -304,13 +313,14 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
             return 0.0
         return max(0.0, 1.0 - (abs(w - float(seed_weight)) / 4.0))
 
-    weight_sim_series = cands['weight_average'].apply(weight_sim)
+    weight_sim_series = cands['weight'].apply(weight_sim)
 
     score = (
         weights.get('types', 0) * types_sim
         + weights.get('mech', 0) * mech_sim
         + weights.get('comp', 0) * comp_sim
         + weights.get('themes', 0) * themes_sim
+        + weights.get('niches', 0) * niches_sim
         + weights.get('rating', 0) * rating_sim_series
         + weights.get('weight', 0) * weight_sim_series
     )
@@ -328,8 +338,8 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
                 'name': row.get('name', ''),
                 'score': f"{row.get('score', 0):.3f}",
                 'overall_rank': overall_rank or '',
-                'avg_rating': row.get('rating_average') or '',
-                'weight': _extract_weight(row.get('weight_average')) or row.get('weight_average') or '',
+                'avg_rating': row.get('rating') or '',
+                'weight': _extract_weight(row.get('weight')) or row.get('weight') or '',
                 'year': row.get('year_published') or '',
                 'url': f"https://boardgamegeek.com/boardgame/{row.get('id')}"
             })

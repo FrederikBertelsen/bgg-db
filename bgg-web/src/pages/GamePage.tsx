@@ -7,12 +7,6 @@ import { PlayerCountGraph } from '../components/PlayerCountGraph'
 import { ScoreRing } from '../components/ScoreRing'
 import { formatNumber, formatRange, normalizeDescriptionHtml } from '../lib/format'
 
-function getNum(game: FullGame | null, key: string) {
-  if (!game) return null
-  const value = (game as Record<string, unknown>)[key]
-  return typeof value === 'number' && Number.isFinite(value) ? value : null
-}
-
 export function GamePage() {
   const params = useParams()
   const id = params.id ?? null
@@ -59,8 +53,8 @@ export function GamePage() {
 
   const heroImageUrl = useMemo(() => {
     if (!game) return ''
-    const image = typeof game.image_url === 'string' ? game.image_url : null
-    const thumb = typeof game.thumbnail_url === 'string' ? game.thumbnail_url : null
+    const image = typeof game.image === 'string' ? game.image : null
+    const thumb = typeof game.thumbnail === 'string' ? game.thumbnail : null
     return image ?? thumb ?? ''
   }, [game])
 
@@ -72,46 +66,25 @@ export function GamePage() {
   }, [game])
 
   const creditsByRole = useMemo(() => {
-    const credits = Array.isArray(game?.credits) ? (game?.credits as unknown[]) : []
     const map = new Map<string, string[]>()
-    for (const c of credits) {
-      if (!c || typeof c !== 'object') continue
-      const role = (c as { role?: unknown }).role
-      const names = (c as { names?: unknown }).names
-      if (typeof role !== 'string' || !Array.isArray(names)) continue
-      const cleaned = names.filter((n) => typeof n === 'string') as string[]
-      if (!cleaned.length) continue
-      map.set(role, cleaned)
-    }
+    if (game?.designers.length) map.set('designers', game.designers)
+    if (game?.artists.length) map.set('artists', game.artists)
+    if (game?.publishers.length) map.set('publishers', game.publishers)
     return map
   }, [game])
 
-  const ranks = Array.isArray(game?.ranks) ? (game?.ranks as unknown[]) : []
-  const playerCountScoresRaw =
-    game && typeof (game as { player_count_scores?: unknown }).player_count_scores === 'object'
-      ? ((game as { player_count_scores?: Record<string, unknown> }).player_count_scores ?? null)
-      : null
+  const ranks = game?.ranks ?? []
+  const playerCountScoresRaw = game?.player_count_scores ?? null
 
   const playerCountScores = useMemo(() => {
     if (!playerCountScoresRaw) return null
     const entries = Object.entries(playerCountScoresRaw)
       .filter(([, value]) => typeof value === 'number')
-      .sort(([a], [b]) => Number(a) - Number(b))
+      .sort(([a], [b]) => {
+        return Number(a) - Number(b)
+      })
     return Object.fromEntries(entries) as Record<string, number>
   }, [playerCountScoresRaw])
-
-  const sideStats: Array<[string, number | null]> = [
-    ['Owned', typeof game?.owned_count === 'number' ? game.owned_count : null],
-    ['Wishlists', typeof game?.wish_count === 'number' ? game.wish_count : null],
-    ['Fans', typeof game?.fan_count === 'number' ? game.fan_count : null],
-    ['Views', typeof game?.view_count === 'number' ? game.view_count : null],
-    ['Comments', typeof game?.comment_count === 'number' ? game.comment_count : null],
-    ['Geeklists', getNum(game, 'geeklist_count')],
-    ['Trading', getNum(game, 'trading_count')],
-    ['Want to play', getNum(game, 'want_to_play_count')],
-    ['Want to buy', getNum(game, 'want_to_buy_count')],
-    ['Wishlist comments', getNum(game, 'wishlist_comment_count')],
-  ]
 
   return (
     <div className="page">
@@ -132,12 +105,20 @@ export function GamePage() {
           {loading ? <div className="muted">Loading…</div> : null}
 
           {game ? (
-            <article className="gameLayout">
+            <article className="gameLayout gameLayout--single">
               <section className="gameMain">
                 <section className="cardLike gameHero">
-                  <img className="heroImage heroImage--large" src={heroImageUrl} alt={game.name} loading="lazy" />
+                  <a href={`https://boardgamegeek.com/boardgame/${game.id}`} target="_blank" rel="noopener noreferrer">
+                    <img className="heroImage heroImage--large" src={heroImageUrl} alt={game.name} loading="lazy" />
+                  </a>
                   <div className="gameHeroBody">
-                    <div className="detailsTitle">{game.name}</div>
+                    <div className="heroTitleRow">
+                      <div className="detailsTitle">{game.name}</div>
+                      <div className="heroScores">
+                        <ScoreRing value={game.rating ?? null} outOf={10} label="Rating" />
+                        <ScoreRing value={game.weight ?? null} outOf={5} reverse={true} label="Weight" />
+                      </div>
+                    </div>
                     <div className="meta">
                       <span className="metaItem">
                         <span className="metaKey">Year</span>
@@ -149,75 +130,55 @@ export function GamePage() {
                       </span>
                       <span className="metaItem">
                         <span className="metaKey">Minutes</span>
-                        <span className="metaValue">{formatRange(game.min_playtime, game.max_playtime)}</span>
+                        <span className="metaValue">{formatRange(game.min_playing_time, game.max_playing_time)}</span>
                       </span>
                     </div>
-                    <div className="heroScores">
-                      <ScoreRing value={game.rating_average ?? null} outOf={10} label="Rating" />
-                      <ScoreRing value={game.weight_average ?? null} outOf={5} label="Weight" />
+                    <div className="heroFooter">
+                      <div className="heroRanks">
+                        {ranks.map((r) => (
+                            <div key={r.name} className="heroRank">
+                              <div className="heroRankLabel">
+                                <strong>{r.name} Rank</strong>
+                                <strong className="heroRankValue">{r.value}</strong>
+                              </div>
+                            </div>
+                        ))}
+                      </div>
+                      <div className="heroStats">
+                        <div className="heroStatItem">
+                          <div className="heroStatKey">Rating count</div>
+                          <div className="heroStatValue">{typeof game.rating_count === 'number' ? game.rating_count : '—'}</div>
+                        </div>
+                        <div className="heroStatItem">
+                          <div className="heroStatKey">Std dev</div>
+                          <div className="heroStatValue">{formatNumber(game.rating_stddev, 2)}</div>
+                        </div>
+                      </div>
                     </div>
-                    {typeof game.url === 'string' && game.url.startsWith('http') ? (
-                      <a className="link" href={game.url} target="_blank" rel="noreferrer">
-                        View on BoardGameGeek
-                      </a>
-                    ) : null}
                   </div>
                 </section>
 
-                {ranks.length ? (
+                <div className="propertiesRow">
                   <section className="section cardLike">
-                    <h3>Ranks</h3>
-                    <div className="rankChips">
-                      {ranks
-                        .map((rank) => rank as { category?: unknown; rank?: unknown })
-                        .filter((rank) => typeof rank.category === 'string')
-                        .map((rank) => (
-                          <div key={String(rank.category)} className="rankChip">
-                            <div className="rankChipLabel">{String(rank.category)}</div>
-                            <div className="rankChipValue">#{typeof rank.rank === 'string' ? rank.rank : '—'}</div>
-                          </div>
-                        ))}
+                    <h3>Properties</h3>
+                    <div className="properties">
+                      <div><strong>Types:</strong> {Array.isArray(game.types) && game.types.length ? game.types.join(' · ') : '—'}</div>
+                      <div><strong>Mechanics:</strong> {Array.isArray(game.mechanics) && game.mechanics.length ? game.mechanics.join(' · ') : '—'}</div>
+                      <div><strong>Components:</strong> {Array.isArray(game.components) && game.components.length ? game.components.join(' · ') : '—'}</div>
+                      <div><strong>Themes:</strong> {Array.isArray(game.themes) && game.themes.length ? game.themes.join(' · ') : '—'}</div>
+                      <div><strong>Niches:</strong> {Array.isArray(game.niches) && game.niches.length ? game.niches.join(' · ') : '—'}</div>
                     </div>
                   </section>
-                ) : null}
 
-                <section className="section cardLike">
-                  <h3>Overview</h3>
-                  <div className="overviewGrid">
-                    <div className="overviewItem">
-                      <div className="overviewKey">Players</div>
-                      <div className="overviewValue">{formatRange(game.min_players, game.max_players)}</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Playtime</div>
-                      <div className="overviewValue">{formatRange(game.min_playtime, game.max_playtime)} min</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Rating count</div>
-                      <div className="overviewValue">{typeof game.rating_count === 'number' ? game.rating_count : '—'}</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Std dev</div>
-                      <div className="overviewValue">{formatNumber(game.stddev_rating, 2)}</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Plays</div>
-                      <div className="overviewValue">{typeof game.play_count === 'number' ? game.play_count : '—'}</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Plays (30d)</div>
-                      <div className="overviewValue">{typeof game.play_count_last_month === 'number' ? game.play_count_last_month : '—'}</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Best players</div>
-                      <div className="overviewValue">{formatRange(getNum(game, 'PlayerCountBestMin'), getNum(game, 'PlayerCountBestMax'))}</div>
-                    </div>
-                    <div className="overviewItem">
-                      <div className="overviewKey">Recommended players</div>
-                      <div className="overviewValue">{formatRange(getNum(game, 'PlayerCountRecommendedMin'), getNum(game, 'PlayerCountRecommendedMax'))}</div>
-                    </div>
-                  </div>
-                </section>
+                  {playerCountScores && Object.keys(playerCountScores).length ? (
+                    <section className="section cardLike">
+                      <h3>Player count</h3>
+                      <PlayerCountGraph scores={playerCountScores} />
+                    </section>
+                  ) : null}
+                </div>
+
+
 
                 {descriptionHtml ? (
                   <section className="section cardLike">
@@ -241,6 +202,10 @@ export function GamePage() {
                   </section>
                 ) : null}
 
+                
+
+
+
                 {recs.length ? (
                   <section className="section cardLike">
                     <h3>Recommendations</h3>
@@ -252,63 +217,18 @@ export function GamePage() {
                   </section>
                 ) : null}
 
-                {playerCountScores && Object.keys(playerCountScores).length ? (
+                {Array.isArray(game.expansions) && game.expansions.length ? (
                   <section className="section cardLike">
-                    <h3>Player count ratings</h3>
-                    <p className="muted">Scores are out of 1.</p>
-                    <PlayerCountGraph scores={playerCountScores} />
-                  </section>
-                ) : null}
-
-                {Array.isArray(game.categories) && game.categories.length ? (
-                  <section className="section cardLike">
-                    <h3>Categories</h3>
+                    <h3>Expansions</h3>
                     <div className="tags">
-                      {game.categories.map((category) => (
-                        <span key={category} className="tag">
-                          {category}
-                        </span>
+                      {game.expansions.map((e) => (
+                        <span key={e.id} className="tag">{e.name}</span>
                       ))}
                     </div>
                   </section>
                 ) : null}
+                
 
-                {Array.isArray(game.mechanics) && game.mechanics.length ? (
-                  <section className="section cardLike">
-                    <h3>Mechanics</h3>
-                    <div className="tags">
-                      {game.mechanics.map((mechanic) => (
-                        <span key={mechanic} className="tag">
-                          {mechanic}
-                        </span>
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
-
-                {Array.isArray(game.honors) && game.honors.length ? (
-                  <section className="section cardLike">
-                    <h3>Honors</h3>
-                    <ul className="bullets">
-                      {game.honors.map((honor) => (
-                        <li key={honor}>{honor}</li>
-                      ))}
-                    </ul>
-                  </section>
-                ) : null}
-
-                {Array.isArray(game.families) && game.families.length ? (
-                  <section className="section cardLike">
-                    <h3>Families</h3>
-                    <div className="tags">
-                      {game.families.map((family: string) => (
-                        <span key={family} className="tag">
-                          {family}
-                        </span>
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
 
                 {creditsByRole.size ? (
                   <section className="section cardLike">
@@ -324,20 +244,6 @@ export function GamePage() {
                   </section>
                 ) : null}
               </section>
-
-              <aside className="gameSide">
-                <section className="section cardLike sideSection">
-                  <h3>Side stats</h3>
-                  <div className="sideStats">
-                    {sideStats.map(([label, value]) => (
-                      <div key={label} className="sideStatRow">
-                        <span className="sideStatKey">{label}</span>
-                        <span className="sideStatValue">{typeof value === 'number' ? value : '—'}</span>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              </aside>
             </article>
           ) : null}
         </section>

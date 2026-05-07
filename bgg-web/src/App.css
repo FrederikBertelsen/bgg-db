@@ -280,7 +280,7 @@
 }
 
 .metaKey {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--text);
   font-weight: 700;
   text-transform: uppercase;
@@ -288,7 +288,7 @@
 }
 
 .metaValue {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--text-h);
   font-weight: 800;
 }
@@ -335,7 +335,7 @@
   stroke-linecap: round;
   stroke-width: 6;
   transform: rotate(-90deg);
-  transform-origin: 20px 20px;
+  transform-origin: center center;
 }
 
 .ring--high .ringValue {
@@ -380,6 +380,34 @@
   gap: 4px;
 }
 
+.cardFacts {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cardFact {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  gap: 8px;
+  align-items: baseline;
+}
+
+.cardFactKey {
+  font-size: 11px;
+  color: var(--text);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+.cardFactValue {
+  font-size: 14px;
+  color: var(--text-h);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
 .desc {
   font-size: 14px;
   color: color-mix(in oklab, var(--text) 65%, var(--text-h));
@@ -420,6 +448,10 @@
   align-items: start;
 }
 
+.gameLayout--single {
+  grid-template-columns: 1fr;
+}
+
 .gameMain {
   display: flex;
   flex-direction: column;
@@ -443,40 +475,136 @@
 
 .gameHero {
   display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 16px;
+  grid-template-columns: auto 1fr;
+  gap: 24px;
   align-items: start;
+}
+
+.gameHero>a {
+  display: inline-block;
+  width: fit-content;
 }
 
 .gameHeroBody {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
+}
+
+.heroTitleRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  align-items: center;
+}
+
+.heroFooter {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
 }
 
 .heroScores {
   display: flex;
-  gap: 12px;
+  gap: 20px;
   flex-wrap: wrap;
 }
 
-.heroImage--large {
-  width: 180px;
-  height: 180px;
-  border-radius: 18px;
+/* Larger rings when shown in hero */
+.heroScores .ringWrap {
+  grid-template-columns: 72px 1fr;
+  gap: 16px;
 }
 
-@media (max-width: 640px) {
-  .gameHero {
-    grid-template-columns: 1fr;
-  }
-
-  .heroImage--large {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 1;
-  }
+.heroScores .ring {
+  width: 72px;
+  height: 72px;
 }
+
+.heroScores .ringNumber {
+  font-size: 22px;
+}
+
+.heroScores .ringLabel {
+  font-size: 13px;
+}
+
+.heroSideInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.heroRanks {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heroRank {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--bg) 95%, var(--border));
+}
+
+.heroRankLabel {
+  font-size: 15px;
+  color: var(--text);
+  text-transform: none;
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.heroRankValue {
+  font-size: 20px;
+  font-weight: 900;
+  color: var(--text-h);
+}
+
+.heroRankText {
+  color: var(--text);
+  font-size: 14px;
+}
+
+.heroOverview {
+  min-width: 220px;
+}
+
+.heroStats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heroStatItem {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.heroStatKey {
+  font-size: 15px;
+  color: var(--text);
+  text-transform: uppercase;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.heroStatValue {
+  font-weight: 900;
+  color: var(--text-h);
+  font-size: 18px;
+  margin-left: 8px;
+}
+
+
 
 .rankChips {
   display: flex;
@@ -576,6 +704,48 @@
   font-weight: 800;
 }
 
+.playerGraphColumns {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start;
+  align-items: stretch;
+  min-height: 200px;
+  padding: 12px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.playerColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1 1 auto;
+  min-width: 12px;
+  gap: 4px;
+}
+
+.playerBarSpacer {
+  flex: 0 1 auto;
+}
+
+.playerBarVertical {
+  width: 100%;
+  background: var(--accent);
+  border-radius: 3px 3px 0 0;
+  min-height: 2px;
+  flex: 0 1 auto;
+}
+
+.playerBarLabel {
+  font-size: 11px;
+  color: var(--text-h);
+  font-weight: 800;
+  text-align: center;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* legacy horizontal bars (unused) */
 .playerBarWrap {
   height: 12px;
   border-radius: 999px;
@@ -587,6 +757,55 @@
   height: 100%;
   border-radius: 999px;
   background: linear-gradient(90deg, #ef4444 0%, #eab308 50%, #22c55e 100%);
+}
+
+.versionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.versionItem {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: color-mix(in oklab, var(--bg) 95%, var(--border));
+}
+
+.versionName {
+  font-weight: 900;
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.versionMeta {
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 400;
+}
+
+.propertiesRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.propertiesRow>.section {
+  min-width: 0;
+}
+
+.properties {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.properties>div {
+  color: var(--text);
+  font-size: 14px;
 }
 
 .detailsHeader {
@@ -610,8 +829,27 @@
   background: var(--code-bg);
 }
 
+.heroImage--large {
+  width: 220px;
+  height: auto;
+  border-radius: 18px;
+  object-fit: contain;
+}
+
+@media (max-width: 640px) {
+  .gameHero {
+    grid-template-columns: 1fr;
+  }
+
+  .heroImage--large {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1;
+  }
+}
+
 .detailsTitle {
-  font-size: 18px;
+  font-size: 32px;
   font-weight: 700;
   color: var(--text-h);
 }
@@ -659,7 +897,7 @@
   text-transform: uppercase;
   letter-spacing: 0.2px;
   color: var(--text);
-  font-weight: 800;
+  font-weight: 900;
 }
 
 .statValue {

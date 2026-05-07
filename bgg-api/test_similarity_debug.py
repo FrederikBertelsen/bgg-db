@@ -8,7 +8,7 @@ import ast
 import numpy as np
 from typing import Any
 from boardgame_db import BoardGameDB
-import recommender as rec
+import recommender_v2 as rec
 import recommender_v2 as rec_v2
 
 # ============================================================================
@@ -69,20 +69,22 @@ def analyze_v2_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> d
     cand = cand_df.iloc[0]
     
     # Extract seed properties
-    seed_types = set(_ensure_list(seed.get('p_types', [])))
-    seed_mech = set(_ensure_list(seed.get('p_mechanics', [])))
-    seed_comp = set(_ensure_list(seed.get('p_components', [])))
-    seed_themes = set(_ensure_list(seed.get('p_themes', [])))
+    seed_types = set(_ensure_list(seed.get('types', [])))
+    seed_mech = set(_ensure_list(seed.get('mechanics', [])))
+    seed_comp = set(_ensure_list(seed.get('components', [])))
+    seed_themes = set(_ensure_list(seed.get('themes', [])))
+    seed_niches = set(_ensure_list(seed.get('niches', [])))
     seed_weight = _extract_weight(seed.get('weight', None)) or seed.get('average_weight')
-    seed_rating = seed.get('rating_average')
+    seed_rating = seed.get('rating')
     
     # Extract candidate properties
-    cand_types = set(_ensure_list(cand.get('p_types', [])))
-    cand_mech = set(_ensure_list(cand.get('p_mechanics', [])))
-    cand_comp = set(_ensure_list(cand.get('p_components', [])))
-    cand_themes = set(_ensure_list(cand.get('p_themes', [])))
+    cand_types = set(_ensure_list(cand.get('types', [])))
+    cand_mech = set(_ensure_list(cand.get('mechanics', [])))
+    cand_comp = set(_ensure_list(cand.get('components', [])))
+    cand_themes = set(_ensure_list(cand.get('themes', [])))
+    cand_niches = set(_ensure_list(cand.get('niches', [])))
     cand_weight = _extract_weight(cand.get('weight', None)) or cand.get('average_weight')
-    cand_rating = cand.get('rating_average')
+    cand_rating = cand.get('rating')
     
     # Compute Jaccard similarities
     def jaccard(a: set, b: set) -> float:
@@ -96,6 +98,7 @@ def analyze_v2_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> d
     mech_sim = jaccard(seed_mech, cand_mech)
     comp_sim = jaccard(seed_comp, cand_comp)
     themes_sim = jaccard(seed_themes, cand_themes)
+    niches_sim = jaccard(seed_niches, cand_niches)
     
     # Rating bonus
     def rating_bonus(x):
@@ -114,16 +117,17 @@ def analyze_v2_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> d
             return 0.0
         return max(0.0, 1.0 - (abs(w - float(seed_weight)) / 4.0))
     
-    weight_sim_val = weight_sim(cand.get('weight_average'))
+    weight_sim_val = weight_sim(cand.get('weight'))
     
     # Default weights from v2
-    weights = {"types": 0.3, "mech": 0.33, "comp": 0.25, "themes": 0.0, "rating": 0.02, "weight": 0.1}
+    weights = {"types": 0.25, "mech": 0.20, "comp": 0.25, "themes": 0.0, "niches": 0.20, "rating": 0.05, "weight": 0.05}
     
     total_score = (
         weights['types'] * types_sim
         + weights['mech'] * mech_sim
         + weights['comp'] * comp_sim
         + weights['themes'] * themes_sim
+        + weights['niches'] * niches_sim
         + weights['rating'] * rating_sim
         + weights['weight'] * weight_sim_val
     )
@@ -136,6 +140,7 @@ def analyze_v2_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> d
             "mechanics": {"jaccard": mech_sim, "weight": weights['mech'], "contribution": weights['mech'] * mech_sim},
             "components": {"jaccard": comp_sim, "weight": weights['comp'], "contribution": weights['comp'] * comp_sim},
             "themes": {"jaccard": themes_sim, "weight": weights['themes'], "contribution": weights['themes'] * themes_sim},
+            "niches": {"jaccard": niches_sim, "weight": weights['niches'], "contribution": weights['niches'] * niches_sim},
             "rating": {"score": rating_sim, "weight": weights['rating'], "contribution": weights['rating'] * rating_sim},
             "weight": {"similarity": weight_sim_val, "weight": weights['weight'], "contribution": weights['weight'] * weight_sim_val},
         },
@@ -145,6 +150,7 @@ def analyze_v2_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> d
             "mechanics": list(seed_mech),
             "components": list(seed_comp),
             "themes": list(seed_themes),
+            "niches": list(seed_niches),
             "rating": seed_rating,
             "weight": seed_weight,
         },
@@ -153,6 +159,7 @@ def analyze_v2_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame) -> d
             "mechanics": list(cand_mech),
             "components": list(cand_comp),
             "themes": list(cand_themes),
+            "niches": list(cand_niches),
             "rating": cand_rating,
             "weight": cand_weight,
         },
@@ -173,12 +180,12 @@ def analyze_original_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame
     seed_cats = set(_ensure_list(seed.get('categories', [])))
     seed_mech = set(_ensure_list(seed.get('mechanics', [])))
     seed_weight = _extract_weight(seed.get('weight', None)) or seed.get('average_weight')
-    seed_rating = seed.get('rating_average')
+    seed_rating = seed.get('rating')
     
     cand_cats = set(_ensure_list(cand.get('categories', [])))
     cand_mech = set(_ensure_list(cand.get('mechanics', [])))
     cand_weight = _extract_weight(cand.get('weight', None)) or cand.get('average_weight')
-    cand_rating = cand.get('rating_average')
+    cand_rating = cand.get('rating')
     
     def jaccard(a: set, b: set) -> float:
         if not a and not b:
@@ -205,7 +212,7 @@ def analyze_original_similarity(game_id_1: str, game_id_2: str, df: pd.DataFrame
             return 0.0
         return max(0.0, 1.0 - (abs(w - float(seed_weight)) / 4.0))
     
-    weight_sim_val = weight_sim(cand.get('weight_average'))
+    weight_sim_val = weight_sim(cand.get('weight'))
     
     weights = {"cat": 0.3, "mech": 0.4, "rating": 0.2, "weight": 0.1}
     

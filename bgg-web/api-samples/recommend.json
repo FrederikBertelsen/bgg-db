@@ -1,127 +1,143 @@
 [
   {
-    "id": "256065",
-    "max_players": 5,
-    "max_playtime": 35,
-    "min_players": 2,
-    "min_playtime": 35,
-    "name": "Carcassonne: Safari",
-    "ranks": [
-      {
-        "bayes_average": "5.9555",
-        "category": "Overall",
-        "rank": "3448"
-      },
-      {
-        "bayes_average": "6.07316",
-        "category": "Family",
-        "rank": "1063"
-      }
-    ],
-    "rating_average": 6.99919,
-    "score": 0.6899838,
-    "short_description": "Build the landscape in Africa and make waterwells for the animals.",
-    "thumbnail_url": "https://cf.geekdo-images.com/MuL2J7uZrxrnesCm9Ok76w__previewthumb/img/Lh5qWnG6-2vI7Sjsun4y5QhZ3Iw=/fit-in/300x320/filters:strip_icc()/pic4307408.png",
-    "weight_average": 1.81,
-    "year_published": 2018
-  },
-  {
-    "id": "406708",
+    "id": "434367",
     "max_players": 4,
-    "max_playtime": 20,
-    "min_players": 2,
-    "min_playtime": 20,
-    "name": "Alpina",
-    "ranks": [
-      {
-        "bayes_average": "5.58138",
-        "category": "Overall",
-        "rank": "10459"
-      }
+    "max_playing_time": 120,
+    "min_players": 1,
+    "min_playing_time": 60,
+    "name": "Nippon: Zaibatsu",
+    "niches": [
+      "niche_36",
+      "niche_40"
     ],
-    "rating_average": 6.59706,
-    "score": 0.6819412,
-    "short_description": "Photograph animals in the Swiss National Park.",
-    "thumbnail_url": "https://cf.geekdo-images.com/nAxDdfP9AcpgzfQhoQFWfA__previewthumb/img/WE2Vbiy2trSmSjL7mTkOvsUOuws=/fit-in/300x320/filters:strip_icc()/pic7867467.jpg",
-    "weight_average": 1.67,
-    "year_published": 2024
-  },
-  {
-    "id": "146963",
-    "max_players": 5,
-    "max_playtime": 20,
-    "min_players": 2,
-    "min_playtime": 20,
-    "name": "Let Them Eat Shrimp!",
     "ranks": [
       {
-        "bayes_average": "5.585",
-        "category": "Overall",
-        "rank": "10243"
+        "name": "Overall Rank",
+        "value": 969
       },
       {
-        "bayes_average": "5.61426",
-        "category": "Family",
-        "rank": "2437"
+        "name": "Strategy Rank",
+        "value": 454
       }
     ],
-    "rating_average": 6.57955,
-    "score": 0.6815910000000001,
-    "short_description": null,
-    "thumbnail_url": "https://cf.geekdo-images.com/BeVF2DaghubYn0PCVBtSvQ__previewthumb/img/ZnATidn6G76EzMB_Z6FdfrvST-I=/fit-in/300x320/filters:strip_icc()/pic1906526.jpg",
-    "weight_average": 1.5,
-    "year_published": 2014
+    "rating": 8.58592,
+    "score": 0.6433759298021096,
+    "short_description": "Control conglomerates of companies driving Japan’s economy.",
+    "thumbnail": "https://cf.geekdo-images.com/bOs_Um4cUUOpKnypCMykJA__small/img/WLGTv9N3yOkGWZSki-c0nc-L_oY=/fit-in/200x150/filters:strip_icc()/pic8844519.png",
+    "weight": 3.592,
+    "year_published": 2026
   },
   {
-    "id": "33155",
-    "max_players": 5,
-    "max_playtime": 45,
-    "min_players": 2,
-    "min_playtime": 45,
-    "name": "Burrows",
+    "id": "310873",
+    "max_players": 4,
+    "max_playing_time": 120,
+    "min_players": 1,
+    "min_playing_time": 90,
+    "name": "Carnegie",
+    "niches": [
+      "niche_16",
+      "niche_40"
+    ],
     "ranks": [
       {
-        "bayes_average": "5.5896",
-        "category": "Overall",
-        "rank": "9933"
+        "name": "Overall Rank",
+        "value": 127
       },
       {
-        "bayes_average": "5.6236",
-        "category": "Family",
-        "rank": "2385"
+        "name": "Strategy Rank",
+        "value": 82
       }
     ],
-    "rating_average": 6.16365,
-    "score": 0.673273,
-    "short_description": null,
-    "thumbnail_url": "https://cf.geekdo-images.com/GMSzSp3Bh4_da5Ih5qi_3w__previewthumb/img/sHdWOcYvq2bENKSrb1ikzXpxgx4=/fit-in/300x320/filters:strip_icc()/pic650564.jpg",
-    "weight_average": 1.5,
-    "year_published": 2010
+    "rating": 7.95997,
+    "score": 0.6337548819389835,
+    "short_description": "Become the most influential entrepreneur and benefactor of your era!",
+    "thumbnail": "https://cf.geekdo-images.com/0qxz9DRRhsJrIW1TJ-kz0w__small/img/ma4yc5wbMVrfbg9r21-LxGVwRKw=/fit-in/200x150/filters:strip_icc()/pic5710736.jpg",
+    "weight": 3.8163,
+    "year_published": 2022
   },
   {
-    "id": "34194",
-    "max_players": 5,
-    "max_playtime": 45,
-    "min_players": 2,
-    "min_playtime": 45,
-    "name": "Aquaretto",
+    "id": "425445",
+    "max_players": 4,
+    "max_playing_time": 200,
+    "min_players": 1,
+    "min_playing_time": 100,
+    "name": "Sweet Lands",
+    "niches": [
+      "niche_3"
+    ],
     "ranks": [
       {
-        "bayes_average": "6.23977",
-        "category": "Overall",
-        "rank": "2074"
+        "name": "Overall Rank",
+        "value": 1361
       },
       {
-        "bayes_average": "6.37193",
-        "category": "Family",
-        "rank": "617"
+        "name": "Strategy Rank",
+        "value": 670
       }
     ],
-    "rating_average": 6.96527,
-    "score": 0.66580047116154,
-    "short_description": "Manage your water-themed zoo by making impressive exhibits maybe even baby animals!",
-    "thumbnail_url": "https://cf.geekdo-images.com/Uy_XB4UjqR3iwouKDMqxNg__previewthumb/img/3xG8T7dHoAflj4Ba1BzoVQdDHcg=/fit-in/300x320/filters:strip_icc()/pic1603517.jpg",
-    "weight_average": 2.12,
-    "year_published": 2008
+    "rating": 8.16146,
+    "score": 0.6070600926899927,
+    "short_description": "Build the richest candy empire to claim the crown of confections.",
+    "thumbnail": "https://cf.geekdo-images.com/qmCyTIgGhdSON0bMUk8qjQ__small/img/7NwXv2G1UPErGTvHHm-R6wdYsoY=/fit-in/200x150/filters:strip_icc()/pic8329173.jpg",
+    "weight": 4.1527,
+    "year_published": 2025
+  },
+  {
+    "id": "316795",
+    "max_players": 4,
+    "max_playing_time": 180,
+    "min_players": 1,
+    "min_playing_time": 90,
+    "name": "Legends of Void",
+    "niches": [
+      "niche_2",
+      "niche_4",
+      "niche_25",
+      "niche_36"
+    ],
+    "ranks": [
+      {
+        "name": "Overall Rank",
+        "value": 4734
+      },
+      {
+        "name": "Strategy Rank",
+        "value": 1877
+      }
+    ],
+    "rating": 7.7545,
+    "score": 0.5952499943140547,
+    "short_description": "Heroes compete against each other to save Outer Lands from the Void.",
+    "thumbnail": "https://cf.geekdo-images.com/Mv9T2Pq3ZWlNS_2t_iVnfw__small/img/EhOEAHL1mMO6KyIM5pelQwtU_Gk=/fit-in/200x150/filters:strip_icc()/pic7371750.png",
+    "weight": 4.093,
+    "year_published": 2022
+  },
+  {
+    "id": "220308",
+    "max_players": 4,
+    "max_playing_time": 150,
+    "min_players": 1,
+    "min_playing_time": 60,
+    "name": "Gaia Project",
+    "niches": [
+      "niche_3",
+      "niche_16"
+    ],
+    "ranks": [
+      {
+        "name": "Overall Rank",
+        "value": 13
+      },
+      {
+        "name": "Strategy Rank",
+        "value": 9
+      }
+    ],
+    "rating": 8.352,
+    "score": 0.5747067004870049,
+    "short_description": "Expand, research, upgrade, and settle the galaxy with one of 14 alien species.",
+    "thumbnail": "https://cf.geekdo-images.com/hGWFm3hbMlCDsfCsauOQ4g__small/img/NNG7Ijyx4evp5gcVReis9i0koas=/fit-in/200x150/filters:strip_icc()/pic5375625.png",
+    "weight": 4.4036,
+    "year_published": 2017
   }
 ]

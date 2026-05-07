@@ -2,141 +2,137 @@
   {
     "id": "13",
     "max_players": 4,
-    "max_playtime": 120,
+    "max_playing_time": 120,
     "min_players": 3,
-    "min_playtime": 60,
+    "min_playing_time": 60,
     "name": "Catan",
+    "niches": [
+      "niche_16",
+      "niche_27"
+    ],
     "ranks": [
       {
-        "bayes_average": "6.90382",
-        "category": "Overall",
-        "rank": "617"
+        "name": "Overall Rank",
+        "value": 615
       },
       {
-        "bayes_average": "6.7747",
-        "category": "Strategy",
-        "rank": "579"
+        "name": "Strategy Rank",
+        "value": 579
       },
       {
-        "bayes_average": "6.85116",
-        "category": "Family",
-        "rank": "209"
+        "name": "Family Rank",
+        "value": 210
       }
     ],
-    "rating_average": 7.09115,
+    "rating": 7.09093,
     "score": 9999,
     "short_description": "Collect and trade resources to build up the island of Catan in this modern classic.",
-    "thumbnail_url": "https://cf.geekdo-images.com/0XODRpReiZBFUffEcqT5-Q__previewthumb/img/6DsnQZpWcdOSo8O18m-QhvgclKY=/fit-in/300x320/filters:strip_icc()/pic9156909.png",
-    "weight_average": 2.28,
+    "thumbnail": "https://cf.geekdo-images.com/0XODRpReiZBFUffEcqT5-Q__small/img/SNVfF23OQafv3u8xdFolJnMkBoM=/fit-in/200x150/filters:strip_icc()/pic9156909.png",
+    "weight": 2.2824,
     "year_published": 1995
   },
   {
-    "id": "103091",
-    "max_players": 4,
-    "max_playtime": 120,
-    "min_players": 3,
-    "min_playtime": 120,
-    "name": "Catan Histories: Merchants of Europe",
+    "id": "278",
+    "max_players": 2,
+    "max_playing_time": 120,
+    "min_players": 2,
+    "min_playing_time": 60,
+    "name": "Catan Card Game",
+    "niches": [],
     "ranks": [
       {
-        "bayes_average": "5.74092",
-        "category": "Overall",
-        "rank": "5549"
+        "name": "Overall Rank",
+        "value": 1362
       },
       {
-        "bayes_average": "5.80057",
-        "category": "Strategy",
-        "rank": "2100"
-      },
-      {
-        "bayes_average": "5.81174",
-        "category": "Family",
-        "rank": "1666"
+        "name": "Strategy Rank",
+        "value": 904
       }
     ],
-    "rating_average": 6.64938,
+    "rating": 6.69719,
     "score": 200,
-    "short_description": "As a merchant, establish trading posts and expand your interests.",
-    "thumbnail_url": "https://cf.geekdo-images.com/hobICjUVwQJOM3tbzTUjlg__previewthumb/img/AmU4zcw-aJMFOYDthIrOfvSLDCU=/fit-in/300x320/filters:strip_icc()/pic1421257.jpg",
-    "weight_average": 2.43,
-    "year_published": 2011
+    "short_description": "Build buildings with special abilities, hire helpers, and more in this 2-player game.",
+    "thumbnail": "https://cf.geekdo-images.com/CRCOv0p4FgZaze_3fGuhIA__small/img/m3u-LAThaaVm0fBYatEMsbrl_bk=/fit-in/200x150/filters:strip_icc()/pic706443.jpg",
+    "weight": 2.4384,
+    "year_published": 1996
+  },
+  {
+    "id": "282853",
+    "max_players": 4,
+    "max_playing_time": 120,
+    "min_players": 3,
+    "min_playing_time": 120,
+    "name": "Catan: Starfarers",
+    "niches": [],
+    "ranks": [
+      {
+        "name": "Overall Rank",
+        "value": 1752
+      },
+      {
+        "name": "Family Rank",
+        "value": 480
+      }
+    ],
+    "rating": 7.51246,
+    "score": 200,
+    "short_description": "Explore, settle and trade in the far reaches of space.",
+    "thumbnail": "https://cf.geekdo-images.com/r5AgUHuyt_jg4lOHcqL12A__small/img/Hrqe-n4HPVHbcriS--573oLj9Y0=/fit-in/200x150/filters:strip_icc()/pic6753707.png",
+    "weight": 2.5882,
+    "year_published": 2019
+  },
+  {
+    "id": "67239",
+    "max_players": 4,
+    "max_playing_time": 120,
+    "min_players": 3,
+    "min_playing_time": 120,
+    "name": "Catan Histories: Settlers of America – Trails to Rails",
+    "niches": [],
+    "ranks": [
+      {
+        "name": "Overall Rank",
+        "value": 2435
+      },
+      {
+        "name": "Strategy Rank",
+        "value": 1256
+      }
+    ],
+    "rating": 6.78415,
+    "score": 200,
+    "short_description": "Head west to settle new lands and build new trade cities.",
+    "thumbnail": "https://cf.geekdo-images.com/4xEt1MM-l4BFuaHOf_IcQw__small/img/I_uH_0OyWtEfrDrxhz9wpTQhhwI=/fit-in/200x150/filters:strip_icc()/pic685614.jpg",
+    "weight": 2.6928,
+    "year_published": 2010
   },
   {
     "id": "125921",
     "max_players": 4,
-    "max_playtime": 30,
+    "max_playing_time": 30,
     "min_players": 2,
-    "min_playtime": 30,
+    "min_playing_time": 30,
     "name": "Catan: Junior",
+    "niches": [],
     "ranks": [
       {
-        "bayes_average": "6.11335",
-        "category": "Overall",
-        "rank": "2585"
+        "name": "Overall Rank",
+        "value": 2584
       },
       {
-        "bayes_average": "6.43318",
-        "category": "Children's",
-        "rank": "58"
+        "name": "Children's Rank",
+        "value": 59
       },
       {
-        "bayes_average": "6.17722",
-        "category": "Family",
-        "rank": "890"
+        "name": "Family Rank",
+        "value": 890
       }
     ],
-    "rating_average": 6.57508,
+    "rating": 6.57508,
     "score": 200,
     "short_description": "Classic game of island development redesigned for families and a younger audience.",
-    "thumbnail_url": "https://cf.geekdo-images.com/t2L_dlodn04yyS7CmwnREQ__previewthumb/img/6sxzlGEsQJOCjvJkziuMAcjyDys=/fit-in/300x320/filters:strip_icc()/pic4741220.jpg",
-    "weight_average": 1.5,
+    "thumbnail": "https://cf.geekdo-images.com/t2L_dlodn04yyS7CmwnREQ__small/img/DtXpiQdqTHdmWmYRMm9RTVmEEis=/fit-in/200x150/filters:strip_icc()/pic4741220.jpg",
+    "weight": 1.4961,
     "year_published": 2012
-  },
-  {
-    "id": "147240",
-    "max_players": 4,
-    "max_playtime": 90,
-    "min_players": 3,
-    "min_playtime": 60,
-    "name": "Catan: Family Edition",
-    "ranks": [
-      {
-        "bayes_average": "5.62798",
-        "category": "Overall",
-        "rank": "8154"
-      }
-    ],
-    "rating_average": 6.56709,
-    "score": 200,
-    "short_description": null,
-    "thumbnail_url": "https://cf.geekdo-images.com/allUQ1tQslwcs2Th7oAJZA__previewthumb/img/kR3NGoVjAgzAZ_-Ns9TO4Fa5vkM=/fit-in/300x320/filters:strip_icc()/pic3192913.jpg",
-    "weight_average": 2.25,
-    "year_published": 2012
-  },
-  {
-    "id": "161527",
-    "max_players": 4,
-    "max_playtime": 75,
-    "min_players": 3,
-    "min_playtime": 75,
-    "name": "Catan: Ancient Egypt",
-    "ranks": [
-      {
-        "bayes_average": "5.74696",
-        "category": "Overall",
-        "rank": "5462"
-      },
-      {
-        "bayes_average": "5.83151",
-        "category": "Family",
-        "rank": "1618"
-      }
-    ],
-    "rating_average": 7.25343,
-    "score": 200,
-    "short_description": "Gather your resources and build settlements in the fertile Nile Valley!",
-    "thumbnail_url": "https://cf.geekdo-images.com/OlacxFqqIDQ7a1LpWQQjAw__previewthumb/img/Vuku08nnFd492zJhS9D9QvI5E6U=/fit-in/300x320/filters:strip_icc()/pic2228343.jpg",
-    "weight_average": 2.47,
-    "year_published": 2014
   }
 ]

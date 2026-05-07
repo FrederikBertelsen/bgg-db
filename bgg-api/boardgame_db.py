@@ -1,5 +1,5 @@
 import pandas as pd
-from recommender import compute_mechanic_importances, recommend
+from recommender_v2 import compute_mechanic_importances, recommend
 from game_search import GameSearchEngine
 from niche_detector import discover_niches
 from boardgame_db_properties import (
@@ -8,16 +8,24 @@ from boardgame_db_properties import (
     load_or_create_property_mappings,
     normalize_families,
 )
-from boardgame_db_features import collect_unique_values
-from boardgame_db_io import load_merged_data,save_cached_boardgame_state
+from utils import collect_unique_values
 from boardgame_db_niches import build_niche_name_cache, create_and_persist_niches
-from boardgame_db_pipeline import prepare_boardgame_db
-
+from boardgame_db_io import (
+    load_merged_data,
+    get_data_files_signature,
+    load_cache_manifest,
+    load_cached_boardgame_state,
+    save_cache_manifest,
+    save_cached_boardgame_state,
+)
 
 class BoardGameDB:
-    def __init__(self, prepare_postprocessing: bool = True):        
+    def __init__(self):
         self.df_games: pd.DataFrame = pd.DataFrame()
         self.unique_mechanics: set[str] = set()
+        self.unique_components: set[str] = set()
+        self.unique_themes: set[str] = set()
+        self.unique_types: set[str] = set()
         self.unique_categories: set[str] = set()
         
         # Search engine (initialized after df_games is loaded)
@@ -34,7 +42,7 @@ class BoardGameDB:
         self.cache_dir = "data/cache"
         self.manifest_path = "data/cache_manifest.json"
 
-        self.prepare_db(prepare_postprocessing=prepare_postprocessing)
+        self.prepare_db()
 
     def get_game_by_id(self, id: str) -> pd.Series | None:
         """
@@ -113,8 +121,6 @@ class BoardGameDB:
             return []
         return self.search_engine.get_english_names_deduplicated(names)
 
-
-
     def search_games(self, searchTerm: str, n: int = 5, threshold: int = 70) -> pd.DataFrame | None:
         """
         Return a list of dicts for board games whose `name` or `alternative_names` fuzzy-match the given `searchTerm`.
@@ -123,7 +129,6 @@ class BoardGameDB:
         if self.search_engine is None:
             return None
         return self.search_engine.search_games(searchTerm, n=n, threshold=threshold)
-
     
     def autocomplete_search(self, searchTerm: str, n: int = 5, threshold: int = 60) -> list[tuple[str, int]]:
         """Return up to `n` matches as (name, score). Delegates to search engine."""
@@ -155,7 +160,7 @@ class BoardGameDB:
         print("\nInitializing search engine...")
         self.search_engine = GameSearchEngine(self.df_games)
     
-    def get_niches(self, verbose: bool = True, params: dict | None = None) -> list:
+    def get_niches(self, verbose: bool = True) -> list:
         """
         Discover board game niches from the current dataset.
         
@@ -177,43 +182,29 @@ class BoardGameDB:
         if verbose:
             print("\nDiscovering board game niches...")
         
-        niches = discover_niches(self.df_games, params=params, verbose=verbose)
+        niches = discover_niches(self.df_games, verbose=verbose)
+
+        if verbose:
+            print(f"\nDiscovered {len(niches)} niches.")
         
         # Cache for future calls
         self._niches_cache = niches
         
         return niches
 
-    def create_and_persist_niches(self, niche_csv_path: str = "data/niches.csv", verbose: bool = True, params: dict | None = None, save_cache: bool = True) -> None:
+    def create_and_cache_niches(self, niche_csv_path: str = "data/niches.csv", verbose: bool = True) -> None:
         if self.df_games.empty:
             if verbose:
                 print("No games loaded; skipping niche creation.")
             return
 
         # Ensure niches are computed and cached by get_niches
-        niches = self.get_niches(verbose=verbose, params=params)
+        niches = self.get_niches(verbose=verbose)
 
         self.df_games = create_and_persist_niches(self.df_games, niches, niche_csv_path=niche_csv_path)
         # Invalidate and rebuild niche-name cache after persistence updates.
         self._niche_name_cache = None
         self._ensure_niche_name_cache(niche_csv_path=niche_csv_path)
-
-        if save_cache:
-            # Persist updated df_games (and other cached artifacts)
-            try:
-                save_cached_boardgame_state(self.cache_dir, {
-                    "df_games": self.df_games,
-                    "unique_mechanics": self.unique_mechanics,
-                    "unique_categories": self.unique_categories,
-                    "unique_types": self.unique_types,
-                    "unique_subdomains": self.unique_subdomains,
-                    "unique_families": self.unique_families,
-                    "mechanic_importances": self.mechanic_importances,
-                    "niches_cache": self._niches_cache,
-                })
-            except Exception:
-                if verbose:
-                    print("Warning: failed to save cache after persisting niches.")
 
     def cache_all_names(self) -> None:
         """Initialize search engine (renamed from cache_all_names)."""
@@ -228,10 +219,14 @@ class BoardGameDB:
         print("\nCaching unique mechanics...")
         self.unique_mechanics = collect_unique_values(self.df_games, 'mechanics')
 
-        # create dataframe and save to .csv file
-        unique_mechanics_df = pd.DataFrame(list(self.unique_mechanics), columns=['mechanic'])
-        unique_mechanics_df.sort_values(by='mechanic', inplace=True)
-        # unique_mechanics_df.to_csv('data/unique_mechanics.csv', index=False)
+    def cache_unique_components(self) -> None:
+        """
+        Precompute and cache the unique components across all games in the dataset.
+        This can speed up recommendation computations that rely on component similarity.
+        """
+
+        print("\nCaching unique components...")
+        self.unique_components = collect_unique_values(self.df_games, 'components')
 
     def cache_unique_categories(self) -> None:
         """
@@ -242,15 +237,6 @@ class BoardGameDB:
         print("\nCaching unique categories...")
         self.unique_categories = collect_unique_values(self.df_games, 'categories')
 
-        # create dataframe and save to .csv file
-        unique_categories_df = pd.DataFrame(list(self.unique_categories), columns=['category'])
-        unique_categories_df.sort_values(by='category', inplace=True)
-        # unique_categories_df.to_csv('data/unique_categories.csv', index=False)
-
-    def cache_recommendations(self):
-        print("\nPrecomputing mechanic importances...")
-        self.mechanic_importances = compute_mechanic_importances(self.df_games)
-
     def cache_unique_types(self) -> None:
         """
         Precompute and cache the unique types across all games in the dataset.
@@ -260,37 +246,29 @@ class BoardGameDB:
         print("\nCaching unique types...")
         self.unique_types = collect_unique_values(self.df_games, 'types')
 
-        # create dataframe and save to .csv file
-        unique_types_df = pd.DataFrame(list(self.unique_types), columns=['type'])
-        unique_types_df.sort_values(by='type', inplace=True)
-        # unique_types_df.to_csv('data/unique_types.csv', index=False)
-
-    def cache_unique_subdomains(self) -> None:
+    def cache_unique_themes(self) -> None:
         """
-        Precompute and cache the unique subdomains across all games in the dataset.
-        This can speed up recommendation computations that rely on subdomain similarity.
+        Precompute and cache the unique themes across all games in the dataset.
+        This can speed up recommendation computations that rely on theme similarity.
         """
 
-        print("\nCaching unique subdomains...")
-        self.unique_subdomains = collect_unique_values(self.df_games, 'subdomains')
+        print("\nCaching unique themes...")
+        self.unique_themes = collect_unique_values(self.df_games, 'themes')
 
-        # create dataframe and save to .csv file
-        unique_subdomains_df = pd.DataFrame(list(self.unique_subdomains), columns=['subdomain'])
-        unique_subdomains_df.sort_values(by='subdomain', inplace=True)
-        # unique_subdomains_df.to_csv('data/unique_subdomains.csv', index=False)
-
-    def cache_and_convert_unique_wanted_families(self) -> None:
-        """Normalize family names and cache the resulting unique values."""
-        self.unique_families = normalize_families(self.df_games)
+    def cache_recommendations(self):
+        print("\nPrecomputing mechanic importances...")
+        self.mechanic_importances = compute_mechanic_importances(self.df_games)
 
 
     def load_property_mappings(self) -> None:
+        unique_families = normalize_families(self.df_games)
+
         self.property_mappings = load_or_create_property_mappings(
             self.unique_mechanics,
+            self.unique_components,
             self.unique_categories,
             self.unique_types,
-            self.unique_families,
-            self.unique_subdomains,
+            unique_families
         )
 
     def collect_and_translate_properties(self) -> None:
@@ -304,5 +282,55 @@ class BoardGameDB:
     def load_data(self) -> None:
         self.df_games = load_merged_data()
     
-    def prepare_db(self, prepare_postprocessing: bool = True):
-        prepare_boardgame_db(self, prepare_postprocessing=prepare_postprocessing)
+
+
+    def prepare_db(self) -> None:
+        """Load cached state if possible, otherwise rebuild the dataset and refresh caches."""
+        print("\n------------------ Preparing BoardGameDB ------------------")
+
+        file_count, file_hash = get_data_files_signature()
+        manifest = load_cache_manifest(self.manifest_path)
+
+        cache_valid = (
+            manifest is not None
+            and manifest.get("file_count") == file_count
+            and manifest.get("file_hash") == file_hash
+        )
+
+        cached_state = load_cached_boardgame_state(self.cache_dir) if cache_valid else None
+        if cached_state:
+            self.df_games = cached_state["df_games"]
+            self.mechanic_importances = cached_state["mechanic_importances"]
+            self._niches_cache = cached_state["niches_cache"]
+            print("\nLoaded from cache (data unchanged).")
+        else:
+            print("\nRebuilding dataset (data changed or cache missing).")
+            self.load_data()
+
+            self.load_property_mappings()
+            self.collect_and_translate_properties()
+            self.load_categorization_data_and_categorize_properties()
+
+            self.create_and_cache_niches()
+            self.cache_recommendations()
+
+            self.df_games.drop(columns=["families", "properties", "categories"], inplace=True, errors="ignore")
+
+        # Always calculate unique values (regardless of cache state)
+        self.cache_unique_mechanics()
+        self.cache_unique_components()
+        self.cache_unique_categories()
+        self.cache_unique_types()
+        self.cache_unique_themes()
+
+        self.init_search_engine()
+
+        save_cached_boardgame_state(self.cache_dir, {
+            "df_games": self.df_games,
+            "mechanic_importances": self.mechanic_importances,
+            "niches_cache": self._niches_cache,
+        })
+        if not cached_state:
+            save_cache_manifest(self.manifest_path, {"file_count": file_count, "file_hash": file_hash})
+
+        print("\n------------------------------------------------------------\n")

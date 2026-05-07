@@ -16,14 +16,14 @@ def to_json_card(input: pd.Series) -> dict:
         "name": input["name"],
         "short_description": input["short_description"],
         "year_published": input["year_published"],
-        "rating_average": input["rating_average"],
-        "weight_average": input["weight_average"],
+        "rating": input["rating"],
+        "weight": input["weight"],
         "ranks": input["ranks"],
         "min_players": input["min_players"],
         "max_players": input["max_players"],
-        "min_playtime": input["min_playtime"],
-        "max_playtime": input["max_playtime"],
-        "thumbnail_url": input["thumbnail_url"],
+        "min_playing_time": input["min_playing_time"],
+        "max_playing_time": input["max_playing_time"],
+        "thumbnail": input["thumbnail"],
         "niches": input.get("niches", []),
         "score": input.get("score", None)
     }
@@ -71,7 +71,7 @@ def _normalize_value(v):
 
 
 def _normalize_dict(d: dict) -> dict:
-    return { k: _normalize_value(v) for k, v in d.items() }
+    return { str(k): _normalize_value(v) for k, v in d.items() }
 
 
 

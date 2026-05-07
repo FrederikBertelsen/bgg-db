@@ -1,49 +1,60 @@
 [
   {
-    "id": "5640",
-    "max_players": 4,
-    "max_playtime": 45,
+    "id": "167791",
+    "max_players": 5,
+    "max_playing_time": 120,
     "min_players": 1,
-    "min_playtime": 45,
-    "name": "Bombay Bazar",
+    "min_playing_time": 120,
+    "name": "Terraforming Mars",
+    "niches": [
+      "niche_3",
+      "niche_4",
+      "niche_36",
+      "niche_36",
+      "niche_40"
+    ],
     "ranks": [
       {
-        "bayes_average": "5.50072",
-        "category": "Overall",
-        "rank": "25485"
+        "name": "Overall Rank",
+        "value": 9
+      },
+      {
+        "name": "Strategy Rank",
+        "value": 8
       }
     ],
-    "rating_average": 5.49058,
+    "rating": 8.33817,
     "score": null,
-    "short_description": null,
-    "thumbnail_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__previewthumb/img/XJcQEBUM7L-GhDYJbL5k1CQKvko=/fit-in/300x320/filters:strip_icc()/pic453846.jpg",
-    "weight_average": 1.33,
-    "year_published": 2001
+    "short_description": "Compete with rival CEOs to make Mars habitable and build your corporate empire.",
+    "thumbnail": "https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__small/img/BTxqxgYay5tHJfVoJ2NF5g43_gA=/fit-in/200x150/filters:strip_icc()/pic3536616.jpg",
+    "weight": 3.2711,
+    "year_published": 2016
   },
   {
     "id": "1406",
     "max_players": 8,
-    "max_playtime": 180,
+    "max_playing_time": 180,
     "min_players": 2,
-    "min_playtime": 60,
+    "min_playing_time": 60,
     "name": "Monopoly",
+    "niches": [
+      "niche_3"
+    ],
     "ranks": [
       {
-        "bayes_average": "4.29346",
-        "category": "Overall",
-        "rank": "30530"
+        "name": "Overall Rank",
+        "value": 30558
       },
       {
-        "bayes_average": "4.22039",
-        "category": "Family",
-        "rank": "3593"
+        "name": "Family Rank",
+        "value": 3596
       }
     ],
-    "rating_average": 4.36917,
+    "rating": 4.369,
     "score": null,
     "short_description": "In this competitive real estate market, there's only one possible outcome: Monopoly!",
-    "thumbnail_url": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__previewthumb/img/cO-1s_fAx_dqsuJxmwYjf3QG7ss=/fit-in/300x320/filters:strip_icc()/pic5786795.jpg",
-    "weight_average": 1.62,
+    "thumbnail": "https://cf.geekdo-images.com/9nGoBZ0MRbi6rdH47sj2Qg__small/img/ezXcyEsHhS9iRxmuGe8SmiLLXlM=/fit-in/200x150/filters:strip_icc()/pic5786795.jpg",
+    "weight": 1.6189,
     "year_published": 1935
   }
 ]

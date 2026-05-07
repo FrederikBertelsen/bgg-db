@@ -36,13 +36,23 @@ async function getJson<T>(path: string, signal?: AbortSignal): Promise<T> {
   })
 
   const text = await res.text()
-  const body = text ? (JSON.parse(text) as unknown) : null
+  let body: unknown = null
+
+  try {
+    body = text ? (JSON.parse(text) as unknown) : null
+  } catch {
+    // JSON parsing failed - body stays null
+  }
 
   if (!res.ok) {
-    const message =
-      typeof body === 'object' && body && 'error' in body
-        ? String((body as { error: unknown }).error)
-        : `Request failed (${res.status})`
+    let message: string
+    if (res.status === 500) {
+      message = 'Server error. Please try again later.'
+    } else if (typeof body === 'object' && body && 'error' in body) {
+      message = String((body as { error: unknown }).error)
+    } else {
+      message = `Request failed (${res.status})`
+    }
     throw new ApiError(message, { status: res.status, url, body })
   }
 

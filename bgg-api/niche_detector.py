@@ -15,14 +15,14 @@ from recommender_v2 import _ensure_list, load_or_compute_mechanic_importances, s
 
 
 # Default tunable parameters
-DEFAULT_PARAMS = {
+PARAMS = {
     'max_prop_freq': 6000,
     'max_pairs_per_token': 700,
     'edge_cutoff': 0.20,
     'cluster_edge_cutoff': 0.30,
     'min_niche_props': 5,
     'min_games_per_niche': 50,
-    'min_coverage': 0.65,
+    'min_coverage': 0.70,
     'max_cluster_size_for_direct_niche': 400,
     'split_edge_multipliers': (1.05, 1.20, 1.35, 1.50),
     'max_global_prop_support': 0.45,
@@ -34,9 +34,9 @@ DEFAULT_PARAMS = {
     'niches_max_game_overlap': 0.70,
     'niches_max_prop_overlap': 0.70,
     'connection_weights': {
-        'types': 0.25,
-        'mech': 0.45,
-        'comp': 0.25,
+        'types': 0.40,
+        'mech': 0.40,
+        'comp': 0.15,
         'themes': 0.0,
         'rating': 0.00,
         'weight': 0.10,
@@ -44,7 +44,7 @@ DEFAULT_PARAMS = {
 }
 
 
-def discover_niches(df_games, params=None, verbose=True):
+def discover_niches(df_games, verbose=True):
     """
     Discover board game niches from a dataset.
     
@@ -62,21 +62,16 @@ def discover_niches(df_games, params=None, verbose=True):
             - selected_props_list: list of the selected properties that define the niche (e.g. ['type::Strategy', 'mech::Dice Rolling', ...])
             - qualifying_games_list: list of (game_id, matches, coverage, game_name) for games that meet the coverage threshold for the selected properties
     """
-    
-    # Merge parameters
-    p = DEFAULT_PARAMS.copy()
-    if params:
-        p.update(params)
-    
+        
     if verbose:
         print('Building per-game property index...')
     game_props = {}
     for _, row in df_games.iterrows():
         gid = row['id']
         game_props[gid] = {
-            'types': set(_ensure_list(row.get('p_types'))),
-            'mech': set(_ensure_list(row.get('p_mechanics'))),
-            'comp': set(_ensure_list(row.get('p_components'))),
+            'types': set(_ensure_list(row.get('types'))),
+            'mech': set(_ensure_list(row.get('mechanics'))),
+            'comp': set(_ensure_list(row.get('components'))),
             'row': row,
         }
 
@@ -92,17 +87,17 @@ def discover_niches(df_games, params=None, verbose=True):
     candidate_pairs = set()
     rng = random.Random(42)
     for token, games in token_to_games.items():
-        if len(games) < 2 or len(games) > p['max_prop_freq']:
+        if len(games) < 2 or len(games) > PARAMS['max_prop_freq']:
             continue
 
         max_possible = (len(games) * (len(games) - 1)) // 2
-        if max_possible <= p['max_pairs_per_token']:
+        if max_possible <= PARAMS['max_pairs_per_token']:
             pairs_iter = itertools.combinations(games, 2)
         else:
             sampled_pairs = set()
-            max_attempts = p['max_pairs_per_token'] * 12
+            max_attempts = PARAMS['max_pairs_per_token'] * 12
             attempts = 0
-            while len(sampled_pairs) < p['max_pairs_per_token'] and attempts < max_attempts:
+            while len(sampled_pairs) < PARAMS['max_pairs_per_token'] and attempts < max_attempts:
                 a, b = rng.sample(games, 2)
                 if a > b:
                     a, b = b, a
@@ -142,18 +137,18 @@ def discover_niches(df_games, params=None, verbose=True):
                 a,
                 b,
                 df=df_games,
-                weights=p['connection_weights'],
+                weights=PARAMS['connection_weights'],
                 mech_weights=mech_weights_cache,
                 game_id_map=game_id_map,
             )
         except Exception:
             continue
 
-        if s['score'] >= p['edge_cutoff']:
+        if s['score'] >= PARAMS['edge_cutoff']:
             edges.append((a, b, s['score']))
 
     if verbose:
-        print(f'Edges kept (score >= {p["edge_cutoff"]}): {len(edges)}')
+        print(f'Edges kept (score >= {PARAMS["edge_cutoff"]}): {len(edges)}')
 
     if verbose:
         print('Building game similarity graph...')
@@ -165,10 +160,10 @@ def discover_niches(df_games, params=None, verbose=True):
         print(f'Graph stats: {Gg.number_of_nodes()} nodes, {Gg.number_of_edges()} edges')
 
     if verbose:
-        print(f'Detecting communities from stronger graph (edge >= {p["cluster_edge_cutoff"]})')
+        print(f'Detecting communities from stronger graph (edge >= {PARAMS["cluster_edge_cutoff"]})')
     Gc = nx.Graph()
     Gc.add_nodes_from(Gg.nodes())
-    Gc.add_edges_from((u, v, d) for u, v, d in Gg.edges(data=True) if d.get('weight', 0.0) >= p['cluster_edge_cutoff'])
+    Gc.add_edges_from((u, v, d) for u, v, d in Gg.edges(data=True) if d.get('weight', 0.0) >= PARAMS['cluster_edge_cutoff'])
     if verbose:
         print(f'Cluster graph stats: {Gc.number_of_nodes()} nodes, {Gc.number_of_edges()} edges')
     game_communities = sorted((set(component) for component in nx.connected_components(Gc)), key=len, reverse=True)
@@ -199,12 +194,12 @@ def discover_niches(df_games, params=None, verbose=True):
     def split_large_cluster(cluster_games: set):
         """Split large components using progressively stronger edge thresholds."""
         clusters = [set(cluster_games)]
-        for mult in p['split_edge_multipliers']:
-            threshold = p['cluster_edge_cutoff'] * mult
+        for mult in PARAMS['split_edge_multipliers']:
+            threshold = PARAMS['cluster_edge_cutoff'] * mult
             next_clusters = []
             changed = False
             for cluster in clusters:
-                if len(cluster) <= p['max_cluster_size_for_direct_niche']:
+                if len(cluster) <= PARAMS['max_cluster_size_for_direct_niche']:
                     next_clusters.append(cluster)
                     continue
 
@@ -219,7 +214,7 @@ def discover_niches(df_games, params=None, verbose=True):
                 components = [
                     set(component)
                     for component in nx.connected_components(subG)
-                    if len(component) >= p['min_games_per_niche']
+                    if len(component) >= PARAMS['min_games_per_niche']
                 ]
                 if len(components) > 1:
                     next_clusters.extend(components)
@@ -251,11 +246,11 @@ def discover_niches(df_games, params=None, verbose=True):
                     continue
                 if cluster_support < support:
                     continue
-                if global_support < p['min_global_prop_support'] or global_support > p['max_global_prop_support']:
+                if global_support < PARAMS['min_global_prop_support'] or global_support > PARAMS['max_global_prop_support']:
                     continue
 
                 enrichment = cluster_support / global_support
-                if enrichment < p['min_enrichment_ratio']:
+                if enrichment < PARAMS['min_enrichment_ratio']:
                     continue
 
                 rank_score = cluster_support * enrichment
@@ -263,7 +258,7 @@ def discover_niches(df_games, params=None, verbose=True):
 
             candidates.sort(reverse=True)
             selected = [prop for _, prop in candidates[:12]]
-            if len(selected) >= p['min_niche_props']:
+            if len(selected) >= PARAMS['min_niche_props']:
                 break
             support -= 0.1
 
@@ -282,10 +277,10 @@ def discover_niches(df_games, params=None, verbose=True):
             token_set = all_tokens_per_game[gid]
             matches = len(token_set & selected_set)
             coverage = matches / len(selected_set) if selected_set else 0.0
-            if coverage >= p['min_coverage']:
+            if coverage >= PARAMS['min_coverage']:
                 qualifying_games.append((gid, matches, coverage, game_props[gid]['row'].get('name', 'Unknown')))
 
-        if len(qualifying_games) < p['min_games_per_niche']:
+        if len(qualifying_games) < PARAMS['min_games_per_niche']:
             return
 
         new_games = {gid for gid, _, _, _ in qualifying_games}
@@ -304,9 +299,9 @@ def discover_niches(df_games, params=None, verbose=True):
     candidate_clusters = []
     for cluster in game_communities:
         cluster_set = set(cluster)
-        if len(cluster_set) < p['min_games_per_niche']:
+        if len(cluster_set) < PARAMS['min_games_per_niche']:
             continue
-        if len(cluster_set) > p['max_cluster_size_for_direct_niche']:
+        if len(cluster_set) > PARAMS['max_cluster_size_for_direct_niche']:
             candidate_clusters.extend(split_large_cluster(cluster_set))
         else:
             candidate_clusters.append(cluster_set)
@@ -316,7 +311,7 @@ def discover_niches(df_games, params=None, verbose=True):
 
     for cluster_set in candidate_clusters:
         niche_props, selected = extract_niche_from_cluster(cluster_set)
-        if len(selected) < p['min_niche_props']:
+        if len(selected) < PARAMS['min_niche_props']:
             continue
 
         selected_set = set(selected)
@@ -325,10 +320,10 @@ def discover_niches(df_games, params=None, verbose=True):
             token_set = all_tokens_per_game[gid]
             matches = len(token_set & selected_set)
             coverage = matches / len(selected_set) if selected_set else 0.0
-            if coverage >= p['min_coverage']:
+            if coverage >= PARAMS['min_coverage']:
                 qualifying_games.append((gid, matches, coverage, game_props[gid]['row'].get('name', 'Unknown')))
 
-        if len(qualifying_games) >= p['min_games_per_niche']:
+        if len(qualifying_games) >= PARAMS['min_games_per_niche']:
             final_niches.append((cluster_set, niche_props, selected, qualifying_games))
 
     if len(final_niches) < 5:
@@ -337,13 +332,13 @@ def discover_niches(df_games, params=None, verbose=True):
         anchors = [
             token
             for token, sup in sorted(global_prop_support.items(), key=lambda x: x[1], reverse=True)
-            if p['min_global_prop_support'] <= sup <= p['max_anchor_global_support']
-            and len(token_games_prefixed[token]) >= p['min_games_per_niche']
+            if PARAMS['min_global_prop_support'] <= sup <= PARAMS['max_anchor_global_support']
+            and len(token_games_prefixed[token]) >= PARAMS['min_games_per_niche']
         ]
 
-        for anchor in anchors[:p['max_anchor_count']]:
+        for anchor in anchors[:PARAMS['max_anchor_count']]:
             cluster_set = set(token_games_prefixed[anchor])
-            if len(cluster_set) < p['min_games_per_niche']:
+            if len(cluster_set) < PARAMS['min_games_per_niche']:
                 continue
 
             niche_props, selected = extract_niche_from_cluster(cluster_set)
@@ -351,7 +346,7 @@ def discover_niches(df_games, params=None, verbose=True):
                 selected = [anchor] + selected
                 selected = selected[:12]
 
-            if len(selected) < p['min_niche_props']:
+            if len(selected) < PARAMS['min_niche_props']:
                 continue
 
             add_niche_if_new(cluster_set, niche_props, selected, final_niches)
@@ -379,10 +374,10 @@ def discover_niches(df_games, params=None, verbose=True):
         for existing in deduped_niches:
             existing_games = {gid for gid, _, _, _ in existing[3]}
             existing_props = set(existing[2])
-            if _jaccard(niche_games, existing_games) >= p['niches_max_game_overlap']:
+            if _jaccard(niche_games, existing_games) >= PARAMS['niches_max_game_overlap']:
                 duplicate = True
                 break
-            if _jaccard(niche_props_set, existing_props) >= p['niches_max_prop_overlap']:
+            if _jaccard(niche_props_set, existing_props) >= PARAMS['niches_max_prop_overlap']:
                 duplicate = True
                 break
 

@@ -49,38 +49,13 @@ def load_cached_boardgame_state(cache_dir: str) -> dict | None:
     try:
         with open(os.path.join(cache_dir, "df_games.pkl"), "rb") as file:
             df_games = pickle.load(file)
-
-        with open(os.path.join(cache_dir, "unique_mechanics.pkl"), "rb") as file:
-            unique_mechanics = pickle.load(file)
-
-        with open(os.path.join(cache_dir, "unique_categories.pkl"), "rb") as file:
-            unique_categories = pickle.load(file)
-
-        with open(os.path.join(cache_dir, "unique_types.pkl"), "rb") as file:
-            unique_types = pickle.load(file)
-
-        with open(os.path.join(cache_dir, "unique_subdomains.pkl"), "rb") as file:
-            unique_subdomains = pickle.load(file)
-
-        with open(os.path.join(cache_dir, "unique_families.pkl"), "rb") as file:
-            unique_families = pickle.load(file)
-
         with open(os.path.join(cache_dir, "mechanic_importances.pkl"), "rb") as file:
             mechanic_importances = pickle.load(file)
-
-        niches_path = os.path.join(cache_dir, "niches.pkl")
-        niches_cache = None
-        if os.path.exists(niches_path):
-            with open(niches_path, "rb") as file:
-                niches_cache = pickle.load(file)
+        with open(os.path.join(cache_dir, "niches.pkl"), "rb") as file:
+            niches_cache = pickle.load(file)
 
         return {
             "df_games": df_games,
-            "unique_mechanics": unique_mechanics,
-            "unique_categories": unique_categories,
-            "unique_types": unique_types,
-            "unique_subdomains": unique_subdomains,
-            "unique_families": unique_families,
             "mechanic_importances": mechanic_importances,
             "niches_cache": niches_cache,
         }
@@ -91,24 +66,8 @@ def load_cached_boardgame_state(cache_dir: str) -> dict | None:
 def save_cached_boardgame_state(cache_dir: str, state: dict) -> None:
     """Persist the cached BoardGameDB state to pickle files."""
     os.makedirs(cache_dir, exist_ok=True)
-
     with open(os.path.join(cache_dir, "df_games.pkl"), "wb") as file:
         pickle.dump(state["df_games"], file)
-
-    with open(os.path.join(cache_dir, "unique_mechanics.pkl"), "wb") as file:
-        pickle.dump(state["unique_mechanics"], file)
-
-    with open(os.path.join(cache_dir, "unique_categories.pkl"), "wb") as file:
-        pickle.dump(state["unique_categories"], file)
-
-    with open(os.path.join(cache_dir, "unique_types.pkl"), "wb") as file:
-        pickle.dump(state["unique_types"], file)
-
-    with open(os.path.join(cache_dir, "unique_subdomains.pkl"), "wb") as file:
-        pickle.dump(state["unique_subdomains"], file)
-
-    with open(os.path.join(cache_dir, "unique_families.pkl"), "wb") as file:
-        pickle.dump(state["unique_families"], file)
 
     with open(os.path.join(cache_dir, "mechanic_importances.pkl"), "wb") as file:
         pickle.dump(state["mechanic_importances"], file)

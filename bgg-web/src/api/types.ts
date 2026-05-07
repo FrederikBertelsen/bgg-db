@@ -1,49 +1,75 @@
 export type Rank = {
-  category: string
-  rank: string
-  bayes_average: string
+  name: string
+  value: number
+}
+
+export type GameLink = {
+  id: string
+  name: string
+}
+
+export type GameVersion = {
+  id: number
+  language: string
+  name: string
+  publisher: string
+  thumbnail: string
+  volume: string
+  weight: string
+  year_published: number
 }
 
 export type GameCard = {
   id: string
   name: string
-  year_published: number | null
-  min_players: number | null
-  max_players: number | null
-  min_playtime: number | null
-  max_playtime: number | null
-  rating_average: number | null
-  weight_average: number | null
+  max_players: number
+  max_playing_time: number
+  min_players: number
+  min_playing_time: number
+  niches: string[]
+  year_published: number
+  rating: number
+  weight: number
   short_description: string | null
-  thumbnail_url: string | null
+  thumbnail: string | null
   ranks: Rank[]
-  score: number | null
+  score: number
 }
 
 export type FullGame = {
+  alternative_names: string[]
+  artists: string[]
+  components: string[]
   id: string
+  description: string
+  designers: string[]
+  estimated_volume_cm3: number
+  estimated_weight_kg: number
+  expands: string[]
+  expansions: GameLink[]
+  image: string
+  implementations: string[]
+  max_players: number
+  max_playing_time: number
+  mechanics: string[]
+  min_age: number
+  min_players: number
+  min_playing_time: number
   name: string
-  description?: string
-  image_url?: string
-  thumbnail_url?: string
-  url?: string
-
-  year_published?: number
-  min_players?: number
-  max_players?: number
-  min_playtime?: number
-  max_playtime?: number
-  min_age?: number
-
-  rating_average?: number
-  bayes_rating_average?: number
-  weight_average?: number
-  ranks?: Rank[]
-
-  categories?: string[]
-  mechanics?: string[]
-  honors?: string[]
-
-  // Allow backend to evolve without breaking the UI.
-  [key: string]: unknown
+  niches: string[]
+  player_count_scores: Record<string, number>
+  playing_time: number
+  publishers: string[]
+  ranks: Rank[]
+  rating: number
+  rating_count: number
+  rating_stddev: number
+  short_description: string
+  tags: string[]
+  themes: string[]
+  thumbnail: string
+  types: string[]
+  versions: GameVersion[]
+  weight: number
+  year_published: number
 }

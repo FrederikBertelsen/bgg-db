@@ -32,20 +32,20 @@ The exact backend payload can evolve; the frontend relies on a small stable subs
 `GameCard` (used in search results + recommendations):
 - `id: string`
 - `name: string`
-- `thumbnail_url: string | null`
+- `thumbnail: string | null`
 - `short_description: string | null`
 - `year_published: number | null`
 - `min_players/max_players: number | null`
-- `min_playtime/max_playtime: number | null`
-- `rating_average: number | null`
-- `weight_average: number | null`
+- `min_playing_time/max_playing_time: number | null`
+- `rating: number | null`
+- `weight: number | null`
 - `ranks: { category, rank, bayes_average }[]`
 
 `FullGame` (used in selected game detail):
 - `id, name`
-- `image_url | thumbnail_url`
+- `image | thumbnail`
 - `year_published, min/max players, min/max playtime`
-- `rating_average, bayes_rating_average, weight_average`
+- `rating, bayes_rating, weight`
 - `categories: string[]` (optional)
 - `mechanics: string[]` (optional)
 - `description: string` (HTML-ish string; rendered as plain text in MVP)

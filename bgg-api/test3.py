@@ -1,12 +1,10 @@
+import pandas as pd
+
 from boardgame_db import BoardGameDB
-from utils import clear_cache_folder
+from boardgame_db_io import load_merged_data
 
-# clear_cache_folder()
+df_niches = pd.read_csv("data/niches.csv")
 
-db = BoardGameDB()
+for _, row in df_niches.iterrows():
 
-# df_games = db.df_games
-
-# df_games = df_games[df_games["properties"].apply(lambda x: "Accessory" in x)]
-
-# print(df_games[["id", "name"]])
+    print(f"Name: {row['name']}\n   Description: {row['description']}\n  Properties: {row['properties']}\n   Games count: {row['games_count']}\n")

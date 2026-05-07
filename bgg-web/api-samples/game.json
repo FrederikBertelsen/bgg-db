@@ -1,142 +1,308 @@
 {
-  "PlayerCountBestMax": 4,
-  "PlayerCountBestMin": 4,
-  "PlayerCountRecommendedMax": 4,
-  "PlayerCountRecommendedMin": 2,
-  "PlayerCountVotes": 0,
-  "alternate_names": [
-    "Bombay Bazaar"
+  "alternative_names": [
+    "A Mars terraformálása",
+    "Mars: Teraformace",
+    "Teraformiranje Marsa",
+    "Terraformacja Marsa",
+    "Terraformarea Planetei Marte",
+    "Terraforming Mars: Ο Αποικισμός Του Άρη",
+    "Покорение Марса",
+    "Тераформирай Марс",
+    "Тераформування Марса",
+    "חיים על מאדים",
+    "टेराफॉर्मिंग मार्स",
+    "พลิกพิภพดาวอังคาร",
+    "テラフォーミング・マーズ",
+    "殖民火星",
+    "重塑火星",
+    "테라포밍 마스"
   ],
-  "bayes_rating_average": 5.50072,
+  "artists": [
+    "Isaac Fryxelius",
+    "Daniel Fryxelius"
+  ],
   "categories": [
-    "Animals"
+    "Civilization",
+    "Economic",
+    "Environmental",
+    "Industry / Manufacturing",
+    "Science Fiction",
+    "Space Exploration",
+    "Territory Building"
   ],
-  "comment_count": 42,
-  "credits": [
+  "components": [
+    "Map",
+    "Grid"
+  ],
+  "description": "In the 2400s, mankind begins to terraform the planet Mars. Giant corporations, sponsored by the World Government on Earth, initiate huge projects to raise the temperature, the oxygen level, and the ocean coverage until the environment is habitable. In Terraforming Mars, you play one of those corporations and work together in the terraforming process, but compete for getting victory points that are awarded not only for your contribution to the terraforming, but also for advancing human infrastructure throughout the solar system, and doing other commendable things.\\n\\nAs a player, you acquire unique project cards (from over two hundred different ones) by buying them to your hand. The cards can give you immediate bonuses, as well as increasing your production of different resources. Many cards also have requirements and they become playable when the temperature, oxygen, or ocean coverage increases enough. Buying cards is costly, so there is a balance between buying cards and actually playing them. Standard Projects are always available to complement your hand of cards. Your basic income, as well as your basic score, are based on your Terraform Rating. However, your income is boosted by your production, and VPs are also gained from many other sources.\\n\\nYou keep track of your production and resources on your player board.  The game uses six types of resources: MegaCredits, Steel, Titanium, Plants, Energy, and Heat. On the game board, you compete for the best places for your city tiles, ocean tiles, and greenery tiles. You also compete for different Milestones and Awards worth many VPs. Each round is called a generation and consists of the following phases:\\n\\n1) Player order shifts clockwise.\\n2) Research phase: All players buy cards from four privately drawn.\\n3) Action phase: Players take turns doing 1-2 actions from these options: Playing a card, claiming a Milestone, funding an Award, using a Standard project, converting plant into greenery tiles (and raising oxygen), converting heat into a temperature raise, and using the action of a card in play. The turn continues around the table (sometimes several laps) until all players have passed.\\n4) Production phase: Players get resources according to their terraform rating and production parameters.\\n\\nWhen the three global parameters (temperature, oxygen, ocean) have all reached their required levels, the terraforming is complete, and the game ends after that generation. Combine your Terraform Rating and other VPs to determine the winning corporation!\\n\\n",
+  "designers": [
+    "Jacob Fryxelius"
+  ],
+  "estimated_volume_cm3": 6290.04,
+  "estimated_weight_kg": 1.61,
+  "expands": [],
+  "expansions": [
     {
-      "names": [
-        "Sylvie Barc",
-        "Juan Rodriguez"
-      ],
-      "role": "boardgame_designer"
+      "id": "406001",
+      "name": "Terraforming Mars: Amazonis & Vastitas"
     },
     {
-      "names": [
-        "Jussi Wallenius"
-      ],
-      "role": "boardgame_artist"
+      "id": "401513",
+      "name": "Terraforming Mars: Amazonis Planitia – Big Board Edition"
     },
     {
-      "names": [
-        "Tactic"
-      ],
-      "role": "boardgame_publisher"
+      "id": "395612",
+      "name": "Terraforming Mars: Automa"
+    },
+    {
+      "id": "311247",
+      "name": "Terraforming Mars: Big Box"
+    },
+    {
+      "id": "428401",
+      "name": "Terraforming Mars: Cardboard Map Box Big Box Extension"
+    },
+    {
+      "id": "255681",
+      "name": "Terraforming Mars: Colonies"
+    },
+    {
+      "id": "468457",
+      "name": "Terraforming Mars: Floyd Continuum"
+    },
+    {
+      "id": "218127",
+      "name": "Terraforming Mars: Hellas & Elysium"
+    },
+    {
+      "id": "401114",
+      "name": "Terraforming Mars: Milestones & Awards"
+    },
+    {
+      "id": "468570",
+      "name": "Terraforming Mars: New Holland"
+    },
+    {
+      "id": "247030",
+      "name": "Terraforming Mars: Prelude"
+    },
+    {
+      "id": "387809",
+      "name": "Terraforming Mars: Prelude 2"
+    },
+    {
+      "id": "365385",
+      "name": "Terraforming Mars: Terra Cimmeria – Big Board Edition"
+    },
+    {
+      "id": "273473",
+      "name": "Terraforming Mars: Turmoil"
+    },
+    {
+      "id": "428511",
+      "name": "Terraforming Mars: Utopia & Cimmeria"
+    },
+    {
+      "id": "359145",
+      "name": "Terraforming Mars: Utopia Planitia – Big Board Edition"
+    },
+    {
+      "id": "365384",
+      "name": "Terraforming Mars: Vastitas Borealis – Big Board Edition"
+    },
+    {
+      "id": "231965",
+      "name": "Terraforming Mars: Venus Next"
+    },
+    {
+      "id": "459369",
+      "name": "Terraforming Mars: Weather Balloons"
     }
   ],
-  "description": "<p><strong>Bombay Bazar</strong> is a game of tactics, where players try to grow their elephants the longest trunk of all.</p>\\n\\n<p>Patience and inventiveness get results, as the pieces of trunk - and options - decrease. Luck can also play it's part in this game for the whole family.</p>\\n\\n<p><strong><a class=\"\" href=\"/wiki/page/Awards#\">Awards</a></strong></p>\\n\\n<p>2001 <a class=\"\" href=\"/wiki/page/%C3%85rets_Spil#\">Årets Familiespil</a>, Family Game of the Year Denmark<br />\\n2001 <a class=\"\" href=\"/wiki/page/Vuoden_Perhepeli#\">Vuoden Perhepeli</a></p>\\n\\n<p><strong>Re-implemented by:</strong></p>\\n\\n<p><a href=\"/boardgame/23426/valtra-tractors\" >Valtra Tractors</a></p>\\n\\n",
-  "estimated_volume_cm3": 5656.75,
-  "estimated_weight_kg": 0,
-  "expansions": [],
-  "families": [
-    "Animals: Elephants",
-    "Cities: Mumbai (India)",
-    "Country: India"
+  "id": "167791",
+  "image": "https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__original/img/thIqWDnH9utKuoKVEUqveDixprI=/0x0/filters:format(jpeg)/pic3536616.jpg",
+  "implementations": [
+    "Terraforming Mars: Ares Expedition",
+    "Terraforming Mars: The Dice Game"
   ],
-  "fan_count": 2,
-  "focus_video_id": null,
-  "geeklist_count": 36,
-  "has_parts_count": 0,
-  "honors": [
-    "2001 Årets Spil Best Family Game Winner",
-    "2001 Vuoden Peli Family Game of the Year Winner"
-  ],
-  "howtoplay_video_id": null,
-  "id": "5640",
-  "image_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__original/img/hJCobF8YOmfvkhKiSiWHbWz87GE=/0x0/filters:format(jpeg)/pic453846.jpg",
-  "instructional_video_id": null,
-  "language_dependence": "No necessary in-game text",
-  "max_players": 4,
-  "max_playtime": 45,
+  "max_players": 5,
+  "max_playing_time": 120,
   "mechanics": [
-    "Tile Placement"
+    "Tags",
+    "Drafting",
+    "Contracts",
+    "Tableau Building",
+    "Tile Placement",
+    "Variable Set-up",
+    "Territory Building",
+    "Hand Management",
+    "End Game Bonuses",
+    "Turn Order",
+    "Income",
+    "Variable Player Powers"
   ],
-  "min_age": 7,
+  "min_age": 12,
   "min_players": 1,
-  "min_playtime": 45,
-  "name": "Bombay Bazar",
-  "owned_count": 167,
-  "play_count": 234,
-  "play_count_last_month": 3,
+  "min_playing_time": 120,
+  "name": "Terraforming Mars",
+  "niches": [
+    "niche_3",
+    "niche_4",
+    "niche_36",
+    "niche_36",
+    "niche_40"
+  ],
   "player_count_scores": {
-    "1": 0.25,
-    "2": 0.5,
-    "3": 0.75,
-    "4": 1,
-    "5": 0
+    "1": 0.42,
+    "2": 0.57,
+    "3": 0.84,
+    "4": 0.65,
+    "5": 0.23,
+    "5+": 0.01
   },
-  "playthrough_video_id": null,
-  "preorder_count": 0,
-  "prev_owned_count": 54,
+  "playing_time": 120,
+  "properties": [
+    "Tags",
+    "Science",
+    "Drafting",
+    "Take That",
+    "Contracts",
+    "Tableau Building",
+    "Tile Placement",
+    "Variable Set-up",
+    "Territory Building",
+    "Hand Management",
+    "Nature",
+    "Industry / Manufacturing",
+    "End Game Bonuses",
+    "Solitaire",
+    "Digital Implementation",
+    "Economic",
+    "Map",
+    "Turn Order",
+    "Grid",
+    "Civilization",
+    "Income",
+    "Science Fiction",
+    "Space",
+    "Strategy",
+    "Variable Player Powers",
+    "Engineering"
+  ],
+  "publishers": [
+    "FryxGames",
+    "Arclight Games",
+    "Brädspel.se",
+    "Fantasmagoria",
+    "Ghenos Games",
+    "Golden Egg Games",
+    "Green Elephant Games",
+    "Intrafin Games",
+    "Kaissa Chess & Games",
+    "Kilogames",
+    "Korea Boardgames",
+    "Lautapelit.fi",
+    "Lavka Games",
+    "Lex Games",
+    "Maldito Games",
+    "MeepleBR",
+    "MINDOK",
+    "MIPL",
+    "MYBG Co., Ltd.",
+    "NeoTroy Games",
+    "Rebel Sp. z o.o.",
+    "Reflexshop",
+    "Schwerkraft-Verlag",
+    "Siam Board Games",
+    "Stronghold Games",
+    "SuperHeated Neurons",
+    "Surfin' Meeple China"
+  ],
   "ranks": [
     {
-      "bayes_average": "5.50072",
-      "category": "Overall",
-      "rank": "25485"
+      "name": "Overall Rank",
+      "value": 9
+    },
+    {
+      "name": "Strategy Rank",
+      "value": 8
     }
   ],
-  "rating_average": 5.49058,
-  "rating_count": 138,
-  "reimplementation": [],
-  "shopping": [],
-  "short_description": null,
-  "stddev_rating": 1.34907,
-  "subdomains": [],
-  "summary_video_id": null,
-  "thumbnail_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__previewthumb/img/XJcQEBUM7L-GhDYJbL5k1CQKvko=/fit-in/300x320/filters:strip_icc()/pic453846.jpg",
-  "trading_count": 6,
-  "types": [],
-  "url": "https://boardgamegeek.com/boardgame/5640/bombay-bazar",
+  "rating": 8.33817,
+  "rating_count": 112909,
+  "rating_stddev": 1.43075,
+  "short_description": "Compete with rival CEOs to make Mars habitable and build your corporate empire.",
+  "tags": [
+    "Digital Implementation"
+  ],
+  "themes": [
+    "Science",
+    "Nature",
+    "Civilization",
+    "Science Fiction",
+    "Space",
+    "Engineering"
+  ],
+  "thumbnail": "https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__small/img/BTxqxgYay5tHJfVoJ2NF5g43_gA=/fit-in/200x150/filters:strip_icc()/pic3536616.jpg",
+  "types": [
+    "Take That",
+    "Industry / Manufacturing",
+    "Solitaire",
+    "Economic",
+    "Strategy"
+  ],
   "versions": [
     {
-      "depth": 0,
-      "image_url": "https://cf.geekdo-images.com/oc5NcuNCD28g0Jtu6NizNQ__original/img/-W0gozE1IX9CMVfzJOz_lEGtjdo=/0x0/filters:format(jpeg)/pic75972.jpg",
-      "length": 0,
-      "name": "Multilingual edition 2002",
-      "url": "https://boardgamegeek.com/boardgameversion/32730/multilingual-edition-2002",
-      "weight_kg": 0,
-      "width": 0,
-      "year_published": "2002"
+      "id": 451731,
+      "language": "Danish",
+      "name": "Danish edition",
+      "publisher": "Lautapelit.fi",
+      "thumbnail": "https://cf.geekdo-images.com/-VT8tCbIh6OhMmYHOWLSJg__small/img/UkmPE-EMVSPfxb26Kz6Db3IQhG0=/fit-in/200x150/filters:strip_icc()/pic5853271.jpg",
+      "volume": "30 x 30 x 7 cm",
+      "weight": "0.0 kg",
+      "year_published": 2019
     },
     {
-      "depth": 5.5999888,
-      "image_url": "https://cf.geekdo-images.com/8L3lAqStNcrIBAAKg_ZAhA__original/img/hJCobF8YOmfvkhKiSiWHbWz87GE=/0x0/filters:format(jpeg)/pic453846.jpg",
-      "length": 37.2999,
-      "name": "Multilingual edition 2001",
-      "url": "https://boardgamegeek.com/boardgameversion/42971/multilingual-edition-2001",
-      "weight_kg": 0,
-      "width": 27.200098,
-      "year_published": "2001"
+      "id": 546377,
+      "language": "English",
+      "name": "English edition 2020",
+      "publisher": "FryxGames",
+      "thumbnail": "https://cf.geekdo-images.com/UqrrQNb5dtf8pvBrdfOWbw__small/img/eA5Y5X4665Nnr5lLP0XN6N3oDuI=/fit-in/200x150/filters:strip_icc()/pic6298807.jpg",
+      "volume": "30 x 30 x 7 cm",
+      "weight": "1.7 kg",
+      "year_published": 2020
     },
     {
-      "depth": 5.588000000000001,
-      "image_url": "https://cf.geekdo-images.com/RvOyvWQPyaV-RaCs_ok18A__original/img/VNRFMQ2gc3drz6PrYhirIvnLb5Y=/0x0/filters:format(jpeg)/pic1080899.jpg",
-      "length": 37.083999999999996,
-      "name": "Multilingual edition with Vuoden Perhepeli and Årets Familiespil awards",
-      "url": "https://boardgamegeek.com/boardgameversion/136401/multilingual-edition-with-vuoden-perhepeli-and-are",
-      "weight_kg": 0,
-      "width": 27.177999999999997,
-      "year_published": "0"
+      "id": 256624,
+      "language": "English",
+      "name": "English first edition, first printing",
+      "publisher": "FryxGames",
+      "thumbnail": "https://cf.geekdo-images.com/URkI3cTZ9NHdlPNRPSd2_g__small/img/FExSgdWqAgTCgouj74VMAlYHo_s=/fit-in/200x150/filters:strip_icc()/pic2891964.jpg",
+      "volume": "30 x 30 x 7 cm",
+      "weight": "0.0 kg",
+      "year_published": 2016
+    },
+    {
+      "id": 349581,
+      "language": "English",
+      "name": "English first edition, second printing",
+      "publisher": "FryxGames",
+      "thumbnail": "https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__small/img/BTxqxgYay5tHJfVoJ2NF5g43_gA=/fit-in/200x150/filters:strip_icc()/pic3536616.jpg",
+      "volume": "30 x 30 x 7 cm",
+      "weight": "1.7 kg",
+      "year_published": 2017
+    },
+    {
+      "id": 360032,
+      "language": "English",
+      "name": "English first edition, third printing",
+      "publisher": "FryxGames",
+      "thumbnail": "https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__small/img/BTxqxgYay5tHJfVoJ2NF5g43_gA=/fit-in/200x150/filters:strip_icc()/pic3536616.jpg",
+      "volume": "30 x 30 x 7 cm",
+      "weight": "1.6 kg",
+      "year_published": 2017
     }
   ],
-  "view_count": 52443,
-  "want_parts_count": 0,
-  "want_to_buy_count": 2,
-  "want_to_play_count": 7,
-  "wanting_count": 1,
-  "website_url": "False",
-  "weight_average": 1.33,
-  "weight_votes": 15,
-  "wish_count": 11,
-  "wishlist_comment_count": 2,
-  "year_published": 2001
+  "weight": 3.2711,
+  "year_published": 2016
 }

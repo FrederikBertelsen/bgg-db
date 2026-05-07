@@ -233,7 +233,7 @@ def extract_ranks_and_types(ranks_list: list[dict]) -> tuple[list[dict], list[di
         name = r.get('friendlyname', '')
 
         ranks.append({
-            'name': name.replace("Board Game Rank", "Overall Rank").replace("Game ", "").strip(),
+            'name': name.replace("Board Game", "Overall").replace("Game ", "").replace("Rank", "").strip(),
             "value": r.get('value')
         })
 
@@ -288,7 +288,21 @@ def extract_expansions(expansions: list[dict]) -> list[dict]:
 def create_df_games(json_data: list[dict]) -> pd.DataFrame:
     df_games = pd.DataFrame(json_data)
 
+    df_games.rename(columns={
+        'yearpublished': 'year_published',
+        'minplayers': 'min_players',
+        'maxplayers': 'max_players',
+        'playingtime': 'playing_time',
+        'minplaytime': 'min_playing_time',
+        'maxplaytime': 'max_playing_time',
+        'minage': 'min_age',
+    }, inplace=True)
+
     df_games = df_games[(df_games['accessory'] == False) & (df_games['expansion'] == False)]
+    df_games.drop(columns=['accessory', 'expansion'], inplace=True)
+
+    # if "Accessory" or "RPG Item" in a rank name, drop row
+    df_games = df_games[~df_games['stats'].apply(lambda s: any('Accessory' in r.get('friendlyname', '') or 'RPG Item' in r.get('friendlyname', '') for r in s.get('ranks', []) if isinstance(s, dict) and isinstance(s.get('ranks'), list)))]
     
     df_games[['estimated_volume_cm3', 'estimated_weight_kg']] = df_games['versions'].apply(lambda v: pd.Series(add_estimated_volume_and_weight(v)))
     
@@ -304,7 +318,6 @@ def create_df_games(json_data: list[dict]) -> pd.DataFrame:
     df_games[['ranks', 'types']] = pd.DataFrame(ranks_and_types.tolist(), index=df_games.index)
     df_games.drop(columns=['stats'], inplace=True)
 
-    df_games.rename(columns={'yearpublished': 'year_published'}, inplace=True)
 
     df_games['versions'] = df_games['versions'].apply(extract_versions)
     df_games['expansions'] = df_games['expansions'].apply(extract_expansions)

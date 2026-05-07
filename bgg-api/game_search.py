@@ -85,7 +85,7 @@ class GameSearchEngine:
     
     def _build_name_mappings(self) -> None:
         """Build mappings of game names and alternate names to IDs."""
-        from recommender import _ensure_list
+        from recommender_v2 import _ensure_list
         
         name_to_id = {}
         name_is_canonical = set()

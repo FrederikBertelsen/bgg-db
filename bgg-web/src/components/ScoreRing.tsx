@@ -3,10 +3,11 @@ import { clamp01 } from '../lib/format'
 type Props = {
   value: number | null | undefined
   outOf: number
+  reverse?: boolean
   label: string
 }
 
-export function ScoreRing({ value, outOf, label }: Props) {
+export function ScoreRing({ value, outOf, reverse, label }: Props) {
   const numeric = typeof value === 'number' && Number.isFinite(value) ? value : null
   const ratio = numeric === null ? null : clamp01(numeric / outOf)
   const radius = 16
@@ -14,8 +15,16 @@ export function ScoreRing({ value, outOf, label }: Props) {
   const dash = ratio === null ? 0 : circumference * ratio
   const dashArray = `${dash} ${circumference - dash}`
 
-  const scoreClass =
-    ratio === null
+  const scoreClass = 
+    reverse ?
+      ratio === null
+        ? 'ring ring--na'
+        : ratio > 0.6
+          ? 'ring ring--low'
+          : ratio >= 0.3
+            ? 'ring ring--mid'
+            : 'ring ring--high'
+    : ratio === null
       ? 'ring ring--na'
       : ratio > 0.6
         ? 'ring ring--high'

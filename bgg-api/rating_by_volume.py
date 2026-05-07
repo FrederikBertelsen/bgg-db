@@ -17,12 +17,12 @@ df_games = db.df_games
 
 df_games = df_games[df_games['rating_count'] > 400]
 df_games = df_games[df_games['max_players'] >= 4]
-df_games = df_games[df_games['rating_average'] > 6.5]
+df_games = df_games[df_games['rating'] > 6.5]
 
 
 # remove none and 0 value rows
 df_games = df_games[df_games['estimated_volume_cm3'] > 90]
-df_games = df_games[df_games['rating_average'] > 0]
+df_games = df_games[df_games['rating'] > 0]
 # df_games = df_games[df_games['year_published'] > 2015]
 df_games = df_games[df_games['estimated_volume_cm3'] <= 4000]
 
@@ -30,13 +30,13 @@ df_games = df_games[df_games['estimated_volume_cm3'] <= 4000]
 RATING_WEIGHT = 0.60
 VOLUME_WEIGHT = 0.40
 
-max_rating = df_games['rating_average'].max()
-min_rating = df_games['rating_average'].min()
+max_rating = df_games['rating'].max()
+min_rating = df_games['rating'].min()
 
 max_volume = df_games['estimated_volume_cm3'].max()
 min_volume = df_games['estimated_volume_cm3'].min()
 
-normalized_rating = (df_games['rating_average'] - min_rating) / (max_rating - min_rating)
+normalized_rating = (df_games['rating'] - min_rating) / (max_rating - min_rating)
 normalized_volume = (df_games['estimated_volume_cm3'] - min_volume) / (max_volume - min_volume)
 
 df_games['value'] = (
@@ -52,7 +52,7 @@ pd.set_option('display.max_colwidth', None)
 
 # shorten column names
 df_games.rename(columns={
-    'rating_average': 'rating',
+    'rating': 'rating',
     'estimated_volume_cm3': 'volume',
     'value': 'value',
     'url': 'url'

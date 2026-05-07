@@ -4,7 +4,7 @@ import os
 
 import pandas as pd
 
-from recommender import _ensure_list
+from recommender_v2 import _ensure_list
 
 
 WANTED_FAMILIES = {
@@ -237,7 +237,7 @@ PRE_REMOVE_CONTAINS = [
 
 def normalize_families(df_games: pd.DataFrame) -> set[str]:
     """Filter and canonicalize family names in-place, returning the unique set."""
-    print("\nCaching and converting unique families...")
+    print("\nconverting unique families...")
 
     df_games["families"] = df_games["families"].apply(
         lambda fams: [
@@ -264,10 +264,10 @@ def normalize_families(df_games: pd.DataFrame) -> set[str]:
 
 def load_or_create_property_mappings(
     unique_mechanics: set[str],
+    unique_components: set[str],
     unique_categories: set[str],
     unique_types: set[str],
     unique_families: set[str],
-    unique_subdomains: set[str],
     mapping_file: str = "data/property_metadata/property_mappings.csv",
 ) -> pd.DataFrame:
     """Load or extend the property mapping table and return it indexed by property."""
@@ -279,7 +279,7 @@ def load_or_create_property_mappings(
 
     existing_properties = set(property_mappings["property"])
     all_properties = set()
-    for prop_set in [unique_mechanics, unique_categories, unique_types, unique_families, unique_subdomains]:
+    for prop_set in [unique_mechanics, unique_components, unique_categories, unique_types, unique_families]:
         all_properties.update(prop_set)
 
     missing_properties = all_properties - existing_properties
@@ -358,11 +358,11 @@ def load_or_create_property_categorizations(
             if prop in property_categorizations.index and property_categorizations.loc[prop, "category"] == category
         ]
 
-    df_games["p_mechanics"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Mechanic"))
-    df_games["p_types"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Type"))
-    df_games["p_components"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Component"))
-    df_games["p_themes"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Theme"))
-    df_games["p_tags"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Tag"))
+    df_games["mechanics"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Mechanic"))
+    df_games["types"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Type"))
+    df_games["components"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Component"))
+    df_games["themes"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Theme"))
+    df_games["tags"] = df_games["properties"].apply(lambda props: _categorize_properties(props, "Tag"))
 
     return property_categorizations
 
