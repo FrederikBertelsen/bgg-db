@@ -9,14 +9,7 @@ from boardgame_db_properties import (
     normalize_families,
 )
 from boardgame_db_features import collect_unique_values
-from boardgame_db_io import (
-    get_data_files_signature,
-    load_cache_manifest,
-    load_cached_boardgame_state,
-    load_merged_data,
-    save_cache_manifest,
-    save_cached_boardgame_state,
-)
+from boardgame_db_io import load_merged_data,save_cached_boardgame_state
 from boardgame_db_niches import build_niche_name_cache, create_and_persist_niches
 from boardgame_db_pipeline import prepare_boardgame_db
 
@@ -124,7 +117,7 @@ class BoardGameDB:
 
     def search_games(self, searchTerm: str, n: int = 5, threshold: int = 70) -> pd.DataFrame | None:
         """
-        Return a list of dicts for board games whose `name` or `alternate_names` fuzzy-match the given `searchTerm`.
+        Return a list of dicts for board games whose `name` or `alternative_names` fuzzy-match the given `searchTerm`.
         Delegates to search engine.
         """
         if self.search_engine is None:

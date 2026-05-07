@@ -3,8 +3,16 @@ import json
 import cloudscraper
 import pandas as pd
 
-df_final = pd.read_csv("data/final/final_20260506.csv")
+scraper = cloudscraper.create_scraper()
 
-df_final['description'] = df_final['description'].str.replace('\n', '\\n')
+boardgame_id = 167791
 
-df_final.to_csv("data/final/final_20260506.csv", index=False)
+url = f"https://api.geekdo.com/api/affiliateads?context=gamemarketplace&objectid={boardgame_id}&objecttype=thing&previewid=0"
+
+
+print(f"Fetching data for board game ID {boardgame_id} from BGG API...")
+response = scraper.get(url)
+
+print(response.status_code)
+print()
+print(response.text)

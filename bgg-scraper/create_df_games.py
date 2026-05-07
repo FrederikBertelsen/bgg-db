@@ -222,16 +222,26 @@ def player_count_poll_to_scores(player_count_poll: dict) -> dict:
     stats = player_count_poll_to_stats(player_count_poll)
     return {pc: round(s.get('score', 0.0), 2) for pc, s in stats.items()}
 
-def extract_ranks(ranks_list: list[dict]) -> list[dict]:
+def extract_ranks_and_types(ranks_list: list[dict]) -> tuple[list[dict], list[dict]]:
     ranks = []
-    
+    types = []
+
     for r in ranks_list:
+        if not isinstance(r, dict):
+            continue
+    
+        name = r.get('friendlyname', '')
+
         ranks.append({
-            'name': r.get('friendlyname',"").replace("Board Game Rank", "Overall Rank").replace("Game ", "").strip(),
+            'name': name.replace("Board Game Rank", "Overall Rank").replace("Game ", "").strip(),
             "value": r.get('value')
         })
 
-    return ranks
+        type = name.replace("Game Rank", "").replace("Rank", "").strip()
+        if type != "Board":
+            types.append(type)
+
+    return ranks, types
 
 def extract_versions(versions: list[dict]) -> list[dict]:
     extracted = []
@@ -277,6 +287,8 @@ def extract_expansions(expansions: list[dict]) -> list[dict]:
 
 def create_df_games(json_data: list[dict]) -> pd.DataFrame:
     df_games = pd.DataFrame(json_data)
+
+    df_games = df_games[(df_games['accessory'] == False) & (df_games['expansion'] == False)]
     
     df_games[['estimated_volume_cm3', 'estimated_weight_kg']] = df_games['versions'].apply(lambda v: pd.Series(add_estimated_volume_and_weight(v)))
     
@@ -288,7 +300,8 @@ def create_df_games(json_data: list[dict]) -> pd.DataFrame:
     df_games['rating_stddev'] = df_games['stats'].apply(lambda s: s.get('stddev', 0.0) if isinstance(s, dict) else 0.0)
     df_games['rating_count'] = df_games['stats'].apply(lambda s: s.get('usersrated', 0) if isinstance(s, dict) else 0)
     df_games['weight'] = df_games['stats'].apply(lambda s: s.get('averageweight', 0.0) if isinstance(s, dict) else 0.0)
-    df_games['ranks'] = df_games['stats'].apply(lambda s: extract_ranks(s.get('ranks', [])) if isinstance(s, dict) else [])
+    ranks_and_types = df_games['stats'].apply(lambda s: extract_ranks_and_types(s.get('ranks', [])) if isinstance(s, dict) else ([], []))
+    df_games[['ranks', 'types']] = pd.DataFrame(ranks_and_types.tolist(), index=df_games.index)
     df_games.drop(columns=['stats'], inplace=True)
 
     df_games.rename(columns={'yearpublished': 'year_published'}, inplace=True)

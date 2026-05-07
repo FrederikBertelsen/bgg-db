@@ -96,8 +96,8 @@ class GameSearchEngine:
             name_is_canonical.add(row['name'])
             
             # alternate names
-            if len(row['alternate_names']) > 0:
-                for alt_name in _ensure_list(row['alternate_names']):
+            if len(row['alternative_names']) > 0:
+                for alt_name in _ensure_list(row['alternative_names']):
                     alt_clean = alt_name.strip()
                     # skip very short alternate names which are noisy (e.g., 'Ion')
                     if len(alt_clean) < self.search_weights.get("min_alt_name_length", 3):
