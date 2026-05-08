@@ -7,20 +7,20 @@
     "min_playing_time": 60,
     "name": "Catan",
     "niches": [
-      "niche_16",
-      "niche_27"
+      "Family Route Building Games",
+      "Hex Tile Abstract Games"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 615
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 579
       },
       {
-        "name": "Family Rank",
+        "name": "Family",
         "value": 210
       }
     ],
@@ -41,11 +41,11 @@
     "niches": [],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 1362
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 904
       }
     ],
@@ -66,11 +66,11 @@
     "niches": [],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 1752
       },
       {
-        "name": "Family Rank",
+        "name": "Family",
         "value": 480
       }
     ],
@@ -91,11 +91,11 @@
     "niches": [],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 2435
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 1256
       }
     ],
@@ -116,15 +116,15 @@
     "niches": [],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 2584
       },
       {
-        "name": "Children's Rank",
+        "name": "Children's",
         "value": 59
       },
       {
-        "name": "Family Rank",
+        "name": "Family",
         "value": 890
       }
     ],

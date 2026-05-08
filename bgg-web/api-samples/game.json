@@ -21,20 +21,11 @@
     "Isaac Fryxelius",
     "Daniel Fryxelius"
   ],
-  "categories": [
-    "Civilization",
-    "Economic",
-    "Environmental",
-    "Industry / Manufacturing",
-    "Science Fiction",
-    "Space Exploration",
-    "Territory Building"
-  ],
   "components": [
     "Map",
     "Grid"
   ],
-  "description": "In the 2400s, mankind begins to terraform the planet Mars. Giant corporations, sponsored by the World Government on Earth, initiate huge projects to raise the temperature, the oxygen level, and the ocean coverage until the environment is habitable. In Terraforming Mars, you play one of those corporations and work together in the terraforming process, but compete for getting victory points that are awarded not only for your contribution to the terraforming, but also for advancing human infrastructure throughout the solar system, and doing other commendable things.\\n\\nAs a player, you acquire unique project cards (from over two hundred different ones) by buying them to your hand. The cards can give you immediate bonuses, as well as increasing your production of different resources. Many cards also have requirements and they become playable when the temperature, oxygen, or ocean coverage increases enough. Buying cards is costly, so there is a balance between buying cards and actually playing them. Standard Projects are always available to complement your hand of cards. Your basic income, as well as your basic score, are based on your Terraform Rating. However, your income is boosted by your production, and VPs are also gained from many other sources.\\n\\nYou keep track of your production and resources on your player board.  The game uses six types of resources: MegaCredits, Steel, Titanium, Plants, Energy, and Heat. On the game board, you compete for the best places for your city tiles, ocean tiles, and greenery tiles. You also compete for different Milestones and Awards worth many VPs. Each round is called a generation and consists of the following phases:\\n\\n1) Player order shifts clockwise.\\n2) Research phase: All players buy cards from four privately drawn.\\n3) Action phase: Players take turns doing 1-2 actions from these options: Playing a card, claiming a Milestone, funding an Award, using a Standard project, converting plant into greenery tiles (and raising oxygen), converting heat into a temperature raise, and using the action of a card in play. The turn continues around the table (sometimes several laps) until all players have passed.\\n4) Production phase: Players get resources according to their terraform rating and production parameters.\\n\\nWhen the three global parameters (temperature, oxygen, ocean) have all reached their required levels, the terraforming is complete, and the game ends after that generation. Combine your Terraform Rating and other VPs to determine the winning corporation!\\n\\n",
+  "description": "In the 2400s, mankind begins to terraform the planet Mars. Giant corporations, sponsored by the World Government on Earth, initiate huge projects to raise the temperature, the oxygen level, and the ocean coverage until the environment is habitable. In Terraforming Mars, you play one of those corporations and work together in the terraforming process, but compete for getting victory points that are awarded not only for your contribution to the terraforming, but also for advancing human infrastructure throughout the solar system, and doing other commendable things.\n\nAs a player, you acquire unique project cards (from over two hundred different ones) by buying them to your hand. The cards can give you immediate bonuses, as well as increasing your production of different resources. Many cards also have requirements and they become playable when the temperature, oxygen, or ocean coverage increases enough. Buying cards is costly, so there is a balance between buying cards and actually playing them. Standard Projects are always available to complement your hand of cards. Your basic income, as well as your basic score, are based on your Terraform Rating. However, your income is boosted by your production, and VPs are also gained from many other sources.\n\nYou keep track of your production and resources on your player board.  The game uses six types of resources: MegaCredits, Steel, Titanium, Plants, Energy, and Heat. On the game board, you compete for the best places for your city tiles, ocean tiles, and greenery tiles. You also compete for different Milestones and Awards worth many VPs. Each round is called a generation and consists of the following phases:\n\n1) Player order shifts clockwise.\n2) Research phase: All players buy cards from four privately drawn.\n3) Action phase: Players take turns doing 1-2 actions from these options: Playing a card, claiming a Milestone, funding an Award, using a Standard project, converting plant into greenery tiles (and raising oxygen), converting heat into a temperature raise, and using the action of a card in play. The turn continues around the table (sometimes several laps) until all players have passed.\n4) Production phase: Players get resources according to their terraform rating and production parameters.\n\nWhen the three global parameters (temperature, oxygen, ocean) have all reached their required levels, the terraforming is complete, and the game ends after that generation. Combine your Terraform Rating and other VPs to determine the winning corporation!",
   "designers": [
     "Jacob Fryxelius"
   ],
@@ -128,29 +119,28 @@
   "max_players": 5,
   "max_playing_time": 120,
   "mechanics": [
-    "Tags",
-    "Drafting",
-    "Contracts",
-    "Tableau Building",
-    "Tile Placement",
-    "Variable Set-up",
-    "Territory Building",
-    "Hand Management",
     "End Game Bonuses",
-    "Turn Order",
     "Income",
-    "Variable Player Powers"
+    "Tile Placement",
+    "Tags",
+    "Variable Player Powers",
+    "Turn Order",
+    "Drafting",
+    "Tableau Building",
+    "Hand Management",
+    "Territory Building",
+    "Contracts",
+    "Variable Set-up"
   ],
   "min_age": 12,
   "min_players": 1,
   "min_playing_time": 120,
   "name": "Terraforming Mars",
   "niches": [
-    "niche_3",
-    "niche_4",
-    "niche_36",
-    "niche_36",
-    "niche_40"
+    "Cooperative Dice Strategy",
+    "Family Abstract Tile Placement",
+    "Contract Worker Placement Games",
+    "Industrial Economic Strategy"
   ],
   "player_count_scores": {
     "1": 0.42,
@@ -161,34 +151,6 @@
     "5+": 0.01
   },
   "playing_time": 120,
-  "properties": [
-    "Tags",
-    "Science",
-    "Drafting",
-    "Take That",
-    "Contracts",
-    "Tableau Building",
-    "Tile Placement",
-    "Variable Set-up",
-    "Territory Building",
-    "Hand Management",
-    "Nature",
-    "Industry / Manufacturing",
-    "End Game Bonuses",
-    "Solitaire",
-    "Digital Implementation",
-    "Economic",
-    "Map",
-    "Turn Order",
-    "Grid",
-    "Civilization",
-    "Income",
-    "Science Fiction",
-    "Space",
-    "Strategy",
-    "Variable Player Powers",
-    "Engineering"
-  ],
   "publishers": [
     "FryxGames",
     "Arclight Games",
@@ -220,11 +182,11 @@
   ],
   "ranks": [
     {
-      "name": "Overall Rank",
+      "name": "Overall",
       "value": 9
     },
     {
-      "name": "Strategy Rank",
+      "name": "Strategy",
       "value": 8
     }
   ],
@@ -237,19 +199,19 @@
   ],
   "themes": [
     "Science",
-    "Nature",
     "Civilization",
-    "Science Fiction",
+    "Nature",
+    "Engineering",
     "Space",
-    "Engineering"
+    "Science Fiction"
   ],
   "thumbnail": "https://cf.geekdo-images.com/wg9oOLcsKvDesSUdZQ4rxw__small/img/BTxqxgYay5tHJfVoJ2NF5g43_gA=/fit-in/200x150/filters:strip_icc()/pic3536616.jpg",
   "types": [
-    "Take That",
     "Industry / Manufacturing",
     "Solitaire",
+    "Strategy",
     "Economic",
-    "Strategy"
+    "Take That"
   ],
   "versions": [
     {

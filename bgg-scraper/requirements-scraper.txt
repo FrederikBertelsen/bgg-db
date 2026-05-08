@@ -1,0 +1,6 @@
+bgg-api
+dotenv
+pandas
+playwright
+web-automator @ git+https://github.com/FrederikBertelsen/web-automator.git
+cloudscraper

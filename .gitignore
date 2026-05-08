@@ -1,1 +1,7 @@
-/bgg-scraper/data/scrape_metadata.csv
+/data/final/**
+/data/ranks/**
+
+!/data/final/.gitkeep
+!/data/ranks/.gitkeep
+
+/data/scrape_metadata.csv

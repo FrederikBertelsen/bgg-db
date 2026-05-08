@@ -1,0 +1,26 @@
+version: "3.9"
+services:
+  api:
+    build:
+      context: .
+      dockerfile: bgg-api/Dockerfile
+    container_name: bgg_api
+    ports:
+      - "8443:8443"
+    volumes:
+      - ./data:/app/data:ro
+    restart: unless-stopped
+
+  scraper:
+    profiles:
+      - scraper
+    build:
+      context: .
+      dockerfile: bgg-scraper/Dockerfile
+    init: true
+    ipc: host
+    volumes:
+      - ./data:/app/data
+      - ./bgg-scraper/cookies:/app/cookies
+      - ./bgg-scraper/.env:/app/.env:ro
+    restart: unless-stopped

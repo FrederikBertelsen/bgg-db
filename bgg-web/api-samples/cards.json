@@ -7,19 +7,18 @@
     "min_playing_time": 120,
     "name": "Terraforming Mars",
     "niches": [
-      "niche_3",
-      "niche_4",
-      "niche_36",
-      "niche_36",
-      "niche_40"
+      "Cooperative Dice Strategy",
+      "Family Abstract Tile Placement",
+      "Contract Worker Placement Games",
+      "Industrial Economic Strategy"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 9
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 8
       }
     ],
@@ -38,15 +37,15 @@
     "min_playing_time": 60,
     "name": "Monopoly",
     "niches": [
-      "niche_3"
+      "Economic Auction Set Collection Games"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 30558
       },
       {
-        "name": "Family Rank",
+        "name": "Family",
         "value": 3596
       }
     ],

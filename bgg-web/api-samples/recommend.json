@@ -7,25 +7,54 @@
     "min_playing_time": 60,
     "name": "Nippon: Zaibatsu",
     "niches": [
-      "niche_36",
-      "niche_40"
+      "Contract Worker Placement Games",
+      "Industrial Economic Strategy"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 969
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 454
       }
     ],
     "rating": 8.58592,
-    "score": 0.6433759298021096,
+    "score": 0.5894575798021096,
     "short_description": "Control conglomerates of companies driving Japan’s economy.",
     "thumbnail": "https://cf.geekdo-images.com/bOs_Um4cUUOpKnypCMykJA__small/img/WLGTv9N3yOkGWZSki-c0nc-L_oY=/fit-in/200x150/filters:strip_icc()/pic8844519.png",
     "weight": 3.592,
     "year_published": 2026
+  },
+  {
+    "id": "316795",
+    "max_players": 4,
+    "max_playing_time": 180,
+    "min_players": 1,
+    "min_playing_time": 90,
+    "name": "Legends of Void",
+    "niches": [
+      "Family Abstract Tile Placement",
+      "Territory Control Strategy",
+      "Contract Worker Placement Games"
+    ],
+    "ranks": [
+      {
+        "name": "Overall",
+        "value": 4734
+      },
+      {
+        "name": "Strategy",
+        "value": 1877
+      }
+    ],
+    "rating": 7.7545,
+    "score": 0.5400845776473879,
+    "short_description": "Heroes compete against each other to save Outer Lands from the Void.",
+    "thumbnail": "https://cf.geekdo-images.com/Mv9T2Pq3ZWlNS_2t_iVnfw__small/img/EhOEAHL1mMO6KyIM5pelQwtU_Gk=/fit-in/200x150/filters:strip_icc()/pic7371750.png",
+    "weight": 4.093,
+    "year_published": 2022
   },
   {
     "id": "310873",
@@ -35,21 +64,21 @@
     "min_playing_time": 90,
     "name": "Carnegie",
     "niches": [
-      "niche_16",
-      "niche_40"
+      "Family Route Building Games",
+      "Industrial Economic Strategy"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 127
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 82
       }
     ],
     "rating": 7.95997,
-    "score": 0.6337548819389835,
+    "score": 0.5174366986056502,
     "short_description": "Become the most influential entrepreneur and benefactor of your era!",
     "thumbnail": "https://cf.geekdo-images.com/0qxz9DRRhsJrIW1TJ-kz0w__small/img/ma4yc5wbMVrfbg9r21-LxGVwRKw=/fit-in/200x150/filters:strip_icc()/pic5710736.jpg",
     "weight": 3.8163,
@@ -63,81 +92,52 @@
     "min_playing_time": 100,
     "name": "Sweet Lands",
     "niches": [
-      "niche_3"
+      "Cooperative Dice Strategy"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
+        "name": "Overall",
         "value": 1361
       },
       {
-        "name": "Strategy Rank",
+        "name": "Strategy",
         "value": 670
       }
     ],
     "rating": 8.16146,
-    "score": 0.6070600926899927,
+    "score": 0.5122727926899927,
     "short_description": "Build the richest candy empire to claim the crown of confections.",
     "thumbnail": "https://cf.geekdo-images.com/qmCyTIgGhdSON0bMUk8qjQ__small/img/7NwXv2G1UPErGTvHHm-R6wdYsoY=/fit-in/200x150/filters:strip_icc()/pic8329173.jpg",
     "weight": 4.1527,
     "year_published": 2025
   },
   {
-    "id": "316795",
+    "id": "175695",
     "max_players": 4,
-    "max_playing_time": 180,
-    "min_players": 1,
-    "min_playing_time": 90,
-    "name": "Legends of Void",
-    "niches": [
-      "niche_2",
-      "niche_4",
-      "niche_25",
-      "niche_36"
-    ],
-    "ranks": [
-      {
-        "name": "Overall Rank",
-        "value": 4734
-      },
-      {
-        "name": "Strategy Rank",
-        "value": 1877
-      }
-    ],
-    "rating": 7.7545,
-    "score": 0.5952499943140547,
-    "short_description": "Heroes compete against each other to save Outer Lands from the Void.",
-    "thumbnail": "https://cf.geekdo-images.com/Mv9T2Pq3ZWlNS_2t_iVnfw__small/img/EhOEAHL1mMO6KyIM5pelQwtU_Gk=/fit-in/200x150/filters:strip_icc()/pic7371750.png",
-    "weight": 4.093,
-    "year_published": 2022
-  },
-  {
-    "id": "220308",
-    "max_players": 4,
-    "max_playing_time": 150,
+    "max_playing_time": 90,
     "min_players": 1,
     "min_playing_time": 60,
-    "name": "Gaia Project",
+    "name": "Minerva",
     "niches": [
-      "niche_3",
-      "niche_16"
+      "Family Abstract Tile Placement",
+      "Contract Worker Placement Games",
+      "Family Construction Strategy Games"
     ],
     "ranks": [
       {
-        "name": "Overall Rank",
-        "value": 13
+        "name": "Overall",
+        "value": 4154
       },
       {
-        "name": "Strategy Rank",
-        "value": 9
+        "name": "Strategy",
+        "value": 1727
       }
     ],
-    "rating": 8.352,
-    "score": 0.5747067004870049,
-    "short_description": "Expand, research, upgrade, and settle the galaxy with one of 14 alien species.",
-    "thumbnail": "https://cf.geekdo-images.com/hGWFm3hbMlCDsfCsauOQ4g__small/img/NNG7Ijyx4evp5gcVReis9i0koas=/fit-in/200x150/filters:strip_icc()/pic5375625.png",
-    "weight": 4.4036,
-    "year_published": 2017
+    "rating": 6.75887,
+    "score": 0.48746569947172336,
+    "short_description": "Manage and develop an ancient Roman city to earn the favour of the goddess Minerva.",
+    "thumbnail": "https://cf.geekdo-images.com/nRgXwRVYgqI6U-R8ibaH0w__small/img/3vOAabZdwiKFr6XJnV8cXmtG0pY=/fit-in/200x150/filters:strip_icc()/pic3464116.png",
+    "weight": 2.775,
+    "year_published": 2015
   }
 ]
