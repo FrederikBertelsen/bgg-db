@@ -1,12 +1,18 @@
 # app.py
+import os
+
+from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 import pandas as pd
 import datetime
 
 from boardgame_db import BoardGameDB
 from data_conversion import *
+from utils import clear_cache
 
 app = Flask(__name__)
+load_dotenv()
+
 db = BoardGameDB()
 
 @app.route("/games/<int:id>")
@@ -118,6 +124,25 @@ def recommend_games(game_id: str): # list[game_card]
         return jsonify([])
 
     return to_json_cards(recs)
+
+
+@app.route("/update-db", methods=["GET", "POST"])
+@app.route("/update_db", methods=["GET", "POST"])
+def update_db():
+    payload = request.get_json(silent=True) or {}
+    key = request.args.get("key", default=payload.get("key", ""), type=str)
+    if key != os.getenv("UPDATE_DB_KEY"):
+        return jsonify({"error": "Unauthorized"}), 401
+
+    global db
+
+    print(f"[{datetime.datetime.now()}] update-db")
+    try:
+        clear_cache()
+        db = BoardGameDB()
+        return jsonify({"message": "Database updated successfully"})
+    except Exception as e:
+        return jsonify({"error": "Failed to update database", "details": str(e)}), 500
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8443, debug=True)

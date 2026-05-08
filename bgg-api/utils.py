@@ -4,13 +4,16 @@ import os
 import pandas as pd
 from recommender_v2 import _ensure_list
 
-def clear_cache_folder() -> None:
+def clear_cache() -> None:
     print("\nClearing cache folder...\n")
     path = "data/cache"
     for filename in os.listdir(path):
         file_path = os.path.join(path, filename)
         if os.path.isfile(file_path):
             os.remove(file_path)
+    
+    if os.path.exists("data/mechanic_importances.csv"):
+        os.remove("data/mechanic_importances.csv")
 
 
 def collect_unique_values(df_games: pd.DataFrame, column: str) -> set[str]:

@@ -59,6 +59,21 @@ def main():
                 os.remove(path)
         except Exception:
             pass
+    
+    # send update signal to api container:
+    database_update_key = os.getenv("UPDATE_DB_KEY")
+    api_url = os.getenv("API_URL")
+    if database_update_key and api_url:
+        print(f"\nSending database update signal to API at {api_url}...\n")
+        try:
+            import requests
+            response = requests.post(f"{api_url}/update-db", json={"key": database_update_key})
+            if response.status_code == 200:
+                print("Database update signal sent successfully.")
+            else:
+                print(f"Failed to send database update signal. Status code: {response.status_code}")
+        except Exception as e:
+            print(f"Error sending database update signal: {e}")
 
 if __name__ == "__main__":
     main()
