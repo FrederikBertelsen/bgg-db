@@ -1,6 +1,7 @@
 # app.py
 from flask import Flask, jsonify, request
 import pandas as pd
+import datetime
 
 from boardgame_db import BoardGameDB
 from data_conversion import *
@@ -10,6 +11,7 @@ db = BoardGameDB()
 
 @app.route("/games/<int:id>")
 def game(id: int): # full_game_info
+    print(f"[{datetime.datetime.now()}] games {id}")
     row = db.get_game_by_id(str(id))
     if row is None:
         return jsonify({"error": "Game not found", "id": id}), 404
@@ -18,6 +20,7 @@ def game(id: int): # full_game_info
 
 @app.route("/cards/<ids_str>")
 def cards(ids_str: str): # list[game_card]
+    print(f"[{datetime.datetime.now()}] cards {ids_str}")
     ids = [i for i in ids_str.split(",") if i.isdigit()]
     if not ids:
         return jsonify({"error": "No valid game IDs provided"}), 400
@@ -33,6 +36,7 @@ def cards(ids_str: str): # list[game_card]
 
 @app.route("/niches/<niche_name>")
 def niche(niche_name: str): # niche_info
+    print(f"[{datetime.datetime.now()}] niche {niche_name}")
     row = db.get_niche_by_name(niche_name)
     if row is None:
         return jsonify({"error": "Niche not found", "name": niche_name}), 404
@@ -47,6 +51,7 @@ def niche(niche_name: str): # niche_info
 
 @app.route("/niches/<niche_name>/games")
 def niche_games(niche_name: str): # list[game_card]
+    print(f"[{datetime.datetime.now()}] niche_games {niche_name}")
     row = db.get_niche_by_name(niche_name)
     if row is None:
         return jsonify({"error": "Niche not found", "name": niche_name}), 404
@@ -67,6 +72,7 @@ def niche_games(niche_name: str): # list[game_card]
 
 @app.route("/search/<search_term>")
 def search(search_term: str): # list[game_card]
+    print(f"[{datetime.datetime.now()}] search {search_term}")
     if not search_term:
         return jsonify({"error": "Empty search term"}), 400
 
@@ -84,6 +90,7 @@ def search(search_term: str): # list[game_card]
 
 @app.route("/autocomplete/<search_term>")
 def autocomplete_search(search_term: str): # list[str]
+    print(f"[{datetime.datetime.now()}] autocomplete {search_term}")
     if not search_term:
         return jsonify({"error": "Empty query"}), 400
     
@@ -99,6 +106,7 @@ def autocomplete_search(search_term: str): # list[str]
 
 @app.route("/recommend/<game_id>")
 def recommend_games(game_id: str): # list[game_card]
+    print(f"[{datetime.datetime.now()}] recommend {game_id}")
     n = request.args.get("n", default=10, type=int)
 
     try:
