@@ -1,5 +1,6 @@
-flask
+dotenv
+Flask
+gunicorn
+networkx
 pandas
 thefuzz
-gunicorn
-werkzeug
