@@ -1,5 +1,5 @@
 flask
 pandas
 thefuzz
-uvicorn
+gunicorn
 werkzeug
