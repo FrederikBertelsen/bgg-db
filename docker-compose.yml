@@ -7,7 +7,7 @@ services:
     ports:
       - "8443:8443"
     volumes:
-      - ./data:/app/data:ro
+      - ./data:/app/data
     restart: unless-stopped
 
   scraper:
