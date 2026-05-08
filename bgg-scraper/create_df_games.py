@@ -298,8 +298,11 @@ def create_df_games(json_data: list[dict]) -> pd.DataFrame:
         'minage': 'min_age',
     }, inplace=True)
 
-    df_games = df_games[(df_games['accessory'] == False) & (df_games['expansion'] == False)]
-    df_games.drop(columns=['accessory', 'expansion'], inplace=True)
+    try:
+        df_games = df_games[(df_games['accessory'] == False) & (df_games['expansion'] == False)]
+        df_games.drop(columns=['accessory', 'expansion'], inplace=True)
+    except KeyError:
+        pass
 
     # if "Accessory" or "RPG Item" in a rank name, drop row
     df_games = df_games[~df_games['stats'].apply(lambda s: any('Accessory' in r.get('friendlyname', '') or 'RPG Item' in r.get('friendlyname', '') for r in s.get('ranks', []) if isinstance(s, dict) and isinstance(s.get('ranks'), list)))]
