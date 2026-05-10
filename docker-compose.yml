@@ -21,5 +21,6 @@ services:
     volumes:
       - ./data:/app/data
       - ./bgg-scraper/cookies:/app/cookies
-      - ./bgg-scraper/.env:/app/.env:ro
+    env_file:
+      - ./bgg-scraper/.env
     restart: unless-stopped
