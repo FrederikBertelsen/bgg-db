@@ -247,7 +247,7 @@ def score_connection(
     }
 
 
-def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 10, weights: dict | None = None, print_results: bool = False) -> pd.DataFrame:
+def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 10, min_score: float = 0.0, min_rating: float = 0.0, weights: dict | None = None, print_results: bool = False) -> pd.DataFrame:
     """Recommender using p_ columns: p_types, p_mechanics, p_components, p_themes.
     
     Each property type gets its own weight for fine-grained control.
@@ -257,6 +257,8 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         df: dataframe with game details.
         method: reserved (only 'simple' supported now).
         k: number of results to return.
+        min_score: minimum similarity score for a game to be recommended.
+        min_rating: minimum rating for a game to be recommended.
         weights: dict with keys `types`, `mech`, `comp`, `themes`, `niches`, `rating`, `weight` controlling contribution.
         print_results: whether to print the recommended games.
 
@@ -315,7 +317,7 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
 
     weight_sim_series = cands['weight'].apply(weight_sim)
 
-    score = (
+    score = round((
         weights.get('types', 0) * types_sim
         + weights.get('mech', 0) * mech_sim
         + weights.get('comp', 0) * comp_sim
@@ -323,10 +325,14 @@ def recommend(game_id: Any, df: pd.DataFrame, method: str = 'simple', k: int = 1
         + weights.get('niches', 0) * niches_sim
         + weights.get('rating', 0) * rating_sim_series
         + weights.get('weight', 0) * weight_sim_series
-    )
+    ), 3)
 
     out = cands.copy()
     out['score'] = score
+
+    # Filter by minimum score and rating thresholds
+    out = out[out['score'] >= min_score]
+    out = out[out['rating'] >= min_rating]
 
     if print_results:
         print(f"Recommendations for '{seed['name']}' (id={game_id}):")

@@ -136,7 +136,7 @@ class BoardGameDB:
             return []
         return self.search_engine.autocomplete_search(searchTerm, n=n, threshold=threshold)
 
-    def recommend_games(self, id: str, n: int = 5) -> pd.DataFrame | None:
+    def recommend_games(self, id: str, n: int = 10, min_score: float = 0.0, min_rating: float = 0.0) -> pd.DataFrame | None:
         """
         Return a list of up to `n` dicts for board games recommended based on the
         game with the given `id`. Recommendations are determined by the `recommended`
@@ -149,7 +149,7 @@ class BoardGameDB:
         if game is None or game.empty:
             return None
         
-        recommendations = recommend(id, self.df_games, k=n, print_results=False)
+        recommendations = recommend(id, self.df_games, k=n, min_score=min_score, min_rating=min_rating, print_results=False)
 
         return recommendations
     
@@ -278,6 +278,67 @@ class BoardGameDB:
     def load_categorization_data_and_categorize_properties(self) -> None:
         self.property_categorizations = load_or_create_property_categorizations(self.df_games)
 
+    def add_polarization_columns(self) -> None:
+        """Add user-facing polarization fields derived from rating variance and volume."""
+        if self.df_games.empty:
+            return
+
+        if "rating_stddev" not in self.df_games.columns:
+            self.df_games["polarization"] = pd.Series(
+                [
+                    {
+                        "percentile": None,
+                        "score": None,
+                        "label": None,
+                        "confidence": "unknown",
+                    }
+                    for _ in range(len(self.df_games))
+                ],
+                index=self.df_games.index,
+                dtype="object",
+            )
+            return
+
+        stddev = pd.to_numeric(self.df_games["rating_stddev"], errors="coerce")
+
+        # Percentile is easier to explain than raw stddev to end users.
+        percentile = stddev.rank(pct=True, method="average")
+        # score = (percentile * 100).round().astype("Int64")
+
+        label = pd.Series(pd.NA, index=self.df_games.index, dtype="object")
+        label[(percentile >= 0.00) & (percentile < 0.25)] = "Low"
+        label[(percentile >= 0.25) & (percentile < 0.75)] = "Moderate"
+        label[(percentile >= 0.75) & (percentile < 0.90)] = "High"
+        label[percentile >= 0.90] = "Very High"
+
+        if "rating_count" in self.df_games.columns:
+            count_series = pd.to_numeric(self.df_games["rating_count"], errors="coerce")
+        elif "usersrated" in self.df_games.columns:
+            count_series = pd.to_numeric(self.df_games["usersrated"], errors="coerce")
+        else:
+            count_series = pd.Series(pd.NA, index=self.df_games.index, dtype="Float64")
+
+        confidence = pd.Series("unknown", index=self.df_games.index, dtype="object")
+        confidence[count_series < 30] = "low"
+        confidence[(count_series >= 30) & (count_series < 100)] = "medium"
+        confidence[count_series >= 100] = "high"
+
+        polarization_df = pd.DataFrame(
+            {
+                "percentile": (percentile * 100).round().astype("Int64"),
+                # "score": score,
+                "label": label,
+                "confidence": confidence,
+            },
+            index=self.df_games.index,
+        )
+        self.df_games["polarization"] = pd.Series(
+            polarization_df.where(pd.notna(polarization_df), None).to_dict(orient="records"),
+            index=self.df_games.index,
+            dtype="object",
+        )
+
+
 
     def load_data(self) -> None:
         self.df_games = load_merged_data()
@@ -315,6 +376,8 @@ class BoardGameDB:
             self.cache_recommendations()
 
             self.df_games.drop(columns=["families", "properties", "categories"], inplace=True, errors="ignore")
+
+        self.add_polarization_columns()
 
         # Always calculate unique values (regardless of cache state)
         self.cache_unique_mechanics()

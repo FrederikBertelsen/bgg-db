@@ -6,9 +6,28 @@ import numpy as np
 from numbers import Integral, Real
 import json
 
-def to_json_full(input: pd.Series) -> Response:
+def bgg_injection_data(input: pd.Series) -> dict:
+    data = {
+        "id": input["id"],
+        "estimated_volume_cm3": input["estimated_volume_cm3"],
+        "estimated_weight_kg": input["estimated_weight_kg"],
+        "player_count_scores": input["player_count_scores"],
+        "recommendations": input.get("recommendations", []),
+        "rating_stddev": input.get("rating_stddev", None),
+        "types": input.get("types", []),
+        "components": input.get("components", []),
+        "themes": input.get("themes", []),
+        "mechanics": input.get("mechanics", []),
+        "tags": input.get("tags", []),
+        "niches": input.get("niches", []),
+        "polarization": input.get("polarization", None)
+    }
+    return _normalize_dict(data)
+
+
+def to_json_full(input: pd.Series) -> dict:
     input['description'] = input['description'].replace(r'\n', '\n').strip()
-    return jsonify(_normalize_dict(input.to_dict()))
+    return _normalize_dict(input.to_dict())
 
 
 def to_json_card(input: pd.Series) -> dict:
@@ -26,14 +45,15 @@ def to_json_card(input: pd.Series) -> dict:
         "max_playing_time": input["max_playing_time"],
         "thumbnail": input["thumbnail"],
         "niches": input.get("niches", []),
-        "score": input.get("score", None)
+        "score": input.get("score", None),
+        "polarization": input.get("polarization", None)
     }
 
     return _normalize_dict(card)
 
 
-def to_json_cards(input: pd.DataFrame) -> Response:
-    return jsonify([to_json_card(row) for _, row in input.iterrows()])
+def to_json_cards(input: pd.DataFrame) -> list[dict]:
+    return [to_json_card(row) for _, row in input.iterrows()]
 
 
 def _normalize_value(v):

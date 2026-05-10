@@ -22,7 +22,7 @@ def game(id: int): # full_game_info
     if row is None:
         return jsonify({"error": "Game not found", "id": id}), 404
     
-    return to_json_full(row)
+    return jsonify(to_json_full(row))
 
 @app.route("/cards/<ids_str>")
 def cards(ids_str: str): # list[game_card]
@@ -38,7 +38,7 @@ def cards(ids_str: str): # list[game_card]
     if rows is None or len(rows) == 0:
         return jsonify({"error": "No games found for provided IDs"}), 404
 
-    return to_json_cards(rows)
+    return jsonify(to_json_cards(rows))
 
 @app.route("/niches/<niche_name>")
 def niche(niche_name: str): # niche_info
@@ -53,7 +53,7 @@ def niche(niche_name: str): # niche_info
     row["games"] = [to_json_card(game_row) for _, game_row in game_rows.iterrows()] if game_rows is not None else []
     row.pop("games_ids")
 
-    return to_json_full(row)
+    return jsonify(to_json_full(row))
 
 @app.route("/niches/<niche_name>/games")
 def niche_games(niche_name: str): # list[game_card]
@@ -74,7 +74,7 @@ def niche_games(niche_name: str): # list[game_card]
     if rows is None or len(rows) == 0:
         return jsonify({"error": "No games found for provided IDs"}), 404
 
-    return to_json_cards(rows)
+    return jsonify(to_json_cards(rows))
 
 @app.route("/search/<search_term>")
 def search(search_term: str): # list[game_card]
@@ -91,7 +91,7 @@ def search(search_term: str): # list[game_card]
     if isinstance(rows, (list, tuple)):
         rows = rows[:n]
 
-    return to_json_cards(rows)
+    return jsonify(to_json_cards(rows))
 
 
 @app.route("/autocomplete/<search_term>")
@@ -114,20 +114,37 @@ def autocomplete_search(search_term: str): # list[str]
 def recommend_games(game_id: str): # list[game_card]
     print(f"[{datetime.datetime.now()}] recommend {game_id}")
     n = request.args.get("n", default=10, type=int)
+    min_score = request.args.get("min_score", default=0.5, type=float)
+    min_rating = request.args.get("min_rating", default=6.5, type=float)
 
     try:
-        recs = db.recommend_games(game_id, n=n)
+        recs = db.recommend_games(game_id, n=n, min_score=min_score, min_rating=min_rating)
     except ValueError:
         return jsonify({"error": "Game not found", "id": game_id}), 404
 
     if recs is None or len(recs) == 0:
         return jsonify([])
 
-    return to_json_cards(recs)
+    return jsonify(to_json_cards(recs))
+
+@app.route("/injection/<game_id>")
+def bgg_injection(game_id: str): # dict
+
+    min_score = request.args.get("min_score", default=0.5, type=float)
+    min_rating = request.args.get("min_rating", default=6.5, type=float)
+        
+    print(f"[{datetime.datetime.now()}] injection {game_id}")
+    row = db.get_game_by_id(game_id)
+    if row is None:
+        return jsonify({"error": "Game not found", "id": game_id}), 404
+    
+    recommendations = db.recommend_games(game_id, n=20, min_score=min_score, min_rating=min_rating)
+    row["recommendations"] = to_json_cards(recommendations) if recommendations is not None else []
+    
+    return jsonify(bgg_injection_data(row))
 
 
 @app.route("/update-db", methods=["GET", "POST"])
-@app.route("/update_db", methods=["GET", "POST"])
 def update_db():
     payload = request.get_json(silent=True) or {}
     key = request.args.get("key", default=payload.get("key", ""), type=str)
