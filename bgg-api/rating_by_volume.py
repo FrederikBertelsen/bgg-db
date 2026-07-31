@@ -12,6 +12,8 @@ from boardgame_db import BoardGameDB
 db = BoardGameDB()
 df_games = db.df_games
 
+df_games['url'] = df_games['id'].apply(lambda x: f"https://boardgamegeek.com/boardgame/{x}")
+
 # print(df_games.columns)
 # exit()
 
@@ -40,7 +42,7 @@ normalized_rating = (df_games['rating'] - min_rating) / (max_rating - min_rating
 normalized_volume = (df_games['estimated_volume_cm3'] - min_volume) / (max_volume - min_volume)
 
 df_games['value'] = (
-    RATING_WEIGHT * normalized_rating +
+    RATING_WEIGHT * (1 - normalized_rating) +
     VOLUME_WEIGHT * (1 - normalized_volume)  # lower volume is better
 )
 
@@ -65,4 +67,6 @@ print("\n"*3)
 specific_game_ids = ['220', '5782', '284083', '324856', '131357', '427593', '277085', '92415', '206915', '223770', '230253']
 #find specific games by id and print their name, rating, volume and value rank (the placement in the sorted list)
 df_specific_games = df_games[df_games['id'].isin(specific_game_ids)]
+
+
 print(df_specific_games[['name', 'rating', 'volume', 'value', 'value_rank', 'url']].to_string(index=False))
